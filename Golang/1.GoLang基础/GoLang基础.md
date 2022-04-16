@@ -72,7 +72,6 @@
 >
 > go.sum 记录依赖数
 >
-> 
 
 ####  **GO基础语法**
 
@@ -246,9 +245,9 @@
 >   >   >
 >   >   > ~~~go
 >   >   > type slice struct{
->   >   >   array unsafe.Pointer
->   >   >   len int
->   >   >   cap int
+>   >   > array unsafe.Pointer
+>   >   > len int
+>   >   > cap int
 >   >   > }
 >   >   > ~~~
 >   >   >
@@ -266,7 +265,7 @@
 >   >   >
 >   >   > 大于1024个元素以增长因子1.25进行扩容
 >   >
->   
+>
 > - map
 >
 >   > ~~~go
@@ -276,7 +275,7 @@
 >   > value,isExit = map[key]
 >   > // map 遍历 非顺序遍历，需要对key进行排序后 顺序取值
 >   > for k，v:=range map{
->   >   
+>   > 
 >   > }
 >   > ~~~
 >   >
@@ -312,9 +311,9 @@
 >   >   >
 >   >   > type 类型名 struct{
 >   >   >
->   >   >   字段名 字段类型
+>   >   > 字段名 字段类型
 >   >   >
->   >   >   字段名 字段类型
+>   >   > 字段名 字段类型
 >   >   >
 >   >   > }
 >   >   >
@@ -326,12 +325,58 @@
 >   >
 >   >   > ```go
 >   >   > // 接受者变量指定 方法属于那个struct结构体
->   >   > //接收者类型：接收者类型和参数类似，可以是指针类型和非指针类型。
+>   >   > //接收者类型：指针类型和非指针类型。非指针类型参数不会更改原对象属性
 >   >   > // 函数不属于任何类型，方法属于特定的类型。
+>   >   > // GO中任何类型都可以拥有方法，非本地类型不能定义方法
 >   >   > func (接收者变量 接收者类型) 方法名(参数列表) (返回参数) {
->   >   >         函数体
->   >   >     } 
+>   >   >   函数体
+>   >   > } 
 >   >   > ```
+>   >
+>   > - 结构体匿名字段
+>   >
+>   >   > ~~~go
+>   >   > // 匿名字段，不需要指定属性名
+>   >   > type Person struct{
+>   >   >  string
+>   >   >  int
+>   >   > }
+>   >   > // 嵌套结构体
+>   >   > type Address struct{
+>   >   >  Province string
+>   >   >  City string
+>   >   >  // 嵌套其他结构体
+>   >   >  Person Person
+>   >   > }
+>   >   > type Animal struct{
+>   >   >  name string
+>   >   > }
+>   >   > // 复写 Animal中方法
+>   >   > func (a *Animal) move(){
+>   >   > 
+>   >   > }
+>   >   > ~~~
+>   >
+>   > - 结构体字段的可见性
+>   >
+>   >   > **结构体中字段大写开头表示可公开访问，小写表示私有（仅在定义当前结构体的包中可访问）**
+>   >
+>   > - 结构体标签(Tag)
+>   >
+>   >   > Tag是结构体的元信息，可以在运行时通过反射读取
+>   >   >
+>   >   > 结构体标签由一个或者多个键值对组成，键值之间使用冒号分割
+>   >   >
+>   >   > ~~~go
+>   >   > //Student 学生
+>   >   > type Student struct {
+>   >   >  ID     int    `json:"id"` //通过指定tag实现json序列化该字段时的key
+>   >   >  Gender string //json序列化是默认使用字段名作为key
+>   >   >  name   string //私有不能被json包访问
+>   >   > }
+>   >   > ~~~
+>   >   >
+>   >   > 
 >
 > ---
 >
@@ -395,7 +440,101 @@
 >
 >   > 1. go语言程序的主入口函数
 >
+
+#### **流程控制**
+
+> - select语句
+>
+>   > select 语句类似于 switch 语句，但是select会随机执行一个可运行的case。如果没有case可运行，它将阻塞，直到有case可运行。
+>   >
+>   > ~~~go
+>   > // 每个case必须时通讯
+>   > // 所有的channel表达式都被求值
+>   > //存在某个通讯可以执行（并发下公平选出一个case执行），就进行执行，忽略其他case
+>   > // 如果没有default语句，select被阻塞，直到由case可以运行
+>   > select {
+>   > communication clause  :
+>   >     statement(s);   
+>   >    default:
+>   >   statement(s);
+>   > }
+>   > ~~~
+>   >
+>   > - 处理异步IO操作，select会监听case语句中channel的读写操作，当case中channel读写操作为非阻塞状态（即能读写）时，将会触发相应的动作。
+>   >
+>   > - select中的default子句总是可运行的。（如果没有可运行的case语句，且有default语句，那么就会执行default的动作。）
+>   >
+>   > 
+>
+> - range/for语句
+>
+>   > - for init;condition;post{}
+>   > - for condititon {} 等于 while
+>   > - range迭代器 返回(索引，值) 或（键，值） 可以对slice，map，数组，字符串进行迭代循环
+
+#### **函数与方法**
+
+> **函数：**
+>
+> - 不支持嵌套，重载，默认参数（一个包不能有同名函数）
+> - 支持多返回值，匿名函数，闭包，赋值变量
+>
+> ~~~go
+> // 入参为函数
+> func test(fn func() int) int {
+>     return fn()
+> }
+> // 定义函数类型
+> type FormatFunc func(s sting,x,y int) string
+> func format(fn FormatFunc, s string, x, y int) string {
+>     return fn(s, x, y)
+> }
+> // map,slice,chan ,指针，interface以外都是按值传递
+> // 0个或者多个参数
+> func myfunce(args ...int){ 
 > 
-
-
-
+> }
+> // 使用slice作为参数是 (slice...) 格式入参
+> 
+> ~~~
+>
+> - 匿名函数
+>
+>   ~~~go
+>   func main(){
+>       // 不存在函数名，只有引用对象getSqrt
+>       getSqrt := func(a float64) float64{
+>           return math.Sqrt(a)
+>       }
+>       fmt.Println(getSqrt(4))
+>   }
+>   ~~~
+>
+> - 闭包、递归
+>
+>   ~~~go
+>   // 闭包 = 函数 + 引用环境
+>   // a函数 返回一个int类型函数
+>   func a() func()int{
+>       //函数a 局部变量
+>       i:=0
+>       b:=func()int{
+>           // 匿名函数b使用函数a的局部变量操作
+>           i++
+>           fmt.Println(i)
+>           return i
+>       }
+>       // 延迟引用
+>       return b
+>   }
+>   func main(){
+>       c := a()
+>       c()  // 1
+>       c()  // 2
+>       c() // 3
+>       // 只执行a() 函数未对返回的b进行操作
+>       a() // 无打印
+>   }
+>   ~~~
+>
+> 
