@@ -645,4 +645,50 @@
 > func (recevier type) methodMane(参数列表)(返回值列表){}
 > ~~~
 >
+
+#### **接口**
+
+> 接口（interface）定义了一个对象的行为规范，只定义规范不实现，由具体的对象来实现规范的细节。
+>
+> ~~~go
+> // 命名规范 接口命名结尾er表示
+> type 接口类型名称 interface{
+>     // method ....
+> }
+>  //接口定义
+> type writer interface{
+>     Write([]byte) error
+> }
+> // 接口实现 与接口方法同名，使用接口类型代替具体实现类型
+> func main() {
+>     // 声明接口Mover  
+>     var x Mover
+>     var wangcai = dog{} // 旺财是dog类型
+>     x = wangcai         // x可以接收dog类型
+>     var fugui = &dog{}  // 富贵是*dog类型
+>     x = fugui           // x可以接收*dog类型
+>     x.move()
+> } 
+> //接口嵌套
+> type Sayer interface{
+>     say()
+> }
+> type Mover interface{
+>     move()
+> }
+> type animal interface{
+>     Sayer
+>     MOber
+> }
+> type cat struct{
+>     name string
+> }
+> // 使用接口代替实参
+> var x animal = cat{name:"~~~"}
+> x.move()
+> x.say()
+> // 空接口 
+> //空接口类型的变量可以存储任意类型的变量。
+> ~~~
+>
 > 
