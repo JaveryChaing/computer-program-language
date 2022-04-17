@@ -376,7 +376,6 @@
 >   >   > }
 >   >   > ~~~
 >   >   >
->   >   > 
 >
 > ---
 >
@@ -536,5 +535,43 @@
 >       a() // 无打印
 >   }
 >   ~~~
+>   
+> - GO延迟调用
+>   
+>   > 1. defer语句在函数**return前执行**（多个defer按先进后出方式执行）
+>   > 2. defer类似finally操作用于关闭资源
+>   >
+>   > 3. defer语句执行时候，函数调用的参数会被保存起来，非执行
+>   > 4. defer 语句执行函数时，拷贝的是函数指针，执方法时拷贝的是方法值参
+>
+
+#### **异常处理**
+
+> - panic 抛出异常
+>
+>   > 类似throw，终止其后执行的代码
+>
+> - recover 捕获异常
+>
+>   > 类似try，捕获panic，不影响应用后续功能
+>
+> - defer
+>
+>   > - 利用recover处理panic指令，defer 必须放在 panic 之前定义，另外 recover 只有在 defer 调用的函数中才有效。否则当panic时，recover无法捕获到panic，无法防止panic扩散。
+>   > - recover 处理异常后，逻辑并不会恢复到 panic 那个点去，函数跑到 defer 之后的那个点。
+>
+> ~~~go
+> defer func() {
+> 		err := recover()
+> 		if err != nil {
+> 		 println(err.(string))
+> 		}
+> 	}()
+> 	panic("------")
+> ~~~
 >
 > 
+>
+> 
+>
+>  
