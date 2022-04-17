@@ -19,6 +19,7 @@
 > - path 添加扩充依赖目录（golang依赖仓库）
 > - GOPATH 工作目录
 > - go env 获取go环境及参数
+> - 
 >
 > GO语言主要特征
 >
