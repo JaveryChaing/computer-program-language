@@ -60,7 +60,7 @@
 > go mod tidy  // 拉取缺少的模块，移除不用的模块
 > go mod verify // 验证依赖是否正确
 > go list -m -u all // 检查升级package
-> go get -u //同上，升级到最新的吃药版本，或修订版本
+> go get -u //同上，升级到最新的版本，或修订版本
 > go get -u=patch // 升级到最新的修订版本
 > ~~~
 >
@@ -73,6 +73,26 @@
 >
 > go.sum 记录依赖数
 >
+> **GO项目目录结构**
+>
+> - cmd/
+>   - api/
+> - pkg/
+>   - api/
+>   - db/
+>   - services/
+>     - service A/
+>     - service B/
+>   - utils/
+> - docs/
+> - web/
+> - static
+> - docker-compose.yml
+> - Makefile
+> - main.go
+> - go.mod
+> - go.sum
+> - README.md
 
 ####  **GO基础语法**
 
