@@ -19,11 +19,10 @@
 > - path 添加扩充依赖目录（golang依赖仓库）
 > - GOPATH 工作目录
 > - go env 获取go环境及参数
-> - 
->
-> GO语言主要特征
->
-> - 内存回收
+> 
+>GO语言主要特征
+> 
+>- 内存回收
 > - 内置数据类型
 > - 函数多返回值
 > - 错误处理
@@ -32,21 +31,21 @@
 > - 并发编程
 > - 反射
 > - 与其他语言交互
->
-> **GO项目构建及编译**
->
-> - go build
+> 
+>**GO项目构建及编译**
+> 
+>- go build
 > - go test
 > - go instll
 > - go mod
->
-> package main ：go应用程序main函数包
->
-> go文件名与包名没有直接关系，**同一个文件夹下的文件只能有一个包名**
->
-> go mod：记录和解析对其他模块的依赖（类似maven），modules替换GOPATH方法来指定使用哪些源文件，go.mod 文件建立后，go get，go build，go mod等命令都以go.mod文件作为配置
->
-> ~~~golang
+> 
+>package main ：go应用程序main函数包
+> 
+>go文件名与包名没有直接关系，**同一个文件夹下的文件只能有一个包名**
+> 
+>go mod：记录和解析对其他模块的依赖（类似maven），modules替换GOPATH方法来指定使用哪些源文件，go.mod 文件建立后，go get，go build，go mod等命令都以go.mod文件作为配置
+> 
+>~~~golang
 > go env -w GOBIN=/Users/youdi/go/bin
 > go env -w GOPROXY=https://goproxy.cn,direct // 使用七牛云的
 > // 开启Module auto情况下  go会根据当前文件go.mod决定是否启用Module，即开启Module后，依赖包存放位置变为 $GOPATH/pkg下，允许同一个版本多个包并存
@@ -63,19 +62,19 @@
 > go get -u //同上，升级到最新的版本，或修订版本
 > go get -u=patch // 升级到最新的修订版本
 > ~~~
->
-> go.mod 文件中命令
->
-> - module 指定包的名字
+> 
+>go.mod 文件中命令
+> 
+>- module 指定包的名字
 > - require 指定依赖项模块
 > - replace替换依赖项模块
 > - exclude 忽略依赖模块
->
-> go.sum 记录依赖数
->
-> **GO项目目录结构**
->
-> - cmd/
+> 
+>go.sum 记录依赖数
+> 
+>**GO项目目录结构**
+> 
+>- cmd/
 >   - api/
 > - pkg/
 >   - api/
@@ -568,7 +567,16 @@
 
 #### **异常处理**
 
-> - panic 抛出异常
+> - error : 一般用来表达可以处理的错误
+>
+>   > errorrs 包
+>   >
+>   > - New 创建新的error
+>   > - Is 判断是不是特定的某个error
+>   > - As 类型转为特定的error
+>   > - Unwrap 解除包装，返回被包装的error
+>
+> - panic 抛出异常（不可恢复，可以被捕获）
 >
 >   > 类似throw，终止其后执行的代码
 >
