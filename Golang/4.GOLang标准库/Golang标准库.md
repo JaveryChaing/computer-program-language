@@ -153,4 +153,10 @@
   
 - #### Http
 
-> 
+- #### **Context**
+
+  > 在 Goroutine 构成的树形结构中对信号进行同步以减少计算资源的浪费是 [`context.Context`](https://draveness.me/golang/tree/context.Context) 的最大作用。
+  >
+  > ![image-20220501192355673](img\image-20220501192355673.png) 
+  >
+  > 
