@@ -139,6 +139,8 @@
   >
   > - AccessLogs  是否输出日志到 Log，默认在 prod 模式下不会输出日志，默认为 false 不输出日志
   > - FileLineNum  是否在日志里面显示文件名和输出日志行号，默认 true。此参数不支持配置文件配置。
+  >
+  > 
   
 - #### **路由配置**
 
@@ -239,5 +241,20 @@
   >   > ~~~
   >
   > - #### **namespace**
+  >
+  >   > beego.AddNamespace()
 
+- #### **控制器函数**
+  
+  > - Init(ct * context.Context,childName stirng,app interface{})
+  > - Perpare()  Method 方法之前执行，用户可以重写这个函数实现类似用户验证之类
+  > - Finish()  执行完相应的 HTTP Method 方法之后执行的
+  > - Render() error  主要用来实现渲染模板，如果 beego.AutoRender 为 true 的情况下才会执行。
+  >
+  > ---
+  >
+  > **提前终止运行（断开请求）**
+  >
+  > StopRun()
+  
   
