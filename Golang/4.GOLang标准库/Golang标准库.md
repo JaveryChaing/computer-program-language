@@ -150,6 +150,21 @@
 - #### **Template**
 
   > 模板语法 {{.}}  .表示当前传入的对象
+  >
+  > ~~~go
+  > func SayHello(response http.ResponseWriter, req *http.Request){
+  > 	// 解析指定文件生成模板对象  项目路径
+  > 	tmpl, err := template.ParseFiles("static/hello.html")
+  > 	if err != nil {
+  > 		fmt.Println("create template failed, err:", err)
+  > 		return
+  > 	}
+  > 	// 利用给定数据渲染模板，并将结果写入w
+  > 	tmpl.Execute(response, "5lmh.com")
+  > }
+  > ~~~
+  >
+  > 
   
 - #### Http
 
