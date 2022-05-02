@@ -140,4 +140,104 @@
   > - AccessLogs  是否输出日志到 Log，默认在 prod 模式下不会输出日志，默认为 false 不输出日志
   > - FileLineNum  是否在日志里面显示文件名和输出日志行号，默认 true。此参数不支持配置文件配置。
   
-   
+- #### **路由配置**
+
+  > - **固定路由**
+  >
+  >   > RESTful 函数路由在 router.go中配置，包含
+  >   >
+  >   > - beego.Get(router, beego.FilterFunc)
+  >   > - beego.Post(router, beego.FilterFunc)
+  >   > - beego.Put(router, beego.FilterFunc)
+  >   > - beego.Patch(router, beego.FilterFunc)
+  >   > - beego.Head(router, beego.FilterFunc)
+  >   > - beego.Options(router, beego.FilterFunc)
+  >   > - beego.Delete(router, beego.FilterFunc)
+  >   > - beego.Any(router, beego.FilterFunc)
+  >   >
+  >   > **自定义handler实现**
+  >   >
+  >   > - beego.Handler(router,http.Handler)  // 将请求交给http.Handler 处理
+  >   >
+  >   > 
+  >   >
+  >   > **RESTful Controller 路由** （请求绑定Controller方法，对Get，Post 等方法进行复写） 
+  >   >
+  >   > - beggo.Router("/",&controllers.MainController{})
+  >   >
+  >   > - beego.Router("/admin", &admin.UserController{})
+  >   >
+  >   > - beego.Router("/admin/index", &admin.ArticleController{})
+  >   >
+  >   >   一个固定的路由，一个控制器，然后根据用户请求方法不同请求控制器中对应的方法
+  >
+  > - **正则路由 **sinatra 
+  >
+  >   > - /api/?:id    匹配api开头路径，变量:id 为后面字符  eg  /api/123  :id 为123
+  >   > - /api/:id  不包含本身路由  /api/ 匹配失败
+  >   > - /api/:id([0-9]+） id 使用正则表达式匹配
+  >   > - /download/`*.*`  download 后任意层级路由   :path 为download后请求，:ext 为扩展文件名
+  >   > - /download/ceshi/*  全匹配方式
+  >   > - `/:id:int`  int 类型设置方式，匹配 :id为int 类型   /:hi:string 匹配 :hi 为 string 类型
+  >   >
+  >   > 
+  >   >
+  >   > **自定义方法及RESTful规则**
+  >   >
+  >   > - beego.Router("/", &IndexController{}, "*:Index") 
+  >   >
+  >   >   > `*`表示任意的 method 都执行该函数
+  >   >   >
+  >   >   > 使用 httpmethod:funcname 格式来展示
+  >   >   >
+  >   >   > 多个不同的格式使用 `;` 分割
+  >   >   >
+  >   >   > 多个 method 对应同一个 funcname，method 之间通过 `,` 来分割
+  >   >   >
+  >   >   > eg 
+  >   >   >
+  >   >   > ```go
+  >   >   > beego.Router("/api/list",&RestController{},"*:ListFood")
+  >   >   > beego.Router("/api/create",&RestController{},"post:CreateFood")
+  >   >   > beego.Router("/api/delete",&RestController{},"delete:DeleteFood")
+  >   >   > // 多个 HTTP Method 指向同一个函数的示例
+  >   >   > beego.Router("/api",&RestController{},"get,post:ApiFunc")
+  >   >   > // 不同的 method 对应不同的函数，通过 ; 进行分割的示例：
+  >   >   > beego.Router("/simple",&SimpleController{},"get:GetFunc;post:PostFunc")
+  >   >   > // * 与 HttpMethod 方法优先匹配 HttpMethod方法
+  >   >   > beego.Router("/simple",&SimpleController{},"`*:AllFunc;post:PostFunc`")
+  >   >   > ```
+  >
+  > - **自动路由**
+  >
+  >   > beego.AutoRouter(&controllers.ObjectController{})
+  >   >
+  >   >  *beego 通过反射获取该结构体中所有的实现方法，即/object/login*  object  为结构体名称，login为结构体方法
+  >   >
+  >   > ~~~go
+  >   > beego.AutoRouter(&controllers.MainController{})
+  >   > // 自动路由    /Main/GetUserName  大小写匹配
+  >   > func (c *MainController) GetUserName() {
+  >   > 	fmt.Println("GetUserName")
+  >   > }
+  >   > ~~~
+  >   >
+  >   > 可以通过 `this.Ctx.Input.Param(":ext")` 获取后缀名。
+  >
+  > - #### **注解路由**
+  >
+  >   > 无需在 router 中注册路由，只需要 Include 相应地 controller,然后在 controller 的 method 方法上面写上 router 注释（// [@router](https://github.com/router)）
+  >   >
+  >   > ~~~go
+  >   > // 路由文件中指定扫描的Controller 
+  >   > beego.Include(&CMSController{})
+  >   > // @router /staticblock/:key [get]
+  >   > func (this *CMSController) StaticBlock() {
+  >   > 
+  >   > }
+  >   > //beego 自动会进行源码分析，注意只会在 dev 模式下进行生成，生成的路由放在 “/routers/commentsRouter.go” 文件中。
+  >   > ~~~
+  >
+  > - #### **namespace**
+
+  
