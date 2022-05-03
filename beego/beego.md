@@ -11,22 +11,44 @@
   > **读取配置**
   >
   > - beego.AppConfig.String("FileName") 读取文件内容
+  >
   > - Set(key, val string) error
+  >
   > - String(key string) string
+  >
   > - Strings(key string) []string
+  >
   > - Int(key string) (int, error)
+  >
   > - Int64(key string) (int64, error)
+  >
   > - Bool(key string) (bool, error)
+  >
   > - Float(key string) (float64, error)
+  >
   > - DefaultString(key string, defaultVal string) string
+  >
   > - DefaultStrings(key string, defaultVal []string)
+  >
   > - DefaultInt(key string, defaultVal int) int
+  >
   > - DefaultInt64(key string, defaultVal int64) int64
+  >
   > - DefaultBool(key string, defaultVal bool) bool
+  >
   > - DefaultFloat(key string, defaultVal float64) float64
+  >
   > - DIY(key string) (interface{}, error)
+  >
   > - GetSection(section string) (map[string]string, error)
+  >
   > - SaveConfigFile(filename string) error
+  >
+  > - section操作
+  >
+  >   > :: 获取组下面数据
+  >   >
+  >   > iniconf.String("demo::key2")
   >
   > **不同环境配置**
   >
@@ -133,7 +155,6 @@
   > - SessionCookieLifeTime  session 默认存在客户端的 cookie 的时间，默认值是 3600 秒。
   > - SessionAutoSetCookie 是否开启SetCookie, 默认值 true 开启。
   > - SessionDomain  session cookie 存储域名, 默认空。
-  > - 
   >
   > ---
   >
@@ -243,7 +264,42 @@
   > - #### **namespace**
   >
   >   > beego.AddNamespace()
-
+  >   >
+  >   > ~~~go
+  >   > ns :=
+  >   > web.NewNamespace("/v1",
+  >   >     web.NSCond(func(ctx *context.Context) bool {
+  >   >         if ctx.Input.Domain() == "api.beego.me" {
+  >   >             return true
+  >   >         }
+  >   >         return false
+  >   >     }),
+  >   >     web.NSBefore(auth),
+  >   >     web.NSGet("/notallowed", func(ctx *context.Context) {
+  >   >         ctx.Output.Body([]byte("notAllowed"))
+  >   >     }),
+  >   >     web.NSRouter("/version", &AdminController{}, "get:ShowAPIVersion"),
+  >   >     web.NSRouter("/changepassword", &UserController{}),
+  >   >     web.NSNamespace("/shop",
+  >   >         web.NSBefore(sentry),
+  >   >         web.NSGet("/:id", func(ctx *context.Context) {
+  >   >             ctx.Output.Body([]byte("notAllowed"))
+  >   >         }),
+  >   >     ),
+  >   >     web.NSNamespace("/cms",
+  >   >         web.NSInclude(
+  >   >             &controllers.MainController{},
+  >   >             &controllers.CMSController{},
+  >   >             &controllers.BlockController{},
+  >   >         ),
+  >   >     ),
+  >   > )
+  >   > // 注册 namespace
+  >   > beego.AddNamespace(ns)
+  >   > ~~~
+  >   >
+  >   > 
+  
   
   > - Init(ct *context.Context, childName string, app interface{}) 
   >
@@ -546,7 +602,14 @@
   > bm, err := cache.NewCache("memory", `{"interval":60}`)
   > ~~~
   >
-  >  **Toolbox模块**
+  >  **Toolbox模块**（单个应用使用，多个应用监测使用Prometheus）
+  >
+  > ~~~ini
+  > # 开启进程内监控模块
+  > enableadmin = true
+  > adminaddr = "127.0.0.1"
+  > adminport = 8088
+  > ~~~
   >
   > ~~~go
   > go get github.com/astaxie/beego/toolbox
@@ -603,6 +666,8 @@
   > }
   > ~~~
   >
+  > 
+  >
   > **l18n 模块**
   >
   > *实现多语言界面与反馈，增强用户体验*
@@ -631,9 +696,66 @@
   > ~~~
   >
   
-- #### **进程内监控**
+- #### **API自动文档**
   
+  > **路由解析，仅支持namespace方式，且dev环境下**
+  >
+  > ~~~ini
+  > EnableDocs = true
+  > // 启动参数
+  > bee run -gendoc=true -downdoc=true
+  > ~~~
+  >
   > 
+  >
+  > 
+  >
+  > 1. `// @APIVersion 1.0.0`
+  > 2. `// @Title mobile API`
+  > 3. `// @Description mobile has every tool to get any job done, so codename for the new mobile APIs.`
+  > 4. `// @Contact astaxie@gmail.com`
+  >
+  > ---
+  >
+  > 1. `// @Title getStaticBlock`
+  > 2. `// @Description get all the staticblock by key`
+  > 3. `// @Param    key        path     string    true        "The email for login"`
+  > 4. `// @Success 200 {object} models.ZDTCustomer.Customer `
+  > 5. `// @Failure 400 Invalid email supplied`
+  > 6. `// @Failure 404 User not found`
+  > 7. `// @router /staticblock/:key [get]`
+  >
+  > - @Title  这个 API 所表达的含义，是一个文本
+  >
+  > - @Description  这个 API 详细的描述，是一个文本，空格之后的内容全部解析为 Description
+  >
+  > - @Param  表示需要传递到服务器端的参数(使用空格或者 tab 分割)
+  >
+  >   > 1. 参数名
+  >   > 2. 参数类型 ( formData、query、path、body、header，formData)
+  >   > 3. 参数类型
+  >   > 4. 是否必须
+  >   > 5. 注释
+  >
+  > - @Success  成功返回给客户端的信息
+  >
+  >   > 1. statuscode 状态码
+  >   > 2. 返回的类型  使用{}表达 
+  >   > 3. 返回的对象或者字符串信息
+  >
+  > - @Failure  失败返回的信息
+  >
+  >   > 1. status code
+  >   > 2. 表示错误信息
+  >
+  > - @router  路由信息
+  >
+  >   > 1. 请求的路由地址
+  >   > 2. 第二个参数是支持的请求方法
+  >
+  > 
+  
+   
   
   
 
