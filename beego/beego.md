@@ -778,11 +778,61 @@
   >   > yum install -y supervisor
   >   > # 启动
   >   > /usr/bin/supervisord -c /etc/supervisord.conf
+  >   > #MacOS
+  >   > brew install supervisord
   >   > ~~~
   >   >
   >   > supervisord.conf 配置文件
   >   >
-  >   > 
+  >   > ~~~ini
+  >   > # 配置监听domain socker 的http服务配置
+  >   > [unix_http_server]  
+  >   > #sock 路径
+  >   > file = path
+  >   > chmod = 0777 
+  >   > #默认使用启动supervisord的用户和用户组
+  >   > chown = nobody:nogroup  
+  >   > #supervisorctl连接supervisord时的授权用户
+  >   > username = user   
+  >   > password = 123
+  >   > # 监听TCP socket的配置
+  >   > [inet_http_server]
+  >   > ~~~
+  >   >
+  >   > [Supervisor配置文件说明](https://www.jianshu.com/p/7e788634257b)
+  >   >
+  >   > - 应用配置文件
+  >   >
+  >   >   ~~~ini
+  >   >   [program:bee_project]
+  >   >   directory = path
+  >   >   command = path
+  >   >   autostart = true
+  >   >   startsecs = 5
+  >   >   user = root
+  >   >   redirect_stderr = true 
+  >   >   stdout_logfile = path 
+  >   >   ~~~
+  >   >
+  >   > **supervisord 管理**
+  >   >
+  >   > - supervisord 初始化启动 Supervisord
+  >   >
+  >   > - supervisorctl  初始应用
+  >   >
+  >   >   > stop 
+  >   >   >
+  >   >   > start 
+  >   >   >
+  >   >   > restart 
+  >   >   >
+  >   >   > stop all  停止全部进程
+  >   >   >
+  >   >   > reload  载入最新的配置文件，停止原有进程并按新的配置启动、管理所有进程。
+  >   >   >
+  >   >   > update 最新的配置文件，启动新配置或有改动的进程
+  >
+  > 
   
   
   
