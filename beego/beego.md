@@ -502,17 +502,17 @@
   > var globalSessions *session.Manager
   > // 设置配置参数
   > func init() {
-  >      sessionConfig := &session.ManagerConfig{
-  >  CookieName:"gosessionid", 
-  >  EnableSetCookie: true, 
-  >  Gclifetime:3600,
-  >  Maxlifetime: 3600, 
-  >  Secure: false,
-  >  CookieLifeTime: 3600,
-  >  ProviderConfig: "./tmp",
-  >  }
-  >  globalSessions, _ = session.NewManager("memory",sessionConfig)
-  >  go globalSessions.GC()
+  >   sessionConfig := &session.ManagerConfig{
+  > CookieName:"gosessionid", 
+  > EnableSetCookie: true, 
+  > Gclifetime:3600,
+  > Maxlifetime: 3600, 
+  > Secure: false,
+  > CookieLifeTime: 3600,
+  > ProviderConfig: "./tmp",
+  > }
+  > globalSessions, _ = session.NewManager("memory",sessionConfig)
+  > go globalSessions.GC()
   > }
   > ```
   >
@@ -528,6 +528,14 @@
   > - 新进程接受新请求，并处理
   > - 老进程不再接受请求，但是要等正在处理的请求处理完成，所有在处理的请求处理完之后，便自动退出
   > - 新进程在老进程退出之后，由init进程收养，但是会继续服务。
+  >
+  > ~~~go
+  > // 基于http 的热升级
+  > "github.com/beego/beego/v2/server/web/grace"
+  >  err := grace.ListenAndServe("localhost:8080", mux)
+  > ~~~
+  >
+  > 
   >
   > 
   >
@@ -603,8 +611,28 @@
   > go get github.com/beego/i18n
   > // 在控制器中使用
   > 
+  > // Initialized language type list.
+  > langs := strings.Split(beego.AppConfig.String("lang::types"), "|")
+  > names := strings.Split(beego.AppConfig.String("lang::names"), "|")
+  > langTypes = make([]*langType, 0, len(langs))
+  > for i, v := range langs {
+  >     langTypes = append(langTypes, &langType{
+  >         Lang: v,
+  >         Name: names[i],
+  >     })
+  > }
+  > for _, lang := range langs {
+  >     beego.Trace("Loading language: " + lang)
+  >     if err := i18n.SetMessage(lang, "conf/"+"locale_"+lang+".ini"); err != nil {
+  >         beego.Error("Fail to set message file: " + err.Error())
+  >         return
+  >     }
+  > }
   > ~~~
   >
+  
+- #### **进程内监控**
+  
   > 
   
   

@@ -164,7 +164,16 @@
   > }
   > ~~~
   >
-  > 
+  > - 使用 `.` 访问当前位置的上下文
+  > - 使用`$`来访问当前模板根级上下文
+  > - 使用`$var` 访问创建的变量
+  >
+  > - 管道输输出`|`
+  > - pipeline  逻辑表达式  pipeline 表示 0 ，false，nil的指针，interface ，长度为0的array，map，string 
+  > -  range pipeline 循环值 
+  > - define 定义模板和模板嵌套 `{{define "loop"}} {{template "loop" .}}`
+  > - 传入函数 {{call .Field.Func .Arg1 .Arg2}} 调用的函数需要返回 1 个值 或者 2 个值，返回两个值时，第二个值用于返回 error 类型的错误
+  > - 
   
 - #### Http
 
@@ -180,6 +189,5 @@
   >
   > 
   >
-  > 
   
   
