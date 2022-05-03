@@ -753,9 +753,38 @@
   >   > 1. 请求的路由地址
   >   > 2. 第二个参数是支持的请求方法
   >
-  > 
   
-   
+- #### **Beego 部署**
+  
+  > - bee new ProjectName   # bee 脚手架
+  > - bee api projectName   # 创建一个api接口项目
+  > - bee run #运行项目
+  > - bee pack #打包项目
+  > - bee pack  -be GOOS = linux 打包环境
+  > - bee generate  自动化的生成代码（一键生成model）
+  > - bee migrate 应用的数据库迁移命令(降级的SQL管理)
+  >
+  > 
+  >
+  > **linux**
+  >
+  > - 基于nohup 命令部署
+  >
+  > - 基于Supervisord 部署
+  >   > *分布式环境应用启动与停止*
+  >   >
+  >   > ~~~shell
+  >   > yum install epel-release 
+  >   > yum install -y supervisor
+  >   > # 启动
+  >   > /usr/bin/supervisord -c /etc/supervisord.conf
+  >   > ~~~
+  >   >
+  >   > supervisord.conf 配置文件
+  >   >
+  >   > 
+  
+  
   
   
 
