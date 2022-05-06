@@ -21,5 +21,8 @@
   go get -u github.com/jinzhu/gorm
   // 表单校验
   go get -u github.com/astaxie/beego/validation
+  // JWT 身份验证
+  go get -u github.com/dgrijalva/jwt-go
+  
   ~~~
 
