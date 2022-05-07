@@ -25,4 +25,24 @@
   go get -u github.com/dgrijalva/jwt-go
   
   ~~~
+  
+- #### **gin 项目结构**
+
+  >gin_project 
+  >
+  >​	--- conf
+  >
+  >​    --- middleware(中间件)
+  >
+  >​    --- models（数据库映射模型）
+  >
+  >​    --- pkg 第三方包（统一错误码，结构体，全局变量）
+  >
+  >​    --- routers 
+  >
+  >​    --- controllers（api）
+  >
+  >​    --- logs 日志文件
+  >
+  >​    --- main.go 
 
