@@ -186,7 +186,18 @@
 >
 > <img src="img\image-20220509161024559.png" alt="image-20220509161024559" style="zoom:67%;" /> 
 >
-> Protocol Buffers v3  Google开源成熟结构数据序列机制（类似于JSON）
+> Protocol Buffers v3  Google开源成熟结构数据序列机制（类似于JSON），gRCP通过序列化机制进行通讯
+
+#### **GOLang中使用GRPC**
+
+> ~~~go
+> // GRPC 包
+> go get -u google.golang.org/grpc
+> // protobuf 格式
+> go get -u github.com/golang/protobuf/protoc-gen-go
+> ~~~
+>
+> 
 
 
 
