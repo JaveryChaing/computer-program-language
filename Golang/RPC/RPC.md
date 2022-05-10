@@ -201,7 +201,7 @@
 
 #### **RPCX**（golang RPC框架）
 
-> - 支持TCP，HTTP，QUIC，KCP协议
+> - 支持TCP，HTTP，QUIC，KCP，TLS协议
 >
 > - 支持多编码方式，JSON，Protobuf，MessagePack，原始字节数据
 >
@@ -211,7 +211,26 @@
 >
 >   > 容错处理方案 (超时处理，限流，线程池，熔断器，降级)
 >   
-> - 
+> - 负载均衡（随机，顺序，一致性哈希，权重，基于网络质量，就近选取）
+>
+> - 压缩，扩展信息传递
+>
+> - 身份认证
+>
+> - 支持metrics、log、timeout、别名、断路器等特性
+>
+> [RPCX](https://doc.rpcx.io/part1/quickstart.html)
+>
+> ~~~go
+> rpcx 依赖
+> go get -u -v github.com/smallnest/rpcx/...
+> go get -u -v -tags "etcd" github.com/smallnest/rpcx/...
+> go get -u -v -tags "quic etcd" github.com/smallnest/rpcx/...
+> go get -u -v -tags "reuseport quic kcp zookeeper etcd consul ping" github.com/smallnest/rpcx/...
+> 
+> ~~~
+>
+> 
 
 
 
