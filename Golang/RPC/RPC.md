@@ -191,13 +191,27 @@
 #### **GOLang中使用GRPC**
 
 > ~~~go
+> // 安装 protoc 
 > // GRPC 包
 > go get -u google.golang.org/grpc
 > // protobuf 格式
 > go get -u github.com/golang/protobuf/protoc-gen-go
 > ~~~
 >
-> 
+
+#### **RPCX**（golang RPC框架）
+
+> - 支持TCP，HTTP，QUIC，KCP协议
+>
+> - 支持多编码方式，JSON，Protobuf，MessagePack，原始字节数据
+>
+> - 服务发现支持，zookeeper、etcd、consul、mDNS
+>
+> - 容错支持 Failover、Failfast、Failtry 
+>
+>   > 容错处理方案 (超时处理，限流，线程池，熔断器，降级)
+>   
+> - 
 
 
 
