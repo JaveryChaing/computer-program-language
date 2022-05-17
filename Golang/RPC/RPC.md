@@ -187,17 +187,80 @@
 > <img src="img\image-20220509161024559.png" alt="image-20220509161024559" style="zoom:67%;" /> 
 >
 > Protocol Buffers v3  Google开源成熟结构数据序列机制（类似于JSON），gRCP通过序列化机制进行通讯
-
-#### **GOLang中使用GRPC**
-
+>
 > ~~~go
-> // 安装 protoc 
-> // GRPC 包
-> go get -u google.golang.org/grpc
-> // protobuf 格式
-> go install github.com/golang/protobuf/protoc-gen-go@latest
+> // GO Plugins 
+> go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+> go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+> go get google.golang.org/grpc
 > ~~~
 >
+> #### **Protobuf语法**
+>
+> ~~~protobuf
+> // Message 类型定义（描述请求或响应的消息格式）
+> // Tags  消息定义中字段的唯一数值标签（用于二进制格式中标识字段）
+> message SearchRequest{
+> 	string query = 1;
+> 	int32 page_number = 2;
+> 	int32 result_per_page = 3;
+> }
+> // reserved 关键值指定保留字段名和标签
+> message Foo{
+> 	reserved 2,15,9 to 11;
+> 	reserved "foo","bar";
+> }
+> 
+> // 枚举类型 Enum 每个enum定义的第一个元素值必须是0
+> enum Corpus {
+> 	 UNIVERSAL = 0;
+> 	 WEB = 0;
+> 	 IMAGES = 0;
+>       NEWS = 0;
+>       PRODUCTS = 0;}
+> 
+> // MAP 类型  key_type 可以是非浮点，byres外内置类型
+> // value_type 除map外任意类型
+> map<key_type,value_type>map_field = N;
+> map<string,Foo>projects = 1;
+> 
+> //Service 定义服务 RPC服务接口
+> service SearchService{
+>   rpc Search(SearchRequest) returns(SearchResponse){}
+> }
+> 
+> Message命名采用驼峰命名方式，字段命名采用小写字母加下划线分隔方式
+> Enums类型名采用驼峰命名方式，字段命名采用大写字母加下划线分隔方式
+> Service名称与RPC方法名统一采用驼峰式命名
+> ~~~
+>
+> **编译**
+>
+> ~~~shell
+> protoc --proto_path=IMPORT_PATH --cpp_out=DST_DIR --java_out=DST_DIR --python_out=DST_DIR --go_out=DST_DIR --ruby_out=DST_DIR --javanano_out=DST_DIR --objc_out=DST_DIR --csharp_out=DST_DIR path/to/file.proto
+> ~~~
+>
+> **基本数据类型**
+>
+> |  .proto  |  C++   |    Java    |     Python     |   Go    |         Ruby         |     C#     |
+> | :------: | :----: | :--------: | :------------: | :-----: | :------------------: | :--------: |
+> |  double  | double |   double   |     float      | float64 |        Float         |   double   |
+> |  float   | float  |   float    |     float      | float32 |        Float         |   float    |
+> |  int32   | int32  |    int     |      int       |  int32  |   Fixnum or Bignum   |    int     |
+> |  int64   | int64  |    long    |  ing/long[3]   |  int64  |        Bignum        |    long    |
+> |  uint32  | uint32 |   int[1]   |  int/long[3]   | uint32  |   Fixnum or Bignum   |    uint    |
+> |  uint64  | uint64 |  long[1]   |  int/long[3]   | uint64  |        Bignum        |   ulong    |
+> |  sint32  | int32  |    int     |      intj      |  int32  |   Fixnum or Bignum   |    int     |
+> |  sint64  | int64  |    long    |  int/long[3]   |  int64  |        Bignum        |    long    |
+> | fixed32  | uint32 |   int[1]   |      int       | uint32  |   Fixnum or Bignum   |    uint    |
+> | fixed64  | uint64 |  long[1]   |  int/long[3]   | uint64  |        Bignum        |   ulong    |
+> | sfixed32 | int32  |    int     |      int       |  int32  |   Fixnum or Bignum   |    int     |
+> | sfixed64 | int64  |    long    |  int/long[3]   |  int64  |        Bignum        |    long    |
+> |   bool   |  bool  |  boolean   |    boolean     |  bool   | TrueClass/FalseClass |    bool    |
+> |  string  | string |   String   | str/unicode[4] | string  |    String(UTF-8)     |   string   |
+> |  bytes   | string | ByteString |      str       | []byte  |  String(ASCII-8BIT)  | ByteString |
+>
+> 
 
 #### **RPCX**（golang RPC框架）
 
