@@ -273,7 +273,7 @@
 > - 容错支持 Failover、Failfast、Failtry 
 >
 >   > 容错处理方案 (超时处理，限流，线程池，熔断器，降级)
->   
+>
 > - 负载均衡（随机，顺序，一致性哈希，权重，基于网络质量，就近选取）
 >
 > - 压缩，扩展信息传递
@@ -289,6 +289,7 @@
 > go get -u -v github.com/smallnest/rpcx/...
 > go get -u -v -tags "etcd" github.com/smallnest/rpcx/...
 > go get -u -v -tags "quic etcd" github.com/smallnest/rpcx/...
+> // 所有标签
 > go get -u -v -tags "reuseport quic kcp zookeeper etcd consul ping" github.com/smallnest/rpcx/...
 > ~~~
 > 
