@@ -155,27 +155,47 @@
   >
   > - 使用BlockingQueue队列协作处理
   >
-  >   > [Blocking 使用](https://gitee.com/miaomiaole/java_project/blob/master/src/main/java/org/example/concurrency/Toast.java)
+  >   > [队列协作处理](https://gitee.com/miaomiaole/java_project/blob/master/src/main/java/org/example/concurrency/Toast.java)
+  >   >
+  >   > offer(E e，long timeout，TimeUnit unit) 满队等待timeout时间放弃或被中断
+  >   >
+  >   > put(E e) 满队阻塞当前入队线程，直到队列空闲或线程中断
+  >   >
+  >   > take()
+  >   >
+  >   > poll(long timeout,TimeUnit unit)
+  >   >
+  >   > ArrayBlockingQueue：指定容量，在入队或出队并发高情况下使用
+  >   >
+  >   > LinkedBlockingQueue：入队出队并发高情况下使用（入队和出队不竞争Queue）
   >
   > ---
   >
   > **java.util.concurrent 线程工具类**
   >
-  > - CountDownLatch  同步一个或者多个任务，强制它们等待其他任务执行完成
+  > - CountDownLatch  设置等待线程数，当计数为0时往下执行 
   >
-  >   >  CountDownLatch  只触发一次，计数值不能被重置（可以使用CyclicBarrier代替）
+  >   >  - countDown() 表示当前线程已完成  计数减一
   >   >
-  >   > CountDownLatch   将程序分为n个相互独立可以分解的任务
+  >   >    > 当某个线程中断（发生异常）将导致await() 线程一直阻塞，不能重试
+  >   >
+  >   >  - await() 被阻塞的线程 当计数为0时进入就绪态
   >
-  > - CyclicBarrier 在进行下一个步骤之前等待，直到上一个任务全部完成
+  > - CyclicBarrier  所有的线程达到屏障点后执行下一个线程
   >
   >   > new CycliBarrier((int parties, Runnable barrierAction)
   >   >
-  >   > parties ：上一个步骤等待线程数
+  >   > parties ：屏障数
   >   >
-  >   > barrierAction ：下一步执行的任务
+  >   > barrierAction ：满足屏障数后执行下一个线程
   >   >
   >   > ---
   >   >
-  >   > barrierAction 执行完后等待新的任务新
+  >   > - await()表示当前线程达到屏障点被阻塞等待其他线程(执行完后await)
+  >   > - rest() 重新执行
+  >   > - isBloken() 判断线程是否被中断
+  >
+  > CyclicBarrier：重点是多个线程，在任意一个线程没有完成，所有的线程都必须等待。
+  >
+  > CountDownLatch：多个线程等待
 
