@@ -152,8 +152,30 @@
   >   > - await() 当前线程进入等待状态除非被通知或中断
   >   >
   >   > - singal() 唤醒在Condition上的线程（进入就绪态）
-  >   
+  >
   > - 使用BlockingQueue队列协作处理
   >
-  >   > 
+  >   > [Blocking 使用](https://gitee.com/miaomiaole/java_project/blob/master/src/main/java/org/example/concurrency/Toast.java)
+  >
+  > ---
+  >
+  > **java.util.concurrent 线程工具类**
+  >
+  > - CountDownLatch  同步一个或者多个任务，强制它们等待其他任务执行完成
+  >
+  >   >  CountDownLatch  只触发一次，计数值不能被重置（可以使用CyclicBarrier代替）
+  >   >
+  >   > CountDownLatch   将程序分为n个相互独立可以分解的任务
+  >
+  > - CyclicBarrier 在进行下一个步骤之前等待，直到上一个任务全部完成
+  >
+  >   > new CycliBarrier((int parties, Runnable barrierAction)
+  >   >
+  >   > parties ：上一个步骤等待线程数
+  >   >
+  >   > barrierAction ：下一步执行的任务
+  >   >
+  >   > ---
+  >   >
+  >   > barrierAction 执行完后等待新的任务新
 
