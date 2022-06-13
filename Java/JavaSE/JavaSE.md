@@ -122,20 +122,24 @@
   >   >
   >   > ---
   >   >
-  >   > **红黑树**   新增，查找，删除最差时间复杂度为$O(log_n)$
+  >   > **多路查找树（B树）**
+  >   >
+  >   > - 2-3树  每个节点都具有2个字节点或3个子节点  **且左子树小于中子树小于右子树**
+  >   >   - 任意节点到它的所有子节点深度相同，**绝对平衡树**
+  >   >   - **中子树元素值位于父节点两个元素之间**
+  >   >   - ![image-20220613161823984](img\image-20220613161823984.png) 
+  >   >
+  >   > ---
+  >   >
+  >   > **红黑树**（2-3-4树）   新增，查找，删除最差时间复杂度为$O(log_n)$
   >   >
   >   > - **二叉排序树**
-  >   > - 节点具有红黑属性
-  >   > - 根节点必须是黑色
-  >   > - 红色节点的子节点必须是黑色
+  >   > - 节点具有红黑属性，黑色节点：对应2-3-4中子节点为2的节点 其他为红色节点
+  >   > - **根节点和叶子节点都是黑色**
   >   > - 一条路径上不能存在相邻红色节点
   >   > - 根节点到叶子节点所有路径包含相同数目的黑色节点
   >   >
   >   > *红黑树的平衡性不如AVL树，维持一种大致上的平衡，可能平均查找次数不如AVL树（取决于树的高度），但在删除操作时，红黑树最多三次旋转后恢复平衡，而AVL可能需要$O(log_N)$次旋转才能恢复平衡，所以在对删除，插入操作频繁时，红黑树整体性能高于AVL树*
-  >   >
-  >   > 
-  >   >
-  >   > TreeMap
   >
   > - 哈希
   >
@@ -171,7 +175,7 @@
   >   > >
   >   > > - 结构（数组+链表+红黑树）
   >   > >
-  >   > >   - <img src="/Users/miaomiaole/Code/computer-program-language/Java/JavaSE/image-20220611232504538.png" alt="image-20220611232504538" style="zoom:30%;" /> 
+  >   > >   - <img src="img/image-20220611232504538.png" alt="image-20220611232504538" style="zoom:30%;" />  
   >   > >
   >   > >   - ~~~java
   >   > >     // 内部Node结构 
@@ -186,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >     
+  >   > >             
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >     
+  >   > >             
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >     
+  >   > >             
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -269,18 +273,104 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >     
+  >   > >             
   >   > >     ~~~
   >   >
   >   > ConcurrentHashMap
   >   >
-  >   > ![image-20220603232657324](/Users/miaomiaole/Code/computer-program-language/Java/JavaSE/image.png)
+  >   > ![image-20220603232657324](img/image.png)
   >   >
   >   > ---
   >   >
   >   > Set
   >   >
   >   > > LinkeHashMap 以插入时顺序排列元素（最近最少使用次序），迭代访问时性能优于HashMap
+  >   >
+  >   > TreeMap（基于红黑树实现，线程不安全）
+  >   >
+  >   > > ![image-20220613165034503](img\image-20220613165034503.png) 
+  >   > >
+  >   > > *sortedMap ：实现key有序不重复，支持队列方式获取元素*
+  >   > >
+  >   > > *NavigableMap： 根据指定的搜索条件返回最匹配的Key-Value元素（key属性查询）*
+  >   > >
+  >   > > TreeMap依靠Comparable或Comparator 实现Key的去重复
+  >   > >
+  >   > >  ~~~java
+  >   > >  // TreeMap  entry 
+  >   > >  static final class Entry<K,V> implements Map.Entry<K,V> {
+  >   > >          K key;
+  >   > >          V value;
+  >   > >          Entry<K,V> left;
+  >   > >          Entry<K,V> right;
+  >   > >          Entry<K,V> parent;
+  >   > >         // 红黑属性
+  >   > >          boolean color = BLACK;
+  >   > >  
+  >   > >          /**
+  >   > >           * Make a new cell with given key, value, and parent, and with
+  >   > >           * {@code null} child links, and BLACK color.
+  >   > >           */
+  >   > >          Entry(K key, V value, Entry<K,V> parent) {
+  >   > >              this.key = key;
+  >   > >              this.value = value;
+  >   > >              this.parent = parent;
+  >   > >          }
+  >   > >  
+  >   > >          /**
+  >   > >           * Returns the key.
+  >   > >           *
+  >   > >           * @return the key
+  >   > >           */
+  >   > >          public K getKey() {
+  >   > >              return key;
+  >   > >          }
+  >   > >  
+  >   > >          /**
+  >   > >           * Returns the value associated with the key.
+  >   > >           *
+  >   > >           * @return the value associated with the key
+  >   > >           */
+  >   > >          public V getValue() {
+  >   > >              return value;
+  >   > >          }
+  >   > >  
+  >   > >          /**
+  >   > >           * Replaces the value currently associated with the key with the given
+  >   > >           * value.
+  >   > >           *
+  >   > >           * @return the value associated with the key before this method was
+  >   > >           *         called
+  >   > >           */
+  >   > >          public V setValue(V value) {
+  >   > >              V oldValue = this.value;
+  >   > >              this.value = value;
+  >   > >              return oldValue;
+  >   > >          }
+  >   > >  
+  >   > >          public boolean equals(Object o) {
+  >   > >              return o instanceof Map.Entry<?, ?> e
+  >   > >                      && valEquals(key,e.getKey())
+  >   > >                      && valEquals(value,e.getValue());
+  >   > >          }
+  >   > >  
+  >   > >          public int hashCode() {
+  >   > >              int keyHash = (key==null ? 0 : key.hashCode());
+  >   > >              int valueHash = (value==null ? 0 : value.hashCode());
+  >   > >              return keyHash ^ valueHash;
+  >   > >          }
+  >   > >  
+  >   > >          public String toString() {
+  >   > >              return key + "=" + value;
+  >   > >          }
+  >   > >      }
+  >   > >  ~~~
+  >   > >
+  >   > > ![image-20220613172100847](img\image-20220613172100847.png) 
+  >   > >
+  >   > > ![image-20220613172133612](img\image-20220613172133612.png) 
+  >   > >
+  >   > > **TODO 红黑树操作**
   >
   > - 图
   >
