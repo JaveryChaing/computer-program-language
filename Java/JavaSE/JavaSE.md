@@ -153,7 +153,7 @@
   >   > >
   >   > > - 阈值（threshold，超过阈值扩容，计算方式 **capacity** * **loadFactor**）
   >   > >
-  >   > > - 负载因子（loadFactor，**数组扩容系数**）
+  >   > > - 负载因子（loadFactor，默认0.75，**数组扩容系数**）
   >   > >
   >   > > - **数组初始容量**（DEFAULT_INITIAL_CAPACITY，默认16，必须是2的N次幂)
   >   > >
@@ -190,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >             
+  >   > >     
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >             
+  >   > >     
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >             
+  >   > >     
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,10 +273,288 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >             
+  >   > >     
   >   > >     ~~~
   >   >
-  >   > ConcurrentHashMap
+  >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
+  >   >
+  >   > - 成员字段
+  >   >
+  >   >   - ~~~java
+  >   >     // node数组，存放数据
+  >   >     transient volatile Node<K,V>[] table;
+  >   >     // 扩容新生成的数组，其大小为table两倍
+  >   >     private transient volatile Node<K,V>[]nextTable;
+  >   >     // Node 内部结构，包含内key 、 value 、 hash 、 next 一个节点
+  >   >     static  class Node<K,V> implements Map.Entry<K,V>
+  >   >     //维护红黑树的读写锁，存储对红黑树节点引用
+  >   >     static final class TreeBin<K,V>  extends Node<K,V>
+  >   >     // 红黑树存储结构
+  >   >     static final class TreeNode<K,V> extends Node<K,V>
+  >   >      //扩容操作，外部对数组节点操作会转发到nextTable
+  >   >     static final class ForwardingNode<K,V> extends Node<K,V>
+  >   >     // 占位加锁，执行读写操作时，对其加锁
+  >   >     static final class ReservationNode<K,V> extends Node<K,V>
+  >   >      // table 初始化和扩容状态位
+  >   >      // sizeCtl = - 1 表示正在初始化
+  >   >      // sizeCtl = -n 表示(n-1)个线程正在进行扩容
+  >   >      // sizeCtl > 0 初始化或扩容中需要使用容量
+  >   >      // sizeCtl = 0 默认值，使用默认容量进行初始化
+  >   >     private transient volatile int sizeCtl 
+  >   >     ~~~
+  >   >
+  >   >   - <img src="img/image-20220614212744603.png" alt="image-20220614212744603" style="zoom:40%;" /> 
+  >   >
+  >   >   - <img src="/Users/miaomiaole/Code/computer-program-language/Java/JavaSE/image-20220614212903715.png" alt="image-20220614212903715" style="zoom:40%;" /> 
+  >   >
+  >   >      
+  >   >
+  >   > - **并发控制逻辑**
+  >   >
+  >   >   - ~~~java
+  >   >      private final Node<K,V>[] initTable() {
+  >   >             Node<K,V>[] tab; int sc;
+  >   >           // table tab都为空 且sizeCtl小于 0 存在线程正在初始化
+  >   >             while ((tab = table) == null || tab.length == 0) {
+  >   >               if ((sc = sizeCtl) < 0)
+  >   >                    // 让出当前线程CPU资源
+  >   >                     Thread.yield(); 
+  >   >               // 大于0 使用CAS（原子操作）并设置为-1
+  >   >                 else if (U.compareAndSetInt(this, SIZECTL, sc, -1)) {
+  >   >                     try {
+  >   >                         if ((tab = table) == null || tab.length == 0) {             // 默认容量
+  >   >                             int n = (sc > 0) ? sc : DEFAULT_CAPACITY;
+  >   >                           // 创建数组
+  >   >                             @SuppressWarnings("unchecked")
+  >   >                             Node<K,V>[] nt = (Node<K,V>[])new Node<?,?>[n];
+  >   >                             table = tab = nt;
+  >   >                             sc = n - (n >>> 2);
+  >   >                         }
+  >   >                     } finally {
+  >   >                       // 扩容中需要使用容量
+  >   >                         sizeCtl = sc;
+  >   >                     }
+  >   >                     break;
+  >   >                 }
+  >   >             }
+  >   >             return tab;
+  >   >         }
+  >   >     //onlyIfAbsent  如果为 true，则不更改现有值 
+  >   >     final V putVal(K key, V value, boolean onlyIfAbsent) {
+  >   >             if (key == null || value == null) throw new NullPointerException();
+  >   >           // 计算hash值
+  >   >             int hash = spread(key.hashCode());
+  >   >         // 统计hash冲突 超过8转红黑树
+  >   >             int binCount = 0;
+  >   >        // while 循环
+  >   >             for (Node<K,V>[] tab = table;;) {
+  >   >                 Node<K,V> f; int n, i, fh; K fk; V fv;
+  >   >                 if (tab == null || (n = tab.length) == 0)
+  >   >                   // tab为空  初始化数组
+  >   >                     tab = initTable();
+  >   >               // 数组槽上没元素，使用cas插入（非分段锁）
+  >   >                 else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {          //  数组槽上没元素时使用cas插入（没加锁）
+  >   >                     if (casTabAt(tab, i, null, new Node<K,V>(hash, key, value)))
+  >   >                         break;                   
+  >   >                 } //MOVED == -1 转发节点的哈希 （正在扩容）
+  >   >                 else if ((fh = f.hash) == MOVED)
+  >   >                    // 协作扩容
+  >   >                     tab = helpTransfer(tab, f);
+  >   >                 else if (onlyIfAbsent // 在不获取锁的情况下检查第一个节点，hash相同，值不同则替换
+  >   >                          && fh == hash
+  >   >                          && ((fk = f.key) == key || (fk != null && key.equals(fk)))
+  >   >                          && (fv = f.val) != null)
+  >   >                     return fv;
+  >   >                 else { // 插入节点hash冲突，且数组没处于扩容状态
+  >   >                     V oldVal = null;
+  >   >                   // 加锁插入
+  >   >                     synchronized (f) {
+  >   >                         if (tabAt(tab, i) == f) {
+  >   >                             if (fh >= 0) {
+  >   >                                 binCount = 1;
+  >   >                                 for (Node<K,V> e = f;; ++binCount) {
+  >   >                                     K ek;
+  >   >                                     if (e.hash == hash &&
+  >   >                                         ((ek = e.key) == key ||
+  >   >                                          (ek != null && key.equals(ek)))) {
+  >   >                                         oldVal = e.val;
+  >   >                                         if (!onlyIfAbsent)
+  >   >                                             e.val = value;
+  >   >                                         break;
+  >   >                                     }
+  >   >                                     Node<K,V> pred = e;
+  >   >                                     if ((e = e.next) == null) {
+  >   >                                         pred.next = new Node<K,V>(hash, key, value);
+  >   >                                         break;
+  >   >                                     }
+  >   >                                 }
+  >   >                             }
+  >   >                             else if (f instanceof TreeBin) {
+  >   >                                 Node<K,V> p;
+  >   >                                 binCount = 2;
+  >   >                                 if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
+  >   >                                                                value)) != null) {
+  >   >                                     oldVal = p.val;
+  >   >                                     if (!onlyIfAbsent)
+  >   >                                         p.val = value;
+  >   >                                 }
+  >   >                             }
+  >   >                             else if (f instanceof ReservationNode)
+  >   >                                 throw new IllegalStateException("Recursive update");
+  >   >                         }
+  >   >                     }
+  >   >                     if (binCount != 0) {
+  >   >                         if (binCount >= TREEIFY_THRESHOLD)
+  >   >                             treeifyBin(tab, i);
+  >   >                         if (oldVal != null)
+  >   >                             return oldVal;
+  >   >                         break;
+  >   >                     }
+  >   >                 }
+  >   >             }
+  >   >             addCount(1L, binCount);
+  >   >             return null;
+  >   >         }
+  >   >      // 数组安全扩容
+  >   >      private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
+  >   >             int n = tab.length, stride;
+  >   >             if ((stride = (NCPU > 1) ? (n >>> 3) / NCPU : n) < MIN_TRANSFER_STRIDE)
+  >   >                 stride = MIN_TRANSFER_STRIDE; // subdivide range
+  >   >             if (nextTab == null) {            // initiating
+  >   >                 try {
+  >   >                     @SuppressWarnings("unchecked")
+  >   >                     Node<K,V>[] nt = (Node<K,V>[])new Node<?,?>[n << 1];
+  >   >                     nextTab = nt;
+  >   >                 } catch (Throwable ex) {      // try to cope with OOME
+  >   >                     sizeCtl = Integer.MAX_VALUE;
+  >   >                     return;
+  >   >                 }
+  >   >                 nextTable = nextTab;
+  >   >                 transferIndex = n;
+  >   >             }
+  >   >             int nextn = nextTab.length;
+  >   >             ForwardingNode<K,V> fwd = new ForwardingNode<K,V>(nextTab);
+  >   >             boolean advance = true;
+  >   >             boolean finishing = false; // to ensure sweep before committing nextTab
+  >   >             for (int i = 0, bound = 0;;) {
+  >   >                 Node<K,V> f; int fh;
+  >   >                 while (advance) {
+  >   >                     int nextIndex, nextBound;
+  >   >                     if (--i >= bound || finishing)
+  >   >                         advance = false;
+  >   >                     else if ((nextIndex = transferIndex) <= 0) {
+  >   >                         i = -1;
+  >   >                         advance = false;
+  >   >                     }
+  >   >                     else if (U.compareAndSetInt
+  >   >                              (this, TRANSFERINDEX, nextIndex,
+  >   >                               nextBound = (nextIndex > stride ?
+  >   >                                            nextIndex - stride : 0))) {
+  >   >                         bound = nextBound;
+  >   >                         i = nextIndex - 1;
+  >   >                         advance = false;
+  >   >                     }
+  >   >                 }
+  >   >                 if (i < 0 || i >= n || i + n >= nextn) {
+  >   >                     int sc;
+  >   >                     if (finishing) {
+  >   >                         nextTable = null;
+  >   >                         table = nextTab;
+  >   >                         sizeCtl = (n << 1) - (n >>> 1);
+  >   >                         return;
+  >   >                     }
+  >   >                     if (U.compareAndSetInt(this, SIZECTL, sc = sizeCtl, sc - 1)) {
+  >   >                         if ((sc - 2) != resizeStamp(n) << RESIZE_STAMP_SHIFT)
+  >   >                             return;
+  >   >                         finishing = advance = true;
+  >   >                         i = n; // recheck before commit
+  >   >                     }
+  >   >                 }
+  >   >                 else if ((f = tabAt(tab, i)) == null)
+  >   >                     advance = casTabAt(tab, i, null, fwd);
+  >   >                 else if ((fh = f.hash) == MOVED)
+  >   >                     advance = true; // already processed
+  >   >                 else {
+  >   >                     synchronized (f) {
+  >   >                         if (tabAt(tab, i) == f) {
+  >   >                             Node<K,V> ln, hn;
+  >   >                             if (fh >= 0) {
+  >   >                                 int runBit = fh & n;
+  >   >                                 Node<K,V> lastRun = f;
+  >   >                                 for (Node<K,V> p = f.next; p != null; p = p.next) {
+  >   >                                     int b = p.hash & n;
+  >   >                                     if (b != runBit) {
+  >   >                                         runBit = b;
+  >   >                                         lastRun = p;
+  >   >                                     }
+  >   >                                 }
+  >   >                                 if (runBit == 0) {
+  >   >                                     ln = lastRun;
+  >   >                                     hn = null;
+  >   >                                 }
+  >   >                                 else {
+  >   >                                     hn = lastRun;
+  >   >                                     ln = null;
+  >   >                                 }
+  >   >                                 for (Node<K,V> p = f; p != lastRun; p = p.next) {
+  >   >                                     int ph = p.hash; K pk = p.key; V pv = p.val;
+  >   >                                     if ((ph & n) == 0)
+  >   >                                         ln = new Node<K,V>(ph, pk, pv, ln);
+  >   >                                     else
+  >   >                                         hn = new Node<K,V>(ph, pk, pv, hn);
+  >   >                                 }
+  >   >                                 setTabAt(nextTab, i, ln);
+  >   >                                 setTabAt(nextTab, i + n, hn);
+  >   >                                 setTabAt(tab, i, fwd);
+  >   >                                 advance = true;
+  >   >                             }
+  >   >                             else if (f instanceof TreeBin) {
+  >   >                                 TreeBin<K,V> t = (TreeBin<K,V>)f;
+  >   >                                 TreeNode<K,V> lo = null, loTail = null;
+  >   >                                 TreeNode<K,V> hi = null, hiTail = null;
+  >   >                                 int lc = 0, hc = 0;
+  >   >                                 for (Node<K,V> e = t.first; e != null; e = e.next) {
+  >   >                                     int h = e.hash;
+  >   >                                     TreeNode<K,V> p = new TreeNode<K,V>
+  >   >                                         (h, e.key, e.val, null, null);
+  >   >                                     if ((h & n) == 0) {
+  >   >                                         if ((p.prev = loTail) == null)
+  >   >                                             lo = p;
+  >   >                                         else
+  >   >                                             loTail.next = p;
+  >   >                                         loTail = p;
+  >   >                                         ++lc;
+  >   >                                     }
+  >   >                                     else {
+  >   >                                         if ((p.prev = hiTail) == null)
+  >   >                                             hi = p;
+  >   >                                         else
+  >   >                                             hiTail.next = p;
+  >   >                                         hiTail = p;
+  >   >                                         ++hc;
+  >   >                                     }
+  >   >                                 }
+  >   >                                 ln = (lc <= UNTREEIFY_THRESHOLD) ? untreeify(lo) :
+  >   >                                     (hc != 0) ? new TreeBin<K,V>(lo) : t;
+  >   >                                 hn = (hc <= UNTREEIFY_THRESHOLD) ? untreeify(hi) :
+  >   >                                     (lc != 0) ? new TreeBin<K,V>(hi) : t;
+  >   >                                 setTabAt(nextTab, i, ln);
+  >   >                                 setTabAt(nextTab, i + n, hn);
+  >   >                                 setTabAt(tab, i, fwd);
+  >   >                                 advance = true;
+  >   >                             }
+  >   >                             else if (f instanceof ReservationNode)
+  >   >                                 throw new IllegalStateException("Recursive update");
+  >   >                         }
+  >   >                     }
+  >   >                 }
+  >   >             }
+  >   >         }
+  >   >     ~~~
+  >   >
+  >   >   - TODO  ConcurrentHashMap 源码解析
+  >   >
+  >   >   
   >   >
   >   > ![image-20220603232657324](img/image.png)
   >   >
@@ -364,15 +642,13 @@
   >   > >              return key + "=" + value;
   >   > >          }
   >   > >      }
-  >   > >  ~~~
+  >   > > ~~~
   >   > >
   >   > > ![image-20220613172100847](img\image-20220613172100847.png) 
   >   > >
   >   > > ![image-20220613172133612](img\image-20220613172133612.png) 
   >   > >
-  >   > > **TODO 红黑树操作**
-  >
-  > - 图
+  >   > > **TODO 红黑树**
   >
   > ---
   >
