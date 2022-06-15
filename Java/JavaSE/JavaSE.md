@@ -190,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >     
+  >   > >         
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >     
+  >   > >         
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >     
+  >   > >         
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +273,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >     
+  >   > >         
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -701,6 +701,19 @@
   
 - #### 并发
 
+  > *并发与并行，并发是指在某个时间段内，多任务交替处理能力，并行是指同时处理多任务能力*
+  >
+  > ---
+  >
+  > 线程安全实现方案：
+  >
+  > 1. 数据单线程内可见（ThreadLocal，存储在线程局部变量表中）
+  > 2. 只读对象（final关键字修饰的字段，String，Interger等）
+  > 3. 线程安全类（StringBuffer等使用synchronized等关键字修饰,**序列化访问共享资源**）
+  > 4. 同步与锁机制（**序列化访问共享资源**）
+  >
+  > ---
+  >
   > - Thread.yield() 线程让步（将当前获取CPU执行权让给其他线程，该线程进入就绪态，**不会释放锁**）
   >
   > - Thread.sleep()  线程睡眠（将当前CPU执行权让给其他线程，该线程进入阻塞态，**不会释放锁**）
@@ -718,9 +731,9 @@
   > **ExecutorService**
   >
   > - newCachedThreadPool  根据需要创建新线程，规定时间内存在空闲线程则使用该线程执行任务，无空闲线程则新建。长时间无执行任务会自动释放线程
-  >- FixedThreadPool   创建固定数量的线程执行任务。线程执行异常则新建线程代替。当所有线程处于执行态，则新加入任务在队列中等待。线程池中线程不会自动回收。
+  > - FixedThreadPool   创建固定数量的线程执行任务。线程执行异常则新建线程代替。当所有线程处于执行态，则新加入任务在队列中等待。线程池中线程不会自动回收。
   > - SingleThreadExecutor  线程数量为1的FixedThreadPool
-  > 
+  >
   > ---
   >
   > **UncaughtException-Handler 线程异常处理器**
@@ -744,31 +757,28 @@
   > - Object.wait()   释放锁等待（一般用在线程执行完任务后手动释放占用资源）
   >
   >   > wait() 在此期间暂停，直到使用notify方法和时间后进入就绪态
-  >  >
+  >   >
   >   > notifyAll()与wait() 配合while 循环判断某个条件是否满足唤醒和挂起=> 实现线程之间协作
-  > 
-  > - Object.notifyAll() 
-  >
+  >   >
+  >   > Object.notifyAll() 
+  >   >
   >   > 调用wait() 和notify()时，**当前线程必须拥有锁**
-  >  >
+  >   >
   >   > ~~~java
   >   > synchronized(x){
-  >   >   // 手动释放x对象锁
-  >   >   x.notifyAll()
-  >   >   x.wait()
+  >   > // 手动释放x对象锁
+  >   > x.notifyAll()
+  >   > x.wait()
   >   > }
   >   > ~~~
-  > 
   > - Condition （多线程协调通信工具类）
   >
   >   > - await() 当前线程进入等待状态除非被通知或中断
-  >  >
   >   > - singal() 唤醒在Condition上的线程（进入就绪态）
-  > 
   > - 使用BlockingQueue队列协作处理
   >
   >   > [队列协作处理](https://gitee.com/miaomiaole/java_project/blob/master/src/main/java/org/example/concurrency/Toast.java)
-  >  >
+  >   >
   >   > offer(E e，long timeout，TimeUnit unit) 满队等待timeout时间放弃或被中断
   >   >
   >   > put(E e) 满队阻塞当前入队线程，直到队列空闲或线程中断
@@ -782,64 +792,64 @@
   >   > ArrayBlockingQueue：指定容量，在入队或出队并发高情况下使用
   >   >
   >   > LinkedBlockingQueue：入队出队并发高情况下使用（入队和出队不竞争Queue）
-  > 
+  >   
+  > -  **DelayQueue**  延迟队列
+  >
+  >    *对象只能在到期时间才能从队列中取走，队头对象延时时间最长*
+  >   
+  >   - 设置元素有效期，有效期过后出队执行（线程睡眠等待元素到期）
+  >   - 定时任务调度
+  >   - Leader，Follower模式 
   > ---
   >
-  > **java.util.concurrent 线程工具类**
+  > **java.util.concurrent 线程工具类** 
+  >
+  > - Lock 
+  >
+  >   > <img src="image-20220615220930183.png" alt="image-20220615220930183" style="zoom:40%;" /> 
+  >   >
+  >   > AQS：AbstractQueuedSynchronizer，**JUC包实现同步的基础工具**
+  >   >
+  >   > *AQS中，定义volatile int state变量作为共享资源，线程获取资源失败，进入同步队列中等待，线程获取资源执行临界区代码并执行完释放资源，通知同步队列中等待的线程，AQS内置自旋锁实现同步队列，封装入队和出队操作*
+  >   >
+  >   > <img src="image-20220615223018774.png" alt="image-20220615223018774" style="zoom:50%;" /> 
+  >   >
+  >   > Synchronized实现
+  >   >
+  >   > - monitor 
   >
   > - CountDownLatch  设置等待线程数，当计数为0时往下执行 
   >
-  >   >  - countDown() 表示当前线程已完成  计数减一
-  >  >
-  >   >    > 当某个线程中断（发生异常）将导致await() 线程一直阻塞，不能重试
+  >   > countDown() 表示当前线程已完成  计数减一
   >   >
-  >   >  - await() 被阻塞的线程 当计数为0时进入就绪态
-  > 
+  >   > 当某个线程中断（发生异常）将导致await() 线程一直阻塞，不能重试
+  >   >
+  >   > await() 被阻塞的线程 当计数为0时进入就绪态
   > - CyclicBarrier  所有的线程达到屏障点后执行下一个线程
   >
   >   > new CycliBarrier((int parties, Runnable barrierAction)
-  >  >
+  >   >
   >   > parties ：屏障数
   >   >
   >   > barrierAction ：满足屏障数后执行下一个线程
   >   >
-  >   > ---
-  >   >
   >   > - await()表示当前线程达到屏障点被阻塞等待其他线程(执行完后await)
   >   > - rest() 重新执行
   >   > - isBloken() 判断线程是否被中断
-  > 
-  > CyclicBarrier：重点是多个线程，在任意一个线程没有完成，所有的线程都必须等待。
+  >   
+  >   CyclicBarrier：重点是多个线程，在任意一个线程没有完成，所有的线程都必须等待。
+  >   
+  >   CountDownLatch：多个线程等待
   >
-  > CountDownLatch：多个线程等待
+  > - **Semaphore** 信号量
   >
-  > 
+  >   > *计数信号量允许n个任务同时访问资源，许可证，限制线程执行的数量，当一个线程执行时先通过其方法进行获取许可操作，获取到许可的线程继续执行业务逻辑，当线程执行完成后进行释放许可操作，未获取达到许可的线程进行等待或者直接结束。*
+  >   >
+  >   > - acquire(int permits) 获取指定数量许可（阻塞等待其他线程释放许可）
+  >   > - `boolean tryAcquire(int permits, long timeout, TimeUnit unit)` 尝试获取指定的许可数 可指定等待时间
+  >   > - void release()
   >
-  >  **DelayQueue**  延迟队列
-  >
-  >  *对象只能在到期时间才能从队列中取走，队头对象延时时间最长*
-  >
-  > - 设置元素有效期，有效期过后出队执行（线程睡眠等待元素到期）
-  >- 定时任务调度
-  > - Leader，Follower模式 
-  > 
-  > 
-  >
-  >  **Semaphore** 信号量
-  >
-  > *计数信号量允许n个任务同时访问资源，许可证，限制线程执行的数量，*
-  >
-  > 当一个线程执行时先通过其方法进行获取许可操作，获取到许可的线程继续执行业务逻辑，当线程执行完成后进行释放许可操作，未获取达到许可的线程进行等待或者直接结束。
-  >
-  > -  acquire(int permits) 获取指定数量许可（阻塞等待其他线程释放许可）
-  >
-  > - `boolean tryAcquire(int permits, long timeout, TimeUnit unit)` 尝试获取指定的许可数 可指定等待时间
-  >
-  > - void release()
-  >
-  > 
-  >
-  >   **Exchanger** 用于线程通信
+  > -  **Exchanger** 用于线程通信
   
   
 
