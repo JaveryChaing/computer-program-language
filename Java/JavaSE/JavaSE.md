@@ -720,19 +720,11 @@
   >
   > - daemon 后台线程 （非后台线程执行完后，程序终止，后台线程终止）
   >
-  > - Thread.join()  等待一段时间直到**其他线程完成后执行**（**执行线程被暂停执行其他线程**，不会释放线程锁）
+  > - Thread.join()  等待一段时间直到**其他线程完成后执行**（**执行线程被暂停执行其他线程，不会释放线程锁**）
   >
   > - Thread.interrupt() 终止当前执行的线程，（当前线程被阻塞或对其操作则抛出异常)
   >
   >   > 当抛出该异常或者调用Thread.interrupted()方法，则中断被复位
-  >
-  > ---
-  >
-  > **ExecutorService**
-  >
-  > - newCachedThreadPool  根据需要创建新线程，规定时间内存在空闲线程则使用该线程执行任务，无空闲线程则新建。长时间无执行任务会自动释放线程
-  > - FixedThreadPool   创建固定数量的线程执行任务。线程执行异常则新建线程代替。当所有线程处于执行态，则新加入任务在队列中等待。线程池中线程不会自动回收。
-  > - SingleThreadExecutor  线程数量为1的FixedThreadPool
   >
   > ---
   >
@@ -814,9 +806,18 @@
   >   >
   >   > <img src="image-20220615223018774.png" alt="image-20220615223018774" style="zoom:50%;" /> 
   >   >
-  >   > Synchronized实现
+  >   > **Synchronized锁**
   >   >
-  >   > - monitor 
+  >   > - monitor  对象属性，使用synchronized时，通过monitor状态进行加解锁
+  >   > - 偏向锁：当一个线程访问同步块并获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程ID，**该线程在进入和退出同步块时不需要进行CAS操作来加锁和解锁**。**存在竞争线程时则释放偏向锁**
+  >   > - 轻量级锁：使用自旋方式获取锁（CAS），如果当前资源存在锁竞争，锁升级为重量级锁。（防止多个线程无效自旋）
+  >   > - 重量级锁：多个线程竞争锁资源时被阻塞，等待持有锁线程释放锁唤醒阻塞线程 ![image-20220616203549032](image-20220616203549032.png) 
+  >   >
+  >   > **volatile机制**  
+  >   >
+  >   > *确保共享变量在多线程环境下一致更新，对变量的操作都在内存中进行，不会产生副。相对于锁的操作在加锁时读取变量，释放锁时写回内存*
+  >   >
+  >   > *volatile 适用于一写多读的方式，最典型的应用是 CopyOnWriteArrayList。它在修改数据时会把整个集合的数据全部复制出来 ， 对写操作加锁，修改完成后， 再用 setArray()把 array指向新的集合。使用 volatile可 以便读线程尽快地感知 array 的修改 ， 不进行指令重排，操作后即对其他线程可见。* 
   >
   > - CountDownLatch  设置等待线程数，当计数为0时往下执行 
   >
@@ -839,17 +840,49 @@
   >   
   >   CyclicBarrier：重点是多个线程，在任意一个线程没有完成，所有的线程都必须等待。
   >   
-  >   CountDownLatch：多个线程等待
+  >   CountDownLatch：一个线程等待多个线程完成
   >
   > - **Semaphore** 信号量
   >
   >   > *计数信号量允许n个任务同时访问资源，许可证，限制线程执行的数量，当一个线程执行时先通过其方法进行获取许可操作，获取到许可的线程继续执行业务逻辑，当线程执行完成后进行释放许可操作，未获取达到许可的线程进行等待或者直接结束。*
   >   >
   >   > - acquire(int permits) 获取指定数量许可（阻塞等待其他线程释放许可）
-  >   > - `boolean tryAcquire(int permits, long timeout, TimeUnit unit)` 尝试获取指定的许可数 可指定等待时间
-  >   > - void release()
+  >   > - `boolean tryAcquire(int permits, long timeout, TimeUnit unit)` 尝试获取指定的许可数  可指定等待时间
+  >   > - void release() 释放当前线程持有的许可（等待许可的线程可以马上执行）
   >
   > -  **Exchanger** 用于线程通信
+  >
+  > ---
+  >
+  > **线程池**
+  >
+  > *使线程更加合理使用计算机资源，减少线程在创建，合理执行，复用，销毁时带来系统资源开销*
+  >
+  > **ThreadPoolExecutor 核心参数**
+  >
+  > - corePoolSize ：核心常驻线程数
+  > - maximumPoolSize：线程池能**同时执行**最大线程数
+  > - keepAliveTime：非核心线程停留时间
+  > - unit：keepAliveTime时间单位默认是秒
+  > - workQueue：缓存队列当请求线程大于maximumPoolSize时进入**阻塞队列**
+  > - threadFactory：生产一组任务相同的线程
+  > - RejectedExecutionHandler： 拒绝处理策略（并发限流）
+  >   - CallerRunsPolicy： 用调用者所在的线程处理任务
+  >   - AbortPolicy：直接丢弃任务，并抛出异常（默认）
+  >   - DiscardOldstPolicy：丢弃等待队列中最久的任务，并执行当前任务
+  >   - DiscardPolicy：直接丢弃任务，不抛出异常
+  >   - 自定义拒绝策略  实现RejectedExecutionHandler接口
+  >     - 将当前任务数据保存到数据库进行削峰
+  >     - 跳转某个提示页面
+  >     - 打印日志
+  >
+  > <img src="image-20220618043941759.png" alt="image-20220618043941759" style="zoom:50%;" /> 
+  >
+  > **ExecutorService**
+  >
+  > - newCachedThreadPool  根据需要创建新线程，规定时间内存在空闲线程则使用该线程执行任务，无空闲线程则新建。长时间无执行任务会自动释放线程
+  > - FixedThreadPool   创建固定数量的线程执行任务。线程执行异常则新建线程代替。当所有线程处于执行态，则新加入任务在队列中等待。线程池中线程不会自动回收。
+  > - SingleThreadExecutor  线程数量为1的FixedThreadPool
   
   
 
