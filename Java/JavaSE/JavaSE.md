@@ -190,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >         
+  >   > >             
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >         
+  >   > >             
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >         
+  >   > >             
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +273,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >         
+  >   > >             
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -784,11 +784,11 @@
   >   > ArrayBlockingQueue：指定容量，在入队或出队并发高情况下使用
   >   >
   >   > LinkedBlockingQueue：入队出队并发高情况下使用（入队和出队不竞争Queue）
-  >   
+  >
   > -  **DelayQueue**  延迟队列
   >
   >    *对象只能在到期时间才能从队列中取走，队头对象延时时间最长*
-  >   
+  >
   >   - 设置元素有效期，有效期过后出队执行（线程睡眠等待元素到期）
   >   - 定时任务调度
   >   - Leader，Follower模式 
@@ -837,9 +837,9 @@
   >   > - await()表示当前线程达到屏障点被阻塞等待其他线程(执行完后await)
   >   > - rest() 重新执行
   >   > - isBloken() 判断线程是否被中断
-  >   
+  >
   >   CyclicBarrier：重点是多个线程，在任意一个线程没有完成，所有的线程都必须等待。
-  >   
+  >
   >   CountDownLatch：一个线程等待多个线程完成
   >
   > - **Semaphore** 信号量
@@ -865,13 +865,13 @@
   > - keepAliveTime：非核心线程停留时间
   > - unit：keepAliveTime时间单位默认是秒
   > - workQueue：缓存队列当请求线程大于maximumPoolSize时进入**阻塞队列**
-  > - threadFactory：生产一组任务相同的线程
-  > - RejectedExecutionHandler： 拒绝处理策略（并发限流）
+  > - **threadFactory**：生产一组任务相同的线程 (自定义实现线程)
+  > - **RejectedExecutionHandler**： 拒绝处理策略（并发限流）
   >   - CallerRunsPolicy： 用调用者所在的线程处理任务
   >   - AbortPolicy：直接丢弃任务，并抛出异常（默认）
   >   - DiscardOldstPolicy：丢弃等待队列中最久的任务，并执行当前任务
   >   - DiscardPolicy：直接丢弃任务，不抛出异常
-  >   - 自定义拒绝策略  实现RejectedExecutionHandler接口
+  >   - **自定义拒绝策略**  实现RejectedExecutionHandler接口
   >     - 将当前任务数据保存到数据库进行削峰
   >     - 跳转某个提示页面
   >     - 打印日志
@@ -880,9 +880,119 @@
   >
   > **ExecutorService**
   >
+  > - newWorkStealingPool  创建支持有足够的线程支持给定的并行都，通过多个队列减少竞争，把CPU数量设置为默认并行度
+  > - newScheduledThreadPool 支持定时及周期性任务
   > - newCachedThreadPool  根据需要创建新线程，规定时间内存在空闲线程则使用该线程执行任务，无空闲线程则新建。长时间无执行任务会自动释放线程
   > - FixedThreadPool   创建固定数量的线程执行任务。线程执行异常则新建线程代替。当所有线程处于执行态，则新加入任务在队列中等待。线程池中线程不会自动回收。
   > - SingleThreadExecutor  线程数量为1的FixedThreadPool
+  >
+  > ---
+  >
+  > **线程池源码**
+  >
+  > ~~~java
+  >  public void execute(Runnable command) {
+  > 
+  >         if (command == null)
+  >             throw new NullPointerException();
+  >        // 获取包含线程数及线程状态的Integer类型数值
+  >        int c = ctl.get();
+  >       // 工作线程小于核心线程数，创建新线程执行任务
+  >      if (workerCountOf(c) < corePoolSize) {
+  >          // 创建线程
+  >          if (addWorker(command, true))
+  >                 return;
+  >          // 创建失败，，重新获取线程池中线程数量及状态   
+  >          c = ctl.get();
+  >         }
+  >       //线程处于RUNNING状态 且将当线程放入队列
+  >         if (isRunning(c) && workQueue.offer(command)) {
+  >             int recheck = ctl.get();
+  >             // 当前线程不处于运行状态，则移除刚加入的任务
+  >             if (! isRunning(recheck) && remove(command))
+  >                 reject(command);
+  >             // 之前任务处理完，新创建一个线程
+  >             else if (workerCountOf(recheck) == 0)
+  >                 addWorker(null, false);
+  >         }
+  >        // 核心线程和队列已满 创建新线程
+  >         else if (!addWorker(command, false))
+  >             reject(command);
+  >     }
+  > 
+  >      // 根据当前线程池状态，判断是否可以添加新的任务线程，创建成功返回true，否则返回false
+  >     // 返回false的情况可能有
+  >    // 1. 线程池没有处于RUNNING状态，被销毁了
+  >   // 2.线程工厂创建线程失败
+  >   // firstTask: 构建第一个父线程
+  >   // core：新增工作线程判断指标 
+  >    // true：表示新增时，当前RUNNING状态的线程是否少于corePool
+  >     // false：与上相反
+  >     private boolean addWorker(Runnable firstTask, boolean core) {
+  >         retry:
+  >         for (int c = ctl.get();;) {
+  >             // Check if queue empty only if necessary.
+  >             if (runStateAtLeast(c, SHUTDOWN)
+  >                 && (runStateAtLeast(c, STOP)
+  >                     || firstTask != null
+  >                     || workQueue.isEmpty()))
+  >                 return false;
+  > 
+  >             for (;;) {
+  >                 if (workerCountOf(c)
+  >                     >= ((core ? corePoolSize : maximumPoolSize) & COUNT_MASK))
+  >                     return false;
+  >                 if (compareAndIncrementWorkerCount(c))
+  >                     break retry;
+  >                 c = ctl.get();  // Re-read ctl
+  >                 if (runStateAtLeast(c, SHUTDOWN))
+  >                     continue retry;
+  >                 // else CAS failed due to workerCount change; retry inner loop
+  >             }
+  >         }
+  > 
+  >         boolean workerStarted = false;
+  >         boolean workerAdded = false;
+  >         Worker w = null;
+  >         try {
+  >             w = new Worker(firstTask);
+  >             final Thread t = w.thread;
+  >             if (t != null) {
+  >                 final ReentrantLock mainLock = this.mainLock;
+  >                 mainLock.lock();
+  >                 try {
+  >                     // Recheck while holding lock.
+  >                     // Back out on ThreadFactory failure or if
+  >                     // shut down before lock acquired.
+  >                     int c = ctl.get();
+  > 
+  >                     if (isRunning(c) ||
+  >                         (runStateLessThan(c, STOP) && firstTask == null)) {
+  >                         if (t.getState() != Thread.State.NEW)
+  >                             throw new IllegalThreadStateException();
+  >                         workers.add(w);
+  >                         workerAdded = true;
+  >                         int s = workers.size();
+  >                         if (s > largestPoolSize)
+  >                             largestPoolSize = s;
+  >                     }
+  >                 } finally {
+  >                     mainLock.unlock();
+  >                 }
+  >                 if (workerAdded) {
+  >                     t.start();
+  >                     workerStarted = true;
+  >                 }
+  >             }
+  >         } finally {
+  >             if (! workerStarted)
+  >                 addWorkerFailed(w);
+  >         }
+  >         return workerStarted;
+  >     }
+  > ~~~
+  >
+  > 
   
   
 
