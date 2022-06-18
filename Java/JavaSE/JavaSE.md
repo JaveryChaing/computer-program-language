@@ -190,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                     
+  >   > >                         
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                     
+  >   > >                         
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                     
+  >   > >                         
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +273,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                     
+  >   > >                         
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -1328,6 +1328,32 @@
   >
   >   *使用static修饰的ThreadLocal不适用于弱引用机制收回线程变量。必须显式remove操作*
   
+#### **单元测试**
+
+> - **Junit 单元测试框架**
+>
+>   > @Test  标识这个方法是测试方法
+>   >
+>   > @TestFactory  注明一个方法是基于数据驱动 的动态测试数据源
+>   >
+>   > @ParameterizedTest  测试方法使用不同的入参运行多次
+>   >
+>   > @RepeatedTest  让测试方法自定义重复运行次数
+>   >
+>   > @BeforeEach  可以在每一个测试方法运行前 ， 都运行一个指 定的方法。 在 JUnit.5 中， 除了运行@Test注解的方法，还额外支持运行@ ParameterizedTest 和@RepeatedTest. 注解的方法
+>   >
+>   > @AfterEach
+>   >
+>   > @BeforeAll
+>   >
+>   > @AfterAll
+>   >
+>   > @Disabled
+>   >
+>   > @Nested
+>   >
+>   > @Tag
+
   
 
 
