@@ -190,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                 
+  >   > >                     
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                 
+  >   > >                     
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                 
+  >   > >                     
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +273,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                 
+  >   > >                     
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -1020,7 +1020,7 @@
   >                 value = v;
   >             }
   >         }
-  >        
+  > 
   >         ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
   >             table = new Entry[INITIAL_CAPACITY];
   >             int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
@@ -1029,7 +1029,7 @@
   >             setThreshold(INITIAL_CAPACITY);
   >         }
   > 
-  >       
+  > 
   >         private ThreadLocalMap(ThreadLocalMap parentMap) {
   >             Entry[] parentTable = parentMap.table;
   >             int len = parentTable.length;
@@ -1118,7 +1118,7 @@
   >             }
   >         }
   > 
-  >       
+  > 
   >         private void replaceStaleEntry(ThreadLocal<?> key, Object value,
   >                                        int staleSlot) {
   >             Entry[] tab = table;
@@ -1135,7 +1135,7 @@
   >             for (int i = nextIndex(staleSlot, len);
   >                  (e = tab[i]) != null;
   >                  i = nextIndex(i, len)) {
-  >               
+  > 
   >                 if (e.refersTo(key)) {
   >                     e.value = value;
   > 
@@ -1216,7 +1216,7 @@
   >             return removed;
   >         }
   > 
-  >      
+  > 
   >         private void rehash() {
   >             expungeStaleEntries();
   > 
@@ -1305,7 +1305,7 @@
   >     }
   > ~~~
   >
-  > <img src="img/image-20220618155922434.png" alt="image-20220618155922434" style="zoom: 67%;" />  
+  > <img src="img/image-20220618155922434.png" alt="image-20220618155922434" style="zoom: 60%;" />  
   >
   > - Thead 实例中仅有1个ThreadLocalMap对象
   > - **Entry对象的key弱引用指向一个ThreadLocal对象**
@@ -1314,9 +1314,19 @@
   >
   > *所有Entry对象被ThreadLocalMap持有，当线程执行完毕时自动释放，当ThreadLocal被赋值为空时，所有线程中使用该对象引用的key对应的Entry都会被下一处YGC时收回，*
   >
-  >  
+  > ---
   >
-  > 在线程池中使用ThreadLocal对象TransmittableThreadLocal
+  > **在线程池中使用ThreadLocal**
+  >
+  > *父子线程变量共享时使用InheritableThreadLocal*
+  >
+  > - 脏数据
+  >
+  >   *线程中需要显式调用remove()清理上一个任务变量*
+  >
+  > - 内存泄漏
+  >
+  >   *使用static修饰的ThreadLocal不适用于弱引用机制收回线程变量。必须显式remove操作*
   
   
 
