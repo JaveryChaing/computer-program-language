@@ -190,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >             
+  >   > >                 
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >             
+  >   > >                 
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >             
+  >   > >                 
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +273,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >             
+  >   > >                 
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -929,9 +929,11 @@
   >    // true：表示新增时，当前RUNNING状态的线程是否少于corePool
   >     // false：与上相反
   >     private boolean addWorker(Runnable firstTask, boolean core) {
-  >         retry:
+  >        // continue retry 快速退出循环
+  >        retry:
   >         for (int c = ctl.get();;) {
-  >             // Check if queue empty only if necessary.
+  >             // 判断是否为RUNNING，STOP，queue是否为空
+  >             // 判断线程池状态和队列任务是否为空
   >             if (runStateAtLeast(c, SHUTDOWN)
   >                 && (runStateAtLeast(c, STOP)
   >                     || firstTask != null
@@ -939,9 +941,11 @@
   >                 return false;
   > 
   >             for (;;) {
+  >               // 超过最大允许线程数不能添加新线程
   >                 if (workerCountOf(c)
   >                     >= ((core ? corePoolSize : maximumPoolSize) & COUNT_MASK))
   >                     return false;
+  >                // 当前活动线程+1
   >                 if (compareAndIncrementWorkerCount(c))
   >                     break retry;
   >                 c = ctl.get();  // Re-read ctl
@@ -950,22 +954,23 @@
   >                 // else CAS failed due to workerCount change; retry inner loop
   >             }
   >         }
-  > 
+  >        // 开始创建线程工作
   >         boolean workerStarted = false;
   >         boolean workerAdded = false;
   >         Worker w = null;
   >         try {
+  >           // 通过线程工厂创建线程，包装Worker对象
   >             w = new Worker(firstTask);
+  >           // 获取Thread对象
   >             final Thread t = w.thread;
   >             if (t != null) {
+  >                // 加锁执行
   >                 final ReentrantLock mainLock = this.mainLock;
   >                 mainLock.lock();
   >                 try {
-  >                     // Recheck while holding lock.
-  >                     // Back out on ThreadFactory failure or if
-  >                     // shut down before lock acquired.
   >                     int c = ctl.get();
-  > 
+  >                   // 当线程池状态位RUNNING或SHUTDOWN时
+  >                   //且 firstTask为空时
   >                     if (isRunning(c) ||
   >                         (runStateLessThan(c, STOP) && firstTask == null)) {
   >                         if (t.getState() != Thread.State.NEW)
@@ -992,7 +997,326 @@
   >     }
   > ~~~
   >
+  > **ThreadLocal 源码** 
+  >
+  > *给每个线程创建变量副本，保证一个线程对变量的修改不会影响到其他线程对它的使用*
+  >
+  > - 软引用（SoftReference）内存不足时GC软引用对象
+  > - 弱引用（WeakReference）WeakHashMap ，ThreadLocal
+  >   - 当WeakHashMap中key赋值为null，GC后其值也被清空
+  >
   > 
+  >
+  > **ThreadLocal**
+  >
+  > ~~~java
+  >   static class ThreadLocalMap {
+  >      		// WeakReference 弱引用对象
+  >         static class Entry extends WeakReference<ThreadLocal<?>> {
+  >             Object value;
+  >             Entry(ThreadLocal<?> k, Object v) {
+  >                // Entry对象的key指向ThreadLocal
+  >                 super(k);
+  >                 value = v;
+  >             }
+  >         }
+  >        
+  >         ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
+  >             table = new Entry[INITIAL_CAPACITY];
+  >             int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
+  >             table[i] = new Entry(firstKey, firstValue);
+  >             size = 1;
+  >             setThreshold(INITIAL_CAPACITY);
+  >         }
+  > 
+  >       
+  >         private ThreadLocalMap(ThreadLocalMap parentMap) {
+  >             Entry[] parentTable = parentMap.table;
+  >             int len = parentTable.length;
+  >             setThreshold(len);
+  >             table = new Entry[len];
+  > 
+  >             for (Entry e : parentTable) {
+  >                 if (e != null) {
+  >                     @SuppressWarnings("unchecked")
+  >                     ThreadLocal<Object> key = (ThreadLocal<Object>) e.get();
+  >                     if (key != null) {
+  >                         Object value = key.childValue(e.value);
+  >                         Entry c = new Entry(key, value);
+  >                         int h = key.threadLocalHashCode & (len - 1);
+  >                         while (table[h] != null)
+  >                             h = nextIndex(h, len);
+  >                         table[h] = c;
+  >                         size++;
+  >                     }
+  >                 }
+  >             }
+  >         }
+  > 
+  >         private Entry getEntry(ThreadLocal<?> key) {
+  >             int i = key.threadLocalHashCode & (table.length - 1);
+  >             Entry e = table[i];
+  >             if (e != null && e.refersTo(key))
+  >                 return e;
+  >             else
+  >                 return getEntryAfterMiss(key, i, e);
+  >         }
+  > 
+  >         private Entry getEntryAfterMiss(ThreadLocal<?> key, int i, Entry e) {
+  >             Entry[] tab = table;
+  >             int len = tab.length;
+  > 
+  >             while (e != null) {
+  >                 if (e.refersTo(key))
+  >                     return e;
+  >                 if (e.refersTo(null))
+  >                     expungeStaleEntry(i);
+  >                 else
+  >                     i = nextIndex(i, len);
+  >                 e = tab[i];
+  >             }
+  >             return null;
+  >         }
+  > 
+  >         private void set(ThreadLocal<?> key, Object value) {
+  >             Entry[] tab = table;
+  >             int len = tab.length;
+  >             int i = key.threadLocalHashCode & (len-1);
+  > 
+  >             for (Entry e = tab[i];
+  >                  e != null;
+  >                  e = tab[i = nextIndex(i, len)]) {
+  >                 if (e.refersTo(key)) {
+  >                     e.value = value;
+  >                     return;
+  >                 }
+  > 
+  >                 if (e.refersTo(null)) {
+  >                     replaceStaleEntry(key, value, i);
+  >                     return;
+  >                 }
+  >             }
+  > 
+  >             tab[i] = new Entry(key, value);
+  >             int sz = ++size;
+  >             if (!cleanSomeSlots(i, sz) && sz >= threshold)
+  >                 rehash();
+  >         }
+  > 
+  >         private void remove(ThreadLocal<?> key) {
+  >             Entry[] tab = table;
+  >             int len = tab.length;
+  >             int i = key.threadLocalHashCode & (len-1);
+  >             for (Entry e = tab[i];
+  >                  e != null;
+  >                  e = tab[i = nextIndex(i, len)]) {
+  >                 if (e.refersTo(key)) {
+  >                     e.clear();
+  >                     expungeStaleEntry(i);
+  >                     return;
+  >                 }
+  >             }
+  >         }
+  > 
+  >       
+  >         private void replaceStaleEntry(ThreadLocal<?> key, Object value,
+  >                                        int staleSlot) {
+  >             Entry[] tab = table;
+  >             int len = tab.length;
+  >             Entry e;
+  > 
+  >             int slotToExpunge = staleSlot;
+  >             for (int i = prevIndex(staleSlot, len);
+  >                  (e = tab[i]) != null;
+  >                  i = prevIndex(i, len))
+  >                 if (e.refersTo(null))
+  >                     slotToExpunge = i;
+  > 
+  >             for (int i = nextIndex(staleSlot, len);
+  >                  (e = tab[i]) != null;
+  >                  i = nextIndex(i, len)) {
+  >               
+  >                 if (e.refersTo(key)) {
+  >                     e.value = value;
+  > 
+  >                     tab[i] = tab[staleSlot];
+  >                     tab[staleSlot] = e;
+  > 
+  >                     // Start expunge at preceding stale entry if it exists
+  >                     if (slotToExpunge == staleSlot)
+  >                         slotToExpunge = i;
+  >                     cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);
+  >                     return;
+  >                 }
+  > 
+  >                 // If we didn't find stale entry on backward scan, the
+  >                 // first stale entry seen while scanning for key is the
+  >                 // first still present in the run.
+  >                 if (e.refersTo(null) && slotToExpunge == staleSlot)
+  >                     slotToExpunge = i;
+  >             }
+  > 
+  >             // If key not found, put new entry in stale slot
+  >             tab[staleSlot].value = null;
+  >             tab[staleSlot] = new Entry(key, value);
+  > 
+  >             // If there are any other stale entries in run, expunge them
+  >             if (slotToExpunge != staleSlot)
+  >                 cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);
+  >         }
+  > 
+  >         private int expungeStaleEntry(int staleSlot) {
+  >             Entry[] tab = table;
+  >             int len = tab.length;
+  > 
+  >             // expunge entry at staleSlot
+  >             tab[staleSlot].value = null;
+  >             tab[staleSlot] = null;
+  >             size--;
+  > 
+  >             // Rehash until we encounter null
+  >             Entry e;
+  >             int i;
+  >             for (i = nextIndex(staleSlot, len);
+  >                  (e = tab[i]) != null;
+  >                  i = nextIndex(i, len)) {
+  >                 ThreadLocal<?> k = e.get();
+  >                 if (k == null) {
+  >                     e.value = null;
+  >                     tab[i] = null;
+  >                     size--;
+  >                 } else {
+  >                     int h = k.threadLocalHashCode & (len - 1);
+  >                     if (h != i) {
+  >                         tab[i] = null;
+  > 
+  >                         // Unlike Knuth 6.4 Algorithm R, we must scan until
+  >                         // null because multiple entries could have been stale.
+  >                         while (tab[h] != null)
+  >                             h = nextIndex(h, len);
+  >                         tab[h] = e;
+  >                     }
+  >                 }
+  >             }
+  >             return i;
+  >         }
+  >         private boolean cleanSomeSlots(int i, int n) {
+  >             boolean removed = false;
+  >             Entry[] tab = table;
+  >             int len = tab.length;
+  >             do {
+  >                 i = nextIndex(i, len);
+  >                 Entry e = tab[i];
+  >                 if (e != null && e.refersTo(null)) {
+  >                     n = len;
+  >                     removed = true;
+  >                     i = expungeStaleEntry(i);
+  >                 }
+  >             } while ( (n >>>= 1) != 0);
+  >             return removed;
+  >         }
+  > 
+  >      
+  >         private void rehash() {
+  >             expungeStaleEntries();
+  > 
+  >             // Use lower threshold for doubling to avoid hysteresis
+  >             if (size >= threshold - threshold / 4)
+  >                 resize();
+  >         }
+  > 
+  >         /**
+  >          * Double the capacity of the table.
+  >          */
+  >         private void resize() {
+  >             Entry[] oldTab = table;
+  >             int oldLen = oldTab.length;
+  >             int newLen = oldLen * 2;
+  >             Entry[] newTab = new Entry[newLen];
+  >             int count = 0;
+  > 
+  >             for (Entry e : oldTab) {
+  >                 if (e != null) {
+  >                     ThreadLocal<?> k = e.get();
+  >                     if (k == null) {
+  >                         e.value = null; // Help the GC
+  >                     } else {
+  >                         int h = k.threadLocalHashCode & (newLen - 1);
+  >                         while (newTab[h] != null)
+  >                             h = nextIndex(h, newLen);
+  >                         newTab[h] = e;
+  >                         count++;
+  >                     }
+  >                 }
+  >             }
+  > 
+  >             setThreshold(newLen);
+  >             size = count;
+  >             table = newTab;
+  >         }
+  > 
+  >         /**
+  >          * Expunge all stale entries in the table.
+  >          */
+  >         private void expungeStaleEntries() {
+  >             Entry[] tab = table;
+  >             int len = tab.length;
+  >             for (int j = 0; j < len; j++) {
+  >                 Entry e = tab[j];
+  >                 if (e != null && e.refersTo(null))
+  >                     expungeStaleEntry(j);
+  >             }
+  >         }
+  >     }
+  > 
+  > 
+  > public T get() {
+  >         Thread t = Thread.currentThread();
+  >        // 每个线程都有ThreadMap 
+  >         ThreadLocalMap map = getMap(t);
+  >        // 不为空则表示线程中存在线程变量
+  >         if (map != null) {
+  >             ThreadLocalMap.Entry e = map.getEntry(this);
+  >             if (e != null) {
+  >                 @SuppressWarnings("unchecked")
+  >                 T result = (T)e.value;
+  >                 return result;
+  >             }
+  >         }
+  >        // 为空初始化线程变量
+  >         return setInitialValue();
+  >     }
+  > 
+  >  private T setInitialValue() {
+  >        // 执行ThreadMap的initialValue方法
+  >         T value = initialValue();
+  >         Thread t = Thread.currentThread();
+  >         ThreadLocalMap map = getMap(t);
+  >         if (map != null) {
+  >            // key为当前线程  value 变量
+  >             map.set(this, value);
+  >         } else {
+  >             createMap(t, value);
+  >         }
+  >         if (this instanceof TerminatingThreadLocal) {
+  >             TerminatingThreadLocal.register((TerminatingThreadLocal<?>) this);
+  >         }
+  >         return value;
+  >     }
+  > ~~~
+  >
+  > <img src="img/image-20220618155922434.png" alt="image-20220618155922434" style="zoom: 67%;" />  
+  >
+  > - Thead 实例中仅有1个ThreadLocalMap对象
+  > - **Entry对象的key弱引用指向一个ThreadLocal对象**
+  > - **ThradLocalMap**可以存储多个Entry对象
+  > - **ThreadLocal**对象可以被多个线程共享
+  >
+  > *所有Entry对象被ThreadLocalMap持有，当线程执行完毕时自动释放，当ThreadLocal被赋值为空时，所有线程中使用该对象引用的key对应的Entry都会被下一处YGC时收回，*
+  >
+  >  
+  >
+  > 在线程池中使用ThreadLocal对象TransmittableThreadLocal
   
   
 
