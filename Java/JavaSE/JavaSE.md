@@ -190,15 +190,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                         
+  >   > >                             
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                         
+  >   > >                             
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                         
+  >   > >                             
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +273,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                         
+  >   > >                             
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -870,7 +870,7 @@
   >   > 当某个线程中断（发生异常）将导致await() 线程一直阻塞，不能重试
   >   >
   >   > await() 被阻塞的线程 当计数为0时进入就绪态
-  >   
+  >
   > - CyclicBarrier  所有的线程达到屏障点后执行下一个线程
   >
   >   > new CycliBarrier((int parties, Runnable barrierAction)
@@ -895,17 +895,39 @@
   >   > - `boolean tryAcquire(int permits, long timeout, TimeUnit unit)` 尝试获取指定的许可数  可指定等待时间
   >   > - void release() 释放当前线程持有的许可（等待许可的线程可以马上执行）
   >
+  > - **Atomic 原子操作类**
+  >
+  >   > - int addAndGet(int delta)  入参与原子变量相加返回结果
+  >   > - boolean compareAndSet(int expect,int update)  原子变量等于expect则将原子变量赋值update
+  >   > - int getAndIncrement()  原子变量当前值加1，**返回自增前的值。**
+  >   > - void lazySet(int newValue)  原子变量终会设置成newValue（其他线程可能在一段时间还是能读取旧值）
+  >   > - int getAndSet(int newValue) 以原子方式设置为newValue的值，**并返回旧值**。
+  >   >
+  >   > 原子更新引用类型
+  >   >
+  >   > - AtomicReference： 原子更新引用类
+  >   > - AtomicReferenceFieldUpdater：原子更新引用类型中字段
+  >
   > - **Exchanger** 用于线程通信
   >
   > - **Fork/Join框架**
   >
-  >   > *将大任务分割成若干个小任务，并汇总每个小任务的结果得到大任务处理结果*
+  >   > *将大任务分割成若干个小任务，并汇总每个小任务的结果得到大任务处理结果,多线程归并处理*
   >   >
   >   > Fork：切分
   >   >
   >   > Join：合并
   >   >
-  >   > 
+  >   > ForkJoinTask
+  >   >
+  >   > - RecursiveAction：用于没有返回结果任务
+  >   > - RecursiveTask：用于有结果返回任务
+  >   >
+  >   > ForkJoinPool：ForkJoinTask通过线程池执行
+  >   
+  > - **FutureTask 异步任务**
+  >
+  >   > FutureTask 未启动或已启动状态时使用get()获取结构会导致调用线程阻塞
   >
   > ---
   >
@@ -942,6 +964,8 @@
   > - SingleThreadExecutor  线程数量为1的FixedThreadPool
   >
   > ---
+  >
+  > 
   >
   > **线程池源码**
   >
