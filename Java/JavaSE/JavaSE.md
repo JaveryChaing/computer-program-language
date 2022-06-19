@@ -97,7 +97,7 @@
   >   >
   >   > Queue
   >
-  > - 树
+  > - **树**
   >
   >   > **二叉排序树(二叉搜索树)**
   >   >
@@ -278,7 +278,7 @@
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
   >   >
-  >   > - 成员字段
+  >   > - **成员字段**
   >   >
   >   >   - ~~~java
   >   >     // node数组，存放数据
@@ -305,14 +305,12 @@
   >   >
   >   >   - <img src="img/image-20220614212744603.png" alt="image-20220614212744603" style="zoom:40%;" /> 
   >   >
-  >   >   - <img src="/Users/miaomiaole/Code/computer-program-language/Java/JavaSE/image-20220614212903715.png" alt="image-20220614212903715" style="zoom:40%;" /> 
+  >   >   - <img src="img/image-20220614212903715.png" alt="image-20220614212903715" style="zoom:40%;" /> 
   >   >
-  >   >      
-  >   >
-  >   > - **并发控制逻辑**
+  >   >      - **并发控制逻辑**
   >   >
   >   >   - ~~~java
-  >   >      private final Node<K,V>[] initTable() {
+  >   >     private final Node<K,V>[] initTable() {
   >   >             Node<K,V>[] tab; int sc;
   >   >           // table tab都为空 且sizeCtl小于 0 存在线程正在初始化
   >   >             while ((tab = table) == null || tab.length == 0) {
@@ -551,8 +549,10 @@
   >   >             }
   >   >         }
   >   >     ~~~
-  >   >
-  >   >   - TODO  ConcurrentHashMap 源码解析
+  >   > 
+  >   >   - ConcurrentHashMap 源码解析
+  >   >  
+  >   >      *get操作过程中使用volatile变量修饰，不需要加锁，变量更改对所有线程可见，put过程中判断是否扩容和插槽加锁，插槽上没元素使用cas将元素插入数组，插槽上存在元素使用synchronized加锁插入。*
   >   >
   >   >   
   >   >
@@ -720,7 +720,7 @@
   >
   > - daemon 后台线程 （非后台线程执行完后，程序终止，后台线程终止）
   >
-  > - Thread.join()  等待一段时间直到**其他线程完成后执行**（**执行线程被暂停执行其他线程，不会释放线程锁**）
+  > - Thread.join()  等待一段时间直到**其他线程完成后执行**（**执行线程被暂停执行其他线程**）
   >
   > - Thread.interrupt() 终止当前执行的线程，（当前线程被阻塞或对其操作则抛出异常)
   >
@@ -796,15 +796,48 @@
   >
   > **java.util.concurrent 线程工具类** 
   >
-  > - Lock 
+  > - **Lock** 
   >
   >   > <img src="img/image-20220615220930183.png" alt="image-20220615220930183" style="zoom:40%;" /> 
   >   >
   >   > AQS：AbstractQueuedSynchronizer，**JUC包实现同步的基础工具**
   >   >
-  >   > *AQS中，定义volatile int state变量作为共享资源，线程获取资源失败，进入同步队列中等待，线程获取资源执行临界区代码并执行完释放资源，通知同步队列中等待的线程，AQS内置自旋锁实现同步队列，封装入队和出队操作*
+  >   > *AQS中，定义volatile int state变量作为共享资源，线程获取资源失败，进入同步队列中等待，线程获取资源执行临界区代码并执行完释放资源，通知同步队列中等待的线程，AQS**内置自旋锁**实现同步队列，封装入队和出队操作*
   >   >
   >   > <img src="img/image-20220615223018774.png" alt="image-20220615223018774" style="zoom:50%;" /> 
+  >   >
+  >   > - getState()获取当前同步状态
+  >   > - setState(int newState) 设置当前同步状态
+  >   > - compareAndSetState(int expect,int update) : 使用CAS设置当前状态
+  >   > - tryAcquite(int arg) 使用CAS设置同步状态（独占锁）
+  >   > - tryRelease(int arg) 释放同步状态并唤醒等待同步线程
+  >   > - tryAcquireShared(int arg) 获取同步状态（共享锁，大于0表示成功）
+  >   > - tryReleaseShared(int arg) 释放共享锁
+  >   > - isHeldExclusively() 判断资源是否被线程占用
+  >   >
+  >   > *独占锁：表示只能存在一个线程访问资源，共享锁可以多个线程同时访问资源*
+  >   >
+  >   > 
+  >   >
+  >   > **同步队列**
+  >   >
+  >   > *当线程获取同步状态失败时，同步器将线程及其等待状态信息构造节点加入队列，同时阻塞当前线程，同步状态释放时，将首节点的线程唤醒尝试获取同步状态*
+  >   >
+  >   > ![image-20220619145906079](img/image-20220619145906079.png) 
+  >   >
+  >   > 首节点是获取同步状态成功的节点，首节点的线程在释放同步状态 时，将会唤醒后继节点，而后继节点将会在获取同步状态成功时将自己设置为首节点
+  >   >
+  >   > ![image-20220619150121884](img/image-20220619150121884.png) 
+  >   >
+  >   > **独占式同步状态获取与释放**
+  >   >
+  >   > *获取同步状态失败，构造同步节点到队尾，并每个节点以自旋方式判断。被阻塞的线程节点依靠**前驱节点出队或阻塞**实现唤醒*
+  >   >
+  >   > ![image-20220619151241863](/Users/miaomiaole/Code/computer-program-language/Java/JavaSE/image-20220619151241863.png) 
+  >   >
+  >   > <img src="img/image-20220619151535400.png" alt="image-20220619151535400" style="zoom:47%;" /> 
+  >   >
+  >   > ---
   >   >
   >   > **Synchronized锁**
   >   >
@@ -819,13 +852,25 @@
   >   >
   >   > *volatile 适用于一写多读的方式，最典型的应用是 CopyOnWriteArrayList。它在修改数据时会把整个集合的数据全部复制出来 ， 对写操作加锁，修改完成后， 再用 setArray()把 array指向新的集合。使用 volatile可 以便读线程尽快地感知 array 的修改 ， 不进行指令重排，操作后即对其他线程可见。* 
   >
-  > - CountDownLatch  设置等待线程数，当计数为0时往下执行 
+  > - ReentrantLock重入锁
+  >
+  >   > *支持一个线程对资源重复加锁，获取锁时公平和非公平选择*
+  >
+  > - ReadWriteLock
+  >
+  >   > - int getReadLockCount() 返回当前读锁获取次数
+  >   > - int getReadHoldCount() 返回当前线程获取读锁次数（ThreadLocal实现）
+  >   > - boolean isWriteLocked() 判断写锁是否被获取
+  >   > - int getWriteHoldCount() 返回当前写锁获取次数
+  >
+  > - **CountDownLatch**  设置等待线程数，当计数为0时往下执行 
   >
   >   > countDown() 表示当前线程已完成  计数减一
   >   >
   >   > 当某个线程中断（发生异常）将导致await() 线程一直阻塞，不能重试
   >   >
   >   > await() 被阻塞的线程 当计数为0时进入就绪态
+  >   
   > - CyclicBarrier  所有的线程达到屏障点后执行下一个线程
   >
   >   > new CycliBarrier((int parties, Runnable barrierAction)
@@ -850,7 +895,17 @@
   >   > - `boolean tryAcquire(int permits, long timeout, TimeUnit unit)` 尝试获取指定的许可数  可指定等待时间
   >   > - void release() 释放当前线程持有的许可（等待许可的线程可以马上执行）
   >
-  > -  **Exchanger** 用于线程通信
+  > - **Exchanger** 用于线程通信
+  >
+  > - **Fork/Join框架**
+  >
+  >   > *将大任务分割成若干个小任务，并汇总每个小任务的结果得到大任务处理结果*
+  >   >
+  >   > Fork：切分
+  >   >
+  >   > Join：合并
+  >   >
+  >   > 
   >
   > ---
   >
