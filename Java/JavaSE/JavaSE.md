@@ -715,22 +715,26 @@
   > ---
   >
   > - Thread.yield() 线程让步（将当前获取CPU执行权让给其他线程，该线程进入就绪态，**不会释放锁**）
-  >
   > - Thread.sleep()  线程睡眠（将当前CPU执行权让给其他线程，该线程进入阻塞态，**不会释放锁**）
-  >
   > - daemon 后台线程 （非后台线程执行完后，程序终止，后台线程终止）
-  >
-  > - Thread.join()  等待一段时间直到**其他线程完成后执行**（**执行线程被暂停执行其他线程**）
-  >
-  > - Thread.interrupt() 终止当前执行的线程，（当前线程被阻塞或对其操作则抛出异常)
-  >
-  >   > 当抛出该异常或者调用Thread.interrupted()方法，则中断被复位
+  > - **interrupt()** ：另一个线程调用**被阻塞线程的interrupt方法**被阻塞线程会抛出InterruptedException异常(**线程周期未结束**)
+  > - isInterruptd()：判断当前线程是否被中断（**线程捕获中断信号后会将interrupt变量复位**）
+  > - interrupted()：静态方法，对比isInterruptd()为成员方法，调用Thread.interrupted()方法后会立即对interrupt变量复位
+  > - Thread.join() ：等待Thread.join()执行完或被中断后，在执行本线程
   >
   > ---
   >
   > **UncaughtException-Handler 线程异常处理器**
   >
   > [异常处理案例](https://gitee.com/miaomiaole/java_project/blob/master/src/main/java/org/example/concurrency/ExceptionThread.java)
+  >
+  > ---
+  >
+  > **守护线程**
+  >
+  > JVM中**没有非守护线程执行**，JVM自动退出
+  >
+  > *守护线程具备自动结束生命周期特性，适用于执行后台任务，当JVM退出时，线程自动关闭，在线程池中使用ThreadFactory工厂创建线程*
   >
   > ---
   >
