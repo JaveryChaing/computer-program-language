@@ -715,16 +715,32 @@
   > ---
   >
   > - Thread.yield() 线程让步（将当前获取CPU执行权让给其他线程，该线程进入就绪态，**不会释放锁**）
+  >
   > - Thread.sleep()  线程睡眠（将当前CPU执行权让给其他线程，该线程进入阻塞态，**不会释放锁**）
+  >
   > - daemon 后台线程 （非后台线程执行完后，程序终止，后台线程终止）
+  >
   > - **interrupt()** ：另一个线程调用**被阻塞线程的interrupt方法**被阻塞线程会抛出InterruptedException异常(**线程周期未结束**)
+  >
   > - isInterruptd()：判断当前线程是否被中断（**线程捕获中断信号后会将interrupt变量复位**）
+  >
   > - interrupted()：静态方法，对比isInterruptd()为成员方法，调用Thread.interrupted()方法后会立即对interrupt变量复位
+  >
   > - Thread.join() ：等待Thread.join()执行完或被中断后，在执行本线程
+  >
+  > - ThreadGroup：线程组，用于批量操作线程
+  >
+  >   > int enumerate(ThreadGroup [] list) 复制
+  >
+  > - Hook线程（钩子线程）
+  >
+  >   > 防止程序重复启动
   >
   > ---
   >
   > **UncaughtException-Handler 线程异常处理器**
+  >
+  > <img src="img/image-20220622231031838.png" alt="image-20220622231031838" style="zoom:50%;" /> 
   >
   > [异常处理案例](https://gitee.com/miaomiaole/java_project/blob/master/src/main/java/org/example/concurrency/ExceptionThread.java)
   >
@@ -853,7 +869,7 @@
   >   > *确保共享变量在多线程环境下一致更新，对变量的操作都在内存中进行，不会产生副。相对于锁的操作在加锁时读取变量，释放锁时写回内存*
   >   >
   >   > *volatile 适用于一写多读的方式，最典型的应用是 CopyOnWriteArrayList。它在修改数据时会把整个集合的数据全部复制出来 ， 对写操作加锁，修改完成后， 再用 setArray()把 array指向新的集合。使用 volatile可 以便读线程尽快地感知 array 的修改 ， 不进行指令重排，操作后即对其他线程可见。* 
-  >   
+  >
   > - ReentrantLock重入锁
   >
   >   > *支持一个线程对资源重复加锁，获取锁时公平和非公平选择*
@@ -861,22 +877,22 @@
   > - ReadWriteLock
   >
   >   > - int getReadLockCount() 返回当前读锁获取次数
-  >  > - int getReadHoldCount() 返回当前线程获取读锁次数（ThreadLocal实现）
+  >   > - int getReadHoldCount() 返回当前线程获取读锁次数（ThreadLocal实现）
   >   > - boolean isWriteLocked() 判断写锁是否被获取
   >   > - int getWriteHoldCount() 返回当前写锁获取次数
-  > 
+  >
   > - **CountDownLatch**  设置等待线程数，当计数为0时往下执行 
   >
   >   > countDown() 表示当前线程已完成  计数减一
-  >  >
+  >   >
   >   > 当某个线程中断（发生异常）将导致await() 线程一直阻塞，不能重试
   >   >
   >   > await() 被阻塞的线程 当计数为0时进入就绪态
-  > 
+  >
   > - CyclicBarrier  所有的线程达到屏障点后执行下一个线程
   >
   >   > new CycliBarrier((int parties, Runnable barrierAction)
-  >  >
+  >   >
   >   > parties ：屏障数
   >   >
   >   > barrierAction ：满足屏障数后执行下一个线程
@@ -884,7 +900,7 @@
   >   > - await()表示当前线程达到屏障点被阻塞等待其他线程(执行完后await)
   >   > - rest() 重新执行
   >   > - isBloken() 判断线程是否被中断
-  > 
+  >
   >   CyclicBarrier：重点是多个线程，在任意一个线程没有完成，所有的线程都必须等待。
   >
   >   CountDownLatch：一个线程等待多个线程完成
@@ -892,15 +908,15 @@
   > - **Semaphore** 信号量
   >
   >   > *计数信号量允许n个任务同时访问资源，许可证，限制线程执行的数量，当一个线程执行时先通过其方法进行获取许可操作，获取到许可的线程继续执行业务逻辑，当线程执行完成后进行释放许可操作，未获取达到许可的线程进行等待或者直接结束。*
-  >  >
+  >   >
   >   > - acquire(int permits) 获取指定数量许可（阻塞等待其他线程释放许可）
   >   > - `boolean tryAcquire(int permits, long timeout, TimeUnit unit)` 尝试获取指定的许可数  可指定等待时间
   >   > - void release() 释放当前线程持有的许可（等待许可的线程可以马上执行）
-  > 
+  >
   > - **Atomic 原子操作类**
   >
   >   > - int addAndGet(int delta)  入参与原子变量相加返回结果
-  >  > - boolean compareAndSet(int expect,int update)  原子变量等于expect则将原子变量赋值update
+  >   > - boolean compareAndSet(int expect,int update)  原子变量等于expect则将原子变量赋值update
   >   > - int getAndIncrement()  原子变量当前值加1，**返回自增前的值。**
   >   > - void lazySet(int newValue)  原子变量终会设置成newValue（其他线程可能在一段时间还是能读取旧值）
   >   > - int getAndSet(int newValue) 以原子方式设置为newValue的值，**并返回旧值**。
@@ -909,13 +925,13 @@
   >   >
   >   > - AtomicReference： 原子更新引用类
   >   > - AtomicReferenceFieldUpdater：原子更新引用类型中字段
-  > 
+  >
   > - **Exchanger** 用于线程通信
   >
   > - **Fork/Join框架**
   >
   >   > *将大任务分割成若干个小任务，并汇总每个小任务的结果得到大任务处理结果,多线程归并处理*
-  >  >
+  >   >
   >   > Fork：切分
   >   >
   >   > Join：合并
@@ -926,9 +942,9 @@
   >   > - RecursiveTask：用于有结果返回任务
   >   >
   >   > ForkJoinPool：ForkJoinTask通过线程池执行
-  > 
+  >
   > - **FutureTask 异步任务**
-  >   
+  >
   >   > FutureTask 未启动或已启动状态时使用get()获取结构会导致调用线程阻塞
   >
   > ---
@@ -940,7 +956,7 @@
   > **ThreadPoolExecutor 核心参数**
   >
   > - corePoolSize ：核心常驻线程数
-  >- maximumPoolSize：线程池能**同时执行**最大线程数
+  > - maximumPoolSize：线程池能**同时执行**最大线程数
   > - keepAliveTime：非核心线程停留时间
   > - unit：keepAliveTime时间单位默认是秒
   > - workQueue：缓存队列当请求线程大于maximumPoolSize时进入**阻塞队列**
@@ -954,17 +970,17 @@
   >     - 将当前任务数据保存到数据库进行削峰
   >     - 跳转某个提示页面
   >     - 打印日志
-  > 
+  >
   > <img src="img/image-20220618043941759.png" alt="image-20220618043941759" style="zoom:50%;" /> 
   >
   > **ExecutorService**
   >
   > - newWorkStealingPool  创建支持有足够的线程支持给定的并行都，通过多个队列减少竞争，把CPU数量设置为默认并行度
-  >- newScheduledThreadPool 支持定时及周期性任务
+  > - newScheduledThreadPool 支持定时及周期性任务
   > - newCachedThreadPool  根据需要创建新线程，规定时间内存在空闲线程则使用该线程执行任务，无空闲线程则新建。长时间无执行任务会自动释放线程
   > - FixedThreadPool   创建固定数量的线程执行任务。线程执行异常则新建线程代替。当所有线程处于执行态，则新加入任务在队列中等待。线程池中线程不会自动回收。
   > - SingleThreadExecutor  线程数量为1的FixedThreadPool
-  > 
+  >
   > ---
   >
   > 
@@ -972,7 +988,7 @@
   > **线程池源码**
   >
   > ~~~java
-  > public void execute(Runnable command) {
+  >  public void execute(Runnable command) {
   > 
   >         if (command == null)
   >             throw new NullPointerException();
@@ -1077,21 +1093,21 @@
   >         return workerStarted;
   >     }
   > ~~~
-  > 
+  >
   > **ThreadLocal 源码** 
   >
   > *给每个线程创建变量副本，保证一个线程对变量的修改不会影响到其他线程对它的使用*
   >
   > - 软引用（SoftReference）内存不足时GC软引用对象
-  >- 弱引用（WeakReference）WeakHashMap ，ThreadLocal
+  > - 弱引用（WeakReference）WeakHashMap ，ThreadLocal
   >   - 当WeakHashMap中key赋值为null，GC后其值也被清空
-  > 
+  >
   > 
   >
   > **ThreadLocal**
   >
   > ~~~java
-  >  static class ThreadLocalMap {
+  >   static class ThreadLocalMap {
   >      		// WeakReference 弱引用对象
   >         static class Entry extends WeakReference<ThreadLocal<?>> {
   >             Object value;
@@ -1385,14 +1401,14 @@
   >         return value;
   >     }
   > ~~~
-  > 
+  >
   > <img src="img/image-20220618155922434.png" alt="image-20220618155922434" style="zoom: 60%;" />  
   >
   > - Thead 实例中仅有1个ThreadLocalMap对象
-  >- **Entry对象的key弱引用指向一个ThreadLocal对象**
+  > - **Entry对象的key弱引用指向一个ThreadLocal对象**
   > - **ThradLocalMap**可以存储多个Entry对象
   > - **ThreadLocal**对象可以被多个线程共享
-  > 
+  >
   > *所有Entry对象被ThreadLocalMap持有，当线程执行完毕时自动释放，当ThreadLocal被赋值为空时，所有线程中使用该对象引用的key对应的Entry都会被下一处YGC时收回，*
   >
   > ---
