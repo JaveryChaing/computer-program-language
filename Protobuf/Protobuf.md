@@ -100,6 +100,13 @@
 > CORPUS_VIDEO = 7;
 > }
 > ~~~
+>
+> ~~~shell
+> # grpc 与message 代码生成 
+> protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative helloworld.proto
+> ~~~
+>
+> 
 
 - #### **JSON与Protobuf转换**
 
