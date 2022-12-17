@@ -1,5 +1,19 @@
 ## Netty
 
+> JDK中NIO网络编程
+>
+> - 缓冲区Buffer
+>
+> - 通道Channel（全双工，用户网络数据读写）
+>
+>   > SelectableChannel 
+>   >
+>   > FileChannel
+>
+> - 多路复用器Selector
+>
+>   > Selector不断轮询其注册上的Channel，Channel发送读写事件，Channel处于就绪态，会被Selector轮询出来，通过SelectionKey获取就绪Channel进行网络读写
+
 *基于Reactor模型的网络通信应用框架（非阻塞异步事件驱动）*
 
 >  Netty 处理流程
