@@ -193,11 +193,13 @@
   >
   > - 效率低，无法兼容其他语言
   >
+  > **JBoss Marshalling**
+  >
+  > - 对JDK默认的序列化框架进行优化，与JDK中Serializable 兼容
+  >
   > **ProtoBuf**
   >
   > **Thrift**
-  >
-  > **JBoss Marshalling**
   >
   > 
   
