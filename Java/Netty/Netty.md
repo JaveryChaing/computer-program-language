@@ -84,7 +84,7 @@
   >
   > <img src="img\image-20221209152536338.png" alt="image-20221209152536338" style="zoom: 67%;" /> 
   >
-  >  
+  > 
   >
   > **适配器类：**
   >
@@ -108,7 +108,7 @@
   >
   > - channelInactive：当 Channel 离开活动状态并且不再连接它的远程节点时被调
   >
-  > - **channelRead：当从服务器接收到一条消息时被调用(需要处理粘包)，需要手动释放ByteBuf实例相关内存（使用ReferenceCountUtil.release(msg) 进行释放 或使用用 SimpleChannelInboundHandler进行继承从写）**
+  > - **channelRead：当从服务器接收到一条消息时被调用(需要处理粘包)，需要手动释放ByteBuf实例相关内存（使用ReferenceCountUtil.release(msg) 进行释放 或使用用 SimpleChannelInboundHandler进行继承重写）**
   >
   > - channelReadComplete：当Channel上的一个读操作完成时被调用 （当所有可读的字节都已经从 Channel 中读取之后，将会调用该回调方法）
   >
@@ -137,27 +137,19 @@
   > - write：当请求通过 Channel 将数据写到远程节点时 被调用
   >
   >   > ChannelPromise与ChannelFuture 定义了回调事件
+  >   >
+  >   > ##### ChannelFuture（在操作完成时通知应用程序的方式）
+  >   >
+  >   > > ChannelFutureListener：在操作完成时获得通知（实现operationComplete方法）
+  >   > >
+  >   > > channel：返回当前正在进行IO操作的通道
+  >   > >
+  >   > > sync：等待异步操作执行完毕，将异步改为同步
   >
-  >   
+  > **ChannelHandlerContext**
+  >
+  > 
 
-- #### ChannelHandlerContext
-
-  > 保存 Channel 所有上下文信息
-  >
-  > close：关闭通道
-  >
-  > flush：刷新
-  >
-  > writeAndFlush：将数据写到 ChannelPipeline 中当前 ChannelHandler 的下一个 ChannelHandler 开始处理
-  
-- #### ChannelFuture（在操作完成时通知应用程序的方式）
-
-  > ChannelFutureListener：在操作完成时获得通知（实现operationComplete方法）
-  >
-  > channel：返回当前正在进行IO操作的通道
-  >
-  > sync：等待异步操作执行完毕，将异步改为同步
-  
 - #### Unpooled
 
   > **零拷贝**
