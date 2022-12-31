@@ -123,7 +123,7 @@
   > - ObjectFactory：创建Mapper映射结果对象实例，DefaultObjectFactory唯一实现接口
   > - ProxyFactory：创建动态代理对象，实现Mybatis懒加载功能，CglibProxyFactory和**Javassist**ProxyFactory实现动态代理
   >
-  >  
+  > 
   >
   > #### **Mybatis操作数据库流程**
   >
@@ -137,7 +137,7 @@
   >   //获取UserMapper代理对象（数据库与Pojo映射）
   >   UserMapper usermapper= sqlSession.getMapper(UserMapper.class);
   >   User user = usermapper.getUser(1);  
-  >    
+  >   
   >   // 方式二配置
   >   Reader mybatisConfig = Resources.getResourceAsReader("mybatis-config.xml");
   >   SqlSessionManager sqlSessionManager = SqlSessionManager.newInstance(mybatisConfig);
@@ -149,7 +149,94 @@
   >
   > - SqlSession：Mybatis提供面向用户操作数据库API
   >
+  > - Mapper：定义SQL执行接口
+  >
+  >   > MapperRegistry注册Mapper接口与Class对象之间映射关系
+  >   >
+  >   > MapperProxyFactory创建代理对象MapperProxy
+  >   >
+  >   > <img src="img\image-20230101004930738.png" alt="image-20230101004930738" style="zoom:50%;" />  
+  >   >
+  >   > MapperProxy类创建Java实例(JDK动态代理)
+  >   >
+  >   > Mapper 方法调用
+  >   >
+  >   > - ~~~java
+  >   >   @Override
+  >   >   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+  >   >       try {
+  >   >          // 对Object类继承的方法不做处理（toString，wait方法）
+  >   >         if (Object.class.equals(method.getDeclaringClass())) {
+  >   >           return method.invoke(this, args);
+  >   >         } else {
+  >   >           // 对Mapper接口中的方法进行代理实现
+  >   >           return cachedInvoker(method).invoke(proxy, method, args, sqlSession);
+  >   >         }
+  >   >       } catch (Throwable t) {
+  >   >         throw ExceptionUtil.unwrapThrowable(t);
+  >   >       }
+  >   >     }
+  >   >   
+  >   >     private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
+  >   >       try {
+  >   >         return MapUtil.computeIfAbsent(methodCache, method, m -> {
+  >   >           if (m.isDefault()) {
+  >   >             try {
+  >   >               if (privateLookupInMethod == null) {
+  >   >                 return new DefaultMethodInvoker(getMethodHandleJava8(method));
+  >   >               } else {
+  >   >                 return new DefaultMethodInvoker(getMethodHandleJava9(method));
+  >   >               }
+  >   >             } catch (IllegalAccessException | InstantiationException | InvocationTargetException
+  >   >                 | NoSuchMethodException e) {
+  >   >               throw new RuntimeException(e);
+  >   >             }
+  >   >           } else {
+  >   >             return new PlainMethodInvoker(new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
+  >   >           }
+  >   >         });
+  >   >       } catch (RuntimeException re) {
+  >   >         Throwable cause = re.getCause();
+  >   >         throw cause == null ? re : cause;
+  >   >       }
+  >   >     }
+  >   >   ~~~
+  >
   > - Executor：Mybatis的SQL执行器，MyBatis中对数据库所有的增删改查操作都是由Executor组件完成
+  >
+  >   >![image-20221231231212404](img\image-20221231231212404.png) 
+  >   >
+  >   >- BaseExecutor：一级缓存（SqlSession缓存，**线程缓存**）
+  >   >
+  >   >- SimpleExecutor：简单执行器，完成基本的增删改查操作
+  >   >
+  >   >- ResueExecutor：可重用执行器（对JDBC中Statement对象缓存，避免平凡创建销毁Statement）
+  >   >
+  >   >- BatchExecutor：批量处理执行器
+  >   >
+  >   >- CachingExecutor：二级缓存（装饰Executor，每次查询时需要通过CachingExecutor进行判断）
+  >   >
+  >   >  > 1. Mapper缓存（表缓存，全局缓存），多个SqlSession共享同一个Mapper缓存
+  >   >  >
+  >   >  > 2. 数据查询过程： 二级缓存->一级缓存->数据库
+  >   >  >
+  >   >  > 3. **多表查询开启二级缓存会导致脏读**，需要使用cache-ref进行配置
+  >   >  >
+  >   >  > 4. 使用Redis作为Mybatis的二级缓存（依赖于jedis2.8)
+  >   >  >
+  >   >  >    ![image-20230101001819648](img\image-20230101001819648.png) 
+  >   >  >
+  >   >  >    ![image-20230101011431587](img\image-20230101011431587.png) 
+  >   >  >
+  >   >  >    使用其他组件作为二级缓存案例
+  >   >  >
+  >   >  >    https://github.com/EsotericSoftware/kryo
+  >   >  >
+  >   >  >    https://github.com/mybatis/ehcache-cache
+  >   >  >
+  >   >  >    https://github.com/mybatis/oscache-cache
+  >   >  >
+  >   >  >    https://github.com/mybatis/oscache-cache
   >
   > - StatementHandler/ParameterHandler：对JDBC的Statement进行封装
   >
@@ -157,13 +244,13 @@
   >
   > - TypeHandler：Mybatis类型处理器
   >
-  >   
+  > 
   >
   > **Mybatis配置**
   >
   > | 设置名                             | 描述                                                         | 有效值                                                       | 默认值                                                |
   > | :--------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- | :---------------------------------------------------- |
-  > | cacheEnabled                       | 全局性地开启或关闭所有映射器配置文件中已配置的任何缓存。     | true \| false                                                | true                                                  |
+  > | cacheEnabled（开启二级缓存）       | 全局性地开启或关闭所有映射器配置文件中已配置的任何缓存。     | true \| false                                                | true                                                  |
   > | lazyLoadingEnabled                 | 延迟加载的全局开关。当开启时，所有关联对象都会延迟加载。 特定关联关系中可通过设置 `fetchType` 属性来覆盖该项的开关状态。 | true \| false                                                | false                                                 |
   > | aggressiveLazyLoading              | 开启时，任一方法的调用都会加载该对象的所有延迟加载属性。 否则，每个延迟加载属性会按需加载（参考 `lazyLoadTriggerMethods`)。 | true \| false                                                | false （在 3.4.1 及之前的版本中默认为 true）          |
   > | multipleResultSetsEnabled          | 是否允许单个语句返回多结果集（需要数据库驱动支持）。         | true \| false                                                | true                                                  |
@@ -240,9 +327,69 @@
   > | `YearMonthTypeHandler`       | `java.time.YearMonth`           | `VARCHAR` 或 `LONGVARCHAR`                                   |
   > | `JapaneseDateTypeHandler`    | `java.time.chrono.JapaneseDate` | `DATE`                                                       |
   >
-  >  
+  > **Mybatis缓存使用**
   >
-  > #### **Executor组件**
+  > - 一级缓存配置
   >
-  > 
+  >   > localCacheScope：
+  >   >
+  >   > 1. SESSION：对整个SqlSession有效，执行DML语句时，缓存清空
+  >   > 2. STATEMENT：仅对当前执行的语句有效，语句执行完毕，缓存清空
+  >
+  > - 二级缓存配置
+  >
+  >   > 1. cacheEnabled=true
+  >   >
+  >   > 2. 缓存策略，缓存刷新批量，容量
+  >   >
+  >   >    > eviction=FIFO
+  >   >    >
+  >   >    > flushInterval=60000
+  >   >    >
+  >   >    > readOnly=true
+  >   >    >
+  >   >    > size=512
+  >
+  > **Mybatis日志实现**
+  >
+  > > Log4j：
+  > >
+  > > Log4j2：Log4j的升级产品
+  > >
+  > > Commons Logging：java日志接口
+  > >
+  > > ---
+  > >
+  > > SLF4J：类似于Commons Logging，是一套简易Java日志门面，本身并无日志的实现
+  > >
+  > > Logback：对SLF4j实现
+
+## **Mybatis插件**
+
+> <img src="img\image-20230101013632476.png" alt="image-20230101013632476" style="zoom:67%;" /> 
+>
+> interceptorChain：拦截器容器，用于存放Plugins标签中所有拦截器
+>
+> Mybaits插件实际上是一个拦截器，实现Interceptor接口
+>
+> 自定义拦截器允许在以下4中组件方法中进行拦截
+>
+> - Executor（update, query, flushStatements, commit, rollback, getTransaction, close, isClosed）
+> - ParameterHandler（getParameterObject, setParameters）ResultSetHandler（handleResultSets, handleOutputParameters）
+> - StatementHandler（prepare, parameterize, batch, update,query）
+> - ResultSetHandler（handleResultSets, handleOutputParameters）
+>
+> **自定义分页插件**
+>
+> ![image-20230101015144936](img\image-20230101015144936.png) 
+>
+> <img src="img\image-20230101015236086.png" alt="image-20230101015236086" style="zoom:67%;" /> 
+>
+> ![image-20230101015315879](img\image-20230101015315879.png) 
+>
+> <img src="img\image-20230101015341582.png" alt="image-20230101015341582" style="zoom:67%;" /> 
+>
+> **自定义慢SQL统计插件**
+>
+> ![image-20230101015453070](img\image-20230101015453070.png) 
 
