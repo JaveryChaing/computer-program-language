@@ -137,7 +137,7 @@
   >   //获取UserMapper代理对象（数据库与Pojo映射）
   >   UserMapper usermapper= sqlSession.getMapper(UserMapper.class);
   >   User user = usermapper.getUser(1);  
-  >   
+  >     
   >   // 方式二配置
   >   Reader mybatisConfig = Resources.getResourceAsReader("mybatis-config.xml");
   >   SqlSessionManager sqlSessionManager = SqlSessionManager.newInstance(mybatisConfig);
@@ -176,7 +176,7 @@
   >   >         throw ExceptionUtil.unwrapThrowable(t);
   >   >       }
   >   >     }
-  >   >   
+  >   >     
   >   >     private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
   >   >       try {
   >   >         return MapUtil.computeIfAbsent(methodCache, method, m -> {
@@ -393,6 +393,4 @@
 >
 > ![image-20230101015453070](img\image-20230101015453070.png) 
 
-## **Mybatis级联映射与懒加载**
-
-> 
+## 
