@@ -28,13 +28,14 @@
 >   >
 >   > - 将消息分为消息头与消息体，消息头中包含数据包总长度
 >   >
->   >   
 
-*基于Reactor模型的网络通信应用框架（非阻塞异步事件驱动）*
+**基于Reactor模型的网络通信应用框架（非阻塞异步事件驱动）**
 
 >  Netty 处理流程
 >
-> ![image-20221213160215064](img\image-20221213160215064.png) 
+>  ![image-20221213160215064](img\image-20221213160215064.png) 
+>
+>  ![DefaultAddressedEnvelope](img\DefaultAddressedEnvelope.png) 
 
 - #### Channel Java NIO的基本构造
 
@@ -57,6 +58,14 @@
   > - 一个 EventLoop 可能会被分配给一个或多个 Channel
   >
   > ![image-20221213152824272](img\image-20221213152824272.png) 
+
+- #### **Channel**
+
+  > ![image-20230101200158827](img\image-20230101200158827.png) 
+  >
+  > ![image-20230101201733403](img\image-20230101201733403.png)  
+  >
+  > 
 
 - #### ChannelHandler、ChannelPipeline
 
@@ -116,8 +125,6 @@
   >
   > - userEventTriggered：用户事件（读或写）
   >
-  > 
-  >
   > **ChannelOutboundHandler出站生命周期函数：**
   >
   > - bind：当请求将 Channel 绑定到本地地址时被调用
@@ -137,7 +144,7 @@
   > - write：当请求通过 Channel 将数据写到远程节点时 被调用
   >
   >   > ChannelPromise与ChannelFuture 定义了回调事件
-  >   >
+  >  >
   >   > ##### ChannelFuture（在操作完成时通知应用程序的方式）
   >   >
   >   > > ChannelFutureListener：在操作完成时获得通知（实现operationComplete方法）
@@ -145,7 +152,7 @@
   >   > > channel：返回当前正在进行IO操作的通道
   >   > >
   >   > > sync：等待异步操作执行完毕，将异步改为同步
-  >
+  > 
   > **ChannelHandlerContext**
   >
   > 
@@ -174,13 +181,17 @@
   >
   > bytebuf构建模式
   >
-  > - 堆缓冲区（适合对象快速创建与释放）
-  > - 直接缓冲区
-  > - 复合缓冲区
+  > - 堆内存（HeapByteBuf)
+  >   - 内存分配和回收速度快，可以被JVM自动收回，进行Socket读写是，需要额外做一次内存复制
+  > - 直接内存（DirectByteBuf)
+  >   - 由操作系统进行内存分配回收，速度比堆内存快
   >
-  
+  > - 复合缓冲区(堆内存负责数据编码，直接内存负责Socket读写)
+  >
+  > 
+
 - #### **Netty编码器与解码器**
-  
+
   > **JDK序列化**  java.io.Serializable 
   >
   > - 效率低，无法兼容其他语言
@@ -192,8 +203,24 @@
   > **ProtoBuf**
   >
   > **Thrift**
+  
+- **EventLoop与EventLoopGroup线程模型**
+
+  > **Reactor 单线程模型**（所有的IO操作都在同一个NIO线程上完成，线程负载过重，处理速度慢)
   >
-  > 
+  > - ![image-20230101202432337](img\image-20230101202432337.png) 
+  >
+  > **Reactor多线程模型**（多路复用+线程池，高并发连接下Acceptor线程负载过重）
+  >
+  > - ![image-20230101202655793](img\image-20230101202655793.png) 
+  > - Acceptor(单线程)用于监听服务端Socket文件（调用Linux函数完成多路复用）
+  > - 网络IO操作由线程池负责，用于消息读取，解码，编码，发送
+  >
+  > **Reactor主从多线程模型**
+  >
+  > - ![image-20230101203648557](img\image-20230101203648557.png) 
+  >
+  > TODO
   
   
 
