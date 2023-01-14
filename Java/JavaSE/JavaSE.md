@@ -10,11 +10,11 @@
   > - 阶码位 （存储指数，$E=e+(2^{n-1}-1)$ E 表示阶码，e表示指数真值，8位阶码的指数范围为[-126，127]）
   > - 有效数（存储有效数） 
   
-- #### **面向对象**
+- #### **JDK**
 
   > 面向对象编程（Object-Oriented Programming) 
   >
-  >  *主要目标*
+  > *主要目标*
   >
   > - 可维护
   > - 可重用
@@ -44,6 +44,44 @@
   > - Serializable  序列化
   > - Hessian 序列化
   > - JSON 数据交互格式
+  >
+  > ---
+  >
+  > **函数式编程**
+  >
+  > - 转换类型：Function<T,R>：元素转换函数
+  >
+  > - 消费类型函数：Consumer ：包装执行逻辑操作
+  >
+  > - 生产类型函数：Supplier：包装new对象操作
+  >
+  > - 判断类型函数：Predicate：包装条件判断逻辑操作
+  >
+  > - null类型包装函数：Optional：包装单元素操作对象（消除 if obj != null 代码)
+  >
+  > - 容器类型包装函数：Stream：操作，收集，统计，约归容器中元素
+  >
+  > - 异步操作对象：Future/CompletableFuture
+  >   - CompletableFuture方法概述
+  >   
+  >     - runAsync：执行无返回的异步线程
+  >     - supplyAsync：执行有返回值得异步线程
+  >     - whenComplete/whenCompleteAsync：计算结果完成时回调
+  >     - handle：同whenComplete，需要手动处理异常
+  >     - thenApply/thenApplyAsync ：回调方法（获取返回值后对结果进行处理）
+  >     - thenAccept/thenApplyAsync:
+  >   
+  >   - 线程池大小：$N_{threads}= N_{CPU}*U_{CPU}*(1+W/C)$ 
+  >   
+  >     > $U_{CPU}$是期望的CPU利用率， W/C是等待时间与计算时间的比率
+  >   
+  >   - **计算密集型的操作**，并且没有I/O，那么推荐使用Stream接口
+  >   
+  >   - **涉及等待I/O的操作（包括网络连接等待）**，那么使用 CompletableFuture
+  >   
+  >   - **Stream与CompletableFuture完成并发异步操作**
+  >   
+  >     > ![image-20230113160522898](img\image-20230113160522898.png) 
 
 - #### **容器**
 
@@ -190,15 +228,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                         
+  >   > >                                                 
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                         
+  >   > >                                                 
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                         
+  >   > >                                                 
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +311,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                         
+  >   > >                                                 
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
