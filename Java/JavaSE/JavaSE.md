@@ -63,13 +63,18 @@
   >
   > - 异步操作对象：Future/CompletableFuture
   >   - CompletableFuture方法概述
-  >   
+  >
   >     - runAsync：执行无返回的异步线程
   >     - supplyAsync：执行有返回值得异步线程
   >     - whenComplete/whenCompleteAsync：计算结果完成时回调
   >     - handle：同whenComplete，需要手动处理异常
-  >     - thenApply/thenApplyAsync ：回调方法（获取返回值后对结果进行处理）
-  >     - thenAccept/thenApplyAsync:
+  >     - thenRun/thenRunAsync/thenApply/thenApplyAsync ：把前面任务结构提交给Funcation需要有返回值
+  >     - thenAccept/thenApplyAsync：消费处理结果
+  >     - thenCombine：将两个任务执行结果作为入参，传递到指定方法中，有返回值
+  >     - thenAcceptBoth：同thenCombine无返回值
+  >     - runAfterBoth：将两个Completable组合起来无返回值
+  >     - allof：所有任务执行完成后，执行allOf
+  >     - AnyOf：任意一个任务执行完后，执行anyOf方法
   >   
   >   - 线程池大小：$N_{threads}= N_{CPU}*U_{CPU}*(1+W/C)$ 
   >   
@@ -228,15 +233,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                 
+  >   > >                                                     
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                 
+  >   > >                                                     
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                 
+  >   > >                                                     
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -311,7 +316,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                 
+  >   > >                                                     
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
