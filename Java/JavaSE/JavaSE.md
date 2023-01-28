@@ -128,8 +128,6 @@
   >   - **Stream与CompletableFuture完成并发异步操作**
   >   
   >     > ![image-20230113160522898](img\image-20230113160522898.png) 
-  >   
-  > - 
 
 - #### **容器**
 
@@ -794,9 +792,9 @@
   > 线程安全实现方案：
   >
   > 1. 数据单线程内可见（ThreadLocal，存储在线程局部变量表中）
-  > 2. 只读对象（final关键字修饰的字段，String，Interger等）
-  > 3. 线程安全类（StringBuffer等使用synchronized等关键字修饰,**序列化访问共享资源**）
-  > 4. 同步与锁机制（**序列化访问共享资源**）
+  > 2. 多线程多实例资源
+  > 3. 只读对象（final关键字修饰的字段，String，Interger等）
+  > 4. 线程安全类，同步锁机制（StringBuffer等使用synchronized等关键字修饰,**序列化访问共享资源**）
   >
   > ---
   >
@@ -960,12 +958,18 @@
   >
   >   > *支持一个线程对资源重复加锁，获取锁时公平和非公平选择*
   >
-  > - ReadWriteLock
+  > - ReadWriteLock（ReentrantReadWriteLock）适用于读多写少的场景
   >
   >   > - int getReadLockCount() 返回当前读锁获取次数
   >   > - int getReadHoldCount() 返回当前线程获取读锁次数（ThreadLocal实现）
   >   > - boolean isWriteLocked() 判断写锁是否被获取
   >   > - int getWriteHoldCount() 返回当前写锁获取次数
+  >
+  > - StampedLock显示锁
+  >
+  >   > 悲观锁：假定会发生并发冲突，则屏蔽一切可能违反数据完整性的操作
+  >   >
+  >   > 乐观锁：假设不会发生并发冲突，只在提交数据时检测数据完整性
   >
   > - **CountDownLatch**  设置等待线程数，当计数为0时往下执行 
   >
@@ -1028,10 +1032,6 @@
   >   > - RecursiveTask：用于有结果返回任务
   >   >
   >   > ForkJoinPool：ForkJoinTask通过线程池执行
-  >
-  > - **FutureTask 异步任务**
-  >
-  >   > FutureTask 未启动或已启动状态时使用get()获取结构会导致调用线程阻塞
   >
   > ---
   >
