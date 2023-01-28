@@ -61,32 +61,75 @@
   >
   > - 容器类型包装函数：Stream：操作，收集，统计，约归容器中元素
   >
-  > - 异步操作对象：Future/CompletableFuture
+  > - **异步操作对象：Future/CompletableFuture（使用多线程和Future结果包装完成异步并发操作）**
+  >   
   >   - CompletableFuture方法概述
-  >
-  >     - runAsync：执行无返回的异步线程
-  >     - supplyAsync：执行有返回值得异步线程
-  >     - whenComplete/whenCompleteAsync：计算结果完成时回调
-  >     - handle：同whenComplete，需要手动处理异常
-  >     - thenRun/thenRunAsync/thenApply/thenApplyAsync ：把前面任务结构提交给Funcation需要有返回值
-  >     - thenAccept/thenApplyAsync：消费处理结果
-  >     - thenCombine：将两个任务执行结果作为入参，传递到指定方法中，有返回值
-  >     - thenAcceptBoth：同thenCombine无返回值
-  >     - runAfterBoth：将两个Completable组合起来无返回值
-  >     - allof：所有任务执行完成后，执行allOf
-  >     - AnyOf：任意一个任务执行完后，执行anyOf方法
+  >   
+  >     ​		**Future结果依赖执行**
+  >   
+  >     - supplyAsync/runAsync：支持任务返回值与不支持返回值
+  >   
+  >     - 包含async方法：从线程池中获取线程执行当前任务（并发执行），不以async结尾方法则使用当前线程继续执行（减少线程上下文切换）
+  >   
+  >     - thenApply：将前面任务执行结果包装成Function函数装换（等待前面任务执行结果）
+  >   
+  >     - thenCompose：**用来连接两个依赖的CompletableFuture**合并成一个新的CompletableFuture（等待前面任务执行结果）
+  >   
+  >       ---
+  >   
+  >       **And并行执行**
+  >   
+  >     - thenCombine：**两个CompletableFuture并行执行**，并返回其结果
+  >   
+  >     - thenAccepetBoth：两个任务并行执行完成后，将结果交给BiConsumer处理，无返回值
+  >   
+  >     - runAfterBoth：两个任务并行执行完成后，执行下一步任务（Runnable）
+  >   
+  >       ---
+  >   
+  >       **Or聚合执行**
+  >   
+  >     - applyToEither：两个CompletableFuture或逻辑执行，有返回值（执行快使用那个结果）
+  >   
+  >     - acceptEither：同上，无返回结果
+  >   
+  >     - runAfterEither：同上，进行下一步操作(Runnable类型任务)
+  >   
+  >       ---
+  >   
+  >       **多任务并行执行**
+  >   
+  >     - allOf():当所有给定的 CompletableFuture 完成时，返回一个新的 CompletableFuture
+  >   
+  >     - anyOf()：当任何一个给定的CompletablFuture完成时，返回一个新的CompletableFuture
+  >   
+  >       **CompletableFuture结果处理**
+  >   
+  >     - get/join：阻塞等待任务结果
+  >   
+  >     - whenComplete：CompletableFuture执行完成时，使用结果或异常处理操作
+  >   
+  >     - exceptionally：任务异常完成时，**给定函数的异常触发这个CompletableFuture的完成**
+  >   
+  >     - handle()：任务返回的结果正常处理与异常处理
+  >   
+  >     - isDone：判断任务是否执行完成
+  >   
+  >     - cancel：取消任务计算
   >   
   >   - 线程池大小：$N_{threads}= N_{CPU}*U_{CPU}*(1+W/C)$ 
   >   
   >     > $U_{CPU}$是期望的CPU利用率， W/C是等待时间与计算时间的比率
   >   
-  >   - **计算密集型的操作**，并且没有I/O，那么推荐使用Stream接口
+  >   - **计算密集型的操作**，并且没有I/O，那么使用Stream接口
   >   
-  >   - **涉及等待I/O的操作（包括网络连接等待）**，那么使用 CompletableFuture
+  >   - **涉及等待I/O的操作（包括网络连接等待）**，使用 CompletableFuture
   >   
   >   - **Stream与CompletableFuture完成并发异步操作**
   >   
   >     > ![image-20230113160522898](img\image-20230113160522898.png) 
+  >   
+  > - 
 
 - #### **容器**
 
@@ -233,15 +276,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                     
+  >   > >                                                             
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                     
+  >   > >                                                             
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                     
+  >   > >                                                             
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -316,7 +359,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                     
+  >   > >                                                             
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
