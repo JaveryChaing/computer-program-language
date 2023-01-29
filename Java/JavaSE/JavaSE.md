@@ -274,15 +274,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                                     
+  >   > >                                                                             
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                                     
+  >   > >                                                                             
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                                     
+  >   > >                                                                             
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -357,7 +357,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                                     
+  >   > >                                                                             
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -782,6 +782,203 @@
   > **apt工具**（注解处理器）
   >
   > *在**代码编译时期**对注解进行处理 @Data 并生成Java文件，减少手动输入代码过程*
+  
+- #### **Locale语言转换**
+
+  > ![image-20230129092633518](img\image-20230129092633518.png) 
+  
+- #### **安全**
+
+  > **类加载器**：负责在运行时将 Java 类动态加载到JVM（按需加载）
+  >
+  > - 引导类：负责加载系统类（从JAR文件rt.jar中加载）
+  >
+  > - 扩展类：从jre/lib/ext目录加载
+  >
+  > - 应用类：由CLASSPATH环境变量中加载类
+  >
+  > 委托加载机制（代理模式）：Java虚拟机区分类是否相同通过**类全名和类加载器是否一致**，**保证 Java 核心库的类型安全**（*不同的类加载器为相同名称的类创建了额外的名称空间。相同名称的类可以并存在 Java 虚拟机中，只需要用不同的类加载器来加载它们即可。不同类加载器加载的类之间是不兼容的，这就相当于在 Java 虚拟机内部创建了一个个相互隔离的 Java 类空间*）
+  >
+  > <img src="img\image-20230129095427841.png" alt="image-20230129095427841" style="zoom:67%;" /> <img src="D:\code\computer-program-language\Java\JavaSE\img\image-20230129100913237.png" alt="image-20230129100913237" style="zoom:67%;" />
+  >
+  > 
+  >
+  > loadClass 类加载器源码
+  >
+  > ~~~java
+  > // name 全类名
+  > protected Class<?> loadClass(String name, boolean resolve)
+  >             throws ClassNotFoundException {
+  >         synchronized (getClassLoadingLock(name)) {
+  >             //首先,检查类文件是否已经被加载过
+  >             Class<?> c = findLoadedClass(name);
+  >             //类文件未被加载过
+  >             if (c == null) {
+  >                 //设定加载时间起始点
+  >                 long t0 = System.nanoTime();
+  >                 try {
+  >                     //其父加载器不为空,说明父加载器为引导加载器
+  >                     if (parent != null) {
+  >                         //通过父加载器搜索name指定的类文件
+  >                         c = parent.loadClass(name, false);
+  >                     } else {
+  >                         //父加载器为空,说明父加载器为启动加载器搜索类文件
+  >                         //启用bootstrap class loader
+  >                         c = findBootstrapClassOrNull(name);
+  >                     }
+  >                 } catch (ClassNotFoundException e) {
+  >                     //如果非空父加载器中找不到name指定的类文件
+  >                     //抛出ClassNotFoundException异常
+  >                 }
+  >                 //父加载器或者启动加载器中都未搜索到该类文件
+  >                 if (c == null) {
+  >                    //设定加载时间结点
+  >                     long t1 = System.nanoTime();
+  >                     //当前加载器内搜索name指定的类文件
+  >                     c = findClass(name);
+  >                     // this is the defining class loader; record the stats
+  >                     sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+  >                     sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+  >                     sun.misc.PerfCounter.getFindClasses().increment();
+  >                 }
+  >             }
+  >             //resolve为true时处理类文件
+  >             if (resolve) {
+  >                 resolveClass(c);
+  >             }
+  >             return c;
+  >         }
+  >     }
+  > ~~~
+  >
+  > **自定义类加载器**（防止反编译，网络中加载源代码，依赖冲突，热加载/热部署）
+  >
+  > ~~~java
+  > package org.example;
+  > 
+  > import cn.hutool.core.io.file.FileReader;
+  > import jdk.internal.perf.PerfCounter;
+  > import lombok.SneakyThrows;
+  > import lombok.extern.slf4j.Slf4j;
+  > 
+  > import java.io.File;
+  > import java.util.Scanner;
+  > 
+  > @Slf4j
+  > public class ClassLoaderExample extends ClassLoader {
+  > 
+  > 
+  >     private String codePath;
+  > 
+  >     // 类加载目录位置
+  >     public ClassLoaderExample(String codePath) {
+  >         this.codePath = codePath;
+  >     }
+  > 
+  >     /**
+  >      *
+  >      * @param parent
+  >      * @param codePath
+  >      */
+  >     public ClassLoaderExample(ClassLoader parent, String codePath) {
+  >         super(parent);
+  >         this.codePath = codePath;
+  >     }
+  > 
+  > 
+  >     @Override
+  >     @SneakyThrows
+  >     protected Class<?> findClass(String name) throws ClassNotFoundException {
+  > 
+  >         Scanner scanner = new Scanner(System.in);
+  > 
+  >         // 判断该类名是否已被加载
+  >         Class<?> loadedClass = findLoadedClass(name);
+  >         if (loadedClass != null) {
+  >             return loadedClass;
+  >         } else {
+  >             //获取父类加载器
+  >             ClassLoader parent = this.getParent();
+  >             try {
+  >                 loadedClass = parent.loadClass(codePath);
+  >             } catch (ClassNotFoundException e) {
+  >                 log.error("{}，父类加载失败，未找到该路径代码path：{}", e.getMessage(), codePath);
+  >             }
+  > 
+  >             if (loadedClass != null) {
+  >                 return loadedClass;
+  >             } else {
+  >                 // 访问加密
+  >                 int serial = 20000456;
+  >                 while (true) {
+  >                     int inSerial = scanner.nextInt();
+  >                     if (serial == inSerial) break;
+  >                     System.err.println("序列号输入错误，请重新输入！");
+  >                 }
+  >                 // 全路径
+  >                 String rootPath = codePath + "/" + name.replace(".", File.separator) + ".class";
+  >                 FileReader fileReader = new FileReader(rootPath);
+  >                 byte[] bytes = fileReader.readBytes();
+  > 
+  >                 if (bytes == null || bytes.length == 0) throw new ClassNotFoundException();
+  > 
+  >                 Class<?> aClass = defineClass(name, bytes, 0, bytes.length);
+  > 
+  >                 return aClass;
+  >             }
+  >         }
+  > 
+  >     }
+  > 
+  > 
+  >     /**
+  >      * 打破双亲委派机制，指定包路径使用自定义类加载器
+  >      *
+  >      * @param name    The <a href="#binary-name">binary name</a> of the class
+  >      * @param resolve If {@code true} then resolve the class
+  >      * @return
+  >      * @throws ClassNotFoundException
+  >      */
+  >     @Override
+  >     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+  >         synchronized (getClassLoadingLock(name)) {
+  > 
+  >             Class<?> c = findLoadedClass(name);
+  >             if (c == null) {
+  >                 long t1 = System.nanoTime();
+  >                 //如果包名是org开头的，调用自定义类的findClass方法，否则调用父类的loadClass方法
+  >                 if (name.startsWith("org")) {
+  >                     c = this.findClass(name);
+  >                 } else {
+  >                     c = this.getParent().loadClass(name);
+  >                 }
+  >                 // this is the defining class loader; record the stats
+  >                 PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+  >                 PerfCounter.getFindClasses().increment();
+  >             }
+  >             if (resolve) {
+  >                 resolveClass(c);
+  >             }
+  >             return c;
+  >         }
+  > 
+  >     }
+  > }
+  > 
+  > // 使用SPI类加载器 ServiceLoader （基于接口反射）
+  > // resource/META-INF/services 配置文件
+  > org.example.loader.SPILoaderA
+  > org.example.loader.SPILoaderB
+  >     
+  > ServiceLoader<SPILoader> serviceLoader = ServiceLoader.load(SPILoader.class);
+  > SPILoader spiLoader = serviceLoader.findFirst().get();
+  > spiLoader.printStr("abc");
+  > 
+  > ~~~
+  >
+  > **字节码校验**
+  >
+  > 
   
 - #### 并发
 
@@ -1511,8 +1708,6 @@
   >
   >   *使用static修饰的ThreadLocal不适用于弱引用机制收回线程变量。必须显式remove操作*
   
-
-
 
 #### **单元测试**
 
