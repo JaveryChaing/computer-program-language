@@ -105,32 +105,52 @@
 - **gradle 全局配置文件**
 
   > ~~~java
-  > allprojects{
+  > allprojects {
   >     repositories {
-  > 	    maven{ 
-  > 		allowInsecureProtocol =true
-  > 		url= 'https://maven.aliyun.com/repository/public'
-  > 	    }
-  > 	
-  >         def REPOSITORY_URL = 'https://maven.aliyun.com/repository/public/'
-  >         //做一些国外不稳定的地址连接的替换
-  >         all {
-  >             ArtifactRepository repo ->
-  >     if (repo instanceof MavenArtifactRepository) {
+  >         def ALIYUN_REPOSITORY_URL = 'https://maven.aliyun.com/repository/public'
+  >         def ALIYUN_JCENTER_URL = 'https://maven.aliyun.com/repository/jcenter'
+  >         def ALIYUN_GOOGLE_URL = 'https://maven.aliyun.com/repository/google'
+  >         def ALIYUN_GRADLE_PLUGIN_URL = 'https://maven.aliyun.com/repository/gradle-plugin'
+  >         def ALIYUN_GRAILS_CORE = 'https://maven.aliyun.com/repository/grails-core'
+  > 
+  >         def REPOSITORY_URL = 'https://repo1.maven.org/maven2/'
+  >         def JCENTER_URL = 'https://jcenter.bintray.com/'
+  >         def GOOGLE_URL = 'https://dl.google.com/dl/android/maven2/'
+  >         def GRADLE_PLUGIN_URL = 'https://plugins.gradle.org/m2/'
+  > 
+  >         all { ArtifactRepository repo ->
+  >             if (repo instanceof MavenArtifactRepository) {
   >                 def url = repo.url.toString()
-  >                 if (url.startsWith('https://artifacts.elastic.co/maven')
-  > 				||url.startsWith('https://repo1.maven.org/maven2') 
-  > 				|| url.startsWith('https://repo.maven.org/maven2') 
-  > 				|| url.startsWith('https://jcenter.bintray.com/')
-  > 				||url.startsWith('https://repo.maven.apache.org/maven2')
-  > 				) {
-  >                     project.logger.lifecycle "Repository ${repo.url} replaced by $REPOSITORY_URL."
+  >                 if (url.startsWith(REPOSITORY_URL)) {
+  >                     project.logger.lifecycle "Repository ${repo.url} replaced by $ALIYUN_REPOSITORY_URL."
+  >                     remove repo
+  >                 }
+  >                 if (url.startsWith(JCENTER_URL)) {
+  >                     project.logger.lifecycle "Repository ${repo.url} replaced by $ALIYUN_JCENTER_URL."
+  >                     remove repo
+  >                 }
+  >                 if (url.startsWith(GOOGLE_URL)) {
+  >                     project.logger.lifecycle "Repository ${repo.url} replaced by $ALIYUN_GOOGLE_URL."
+  >                     remove repo
+  >                 }
+  >                 if (url.startsWith(GRADLE_PLUGIN_URL)) {
+  >                     project.logger.lifecycle "Repository ${repo.url} replaced by $ALIYUN_GRADLE_PLUGIN_URL."
   >                     remove repo
   >                 }
   >             }
   >         }
+  >         maven { url ALIYUN_REPOSITORY_URL }
+  >         maven { url ALIYUN_JCENTER_URL }
+  >         maven { url ALIYUN_GOOGLE_URL }
+  >         maven { url ALIYUN_GRADLE_PLUGIN_URL }
+  >         maven { url ALIYUN_GRAILS_CORE }
+  >         maven { url REPOSITORY_URL }
+  >         maven { url JCENTER_URL }
+  >         maven { url GOOGLE_URL }
+  >         maven { url GRADLE_PLUGIN_URL }
   >     }
   > }
+  > 
   > 
   > ~~~
   >
