@@ -414,15 +414,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                                                         
+  >   > >                                                                                             
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                                                         
+  >   > >                                                                                             
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                                                         
+  >   > >                                                                                             
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -497,7 +497,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                                                         
+  >   > >                                                                                             
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -1029,9 +1029,7 @@
   >     @Override
   >     @SneakyThrows
   >     protected Class<?> findClass(String name) throws ClassNotFoundException {
-  > 
   >         Scanner scanner = new Scanner(System.in);
-  > 
   >         // 判断该类名是否已被加载
   >         Class<?> loadedClass = findLoadedClass(name);
   >         if (loadedClass != null) {
@@ -1109,14 +1107,32 @@
   > // resource/META-INF/services 配置文件
   > org.example.loader.SPILoaderA
   > org.example.loader.SPILoaderB
-  >     
+  > 
   > ServiceLoader<SPILoader> serviceLoader = ServiceLoader.load(SPILoader.class);
-  > SPILoader spiLoader = serviceLoader.findFirst().get();
+  >     SPILoader spiLoader = serviceLoader.findFirst().get();
   > spiLoader.printStr("abc");
   > 
   > ~~~
-  >
+  > 
   > **字节码校验**
+  >
+  
+- #### **RMI** (Remote Method Invocation)
+
+  > JRMP：Java远程消息交换协议，能够让Java虚拟机上的对象调用另个虚拟机上对象方法
+  >
+  > ~~~java
+  >         SomeThing someThing = new SomeThing();
+  >         LocateRegistry.createRegistry(8888);
+  >         // 把远程对象注册到RMI注册服务器上 命名为someThing
+  >         Naming.bind("rmi://localhost:8888/someThing", someThing);
+  >         log.info("=================");
+  > 
+  >         IRemote lookup = (IRemote) Naming.lookup("rmi://localhost:8888/someThing");
+  > 
+  >         lookup.callRemote("qweqweqwe");
+  >         lookup.doSomething();
+  > ~~~
   >
   > 
   
