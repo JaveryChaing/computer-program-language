@@ -12,6 +12,8 @@
   
 - #### **JDK**
 
+  > [OpenJdk](https://jdk.java.net/archive/)
+  >
   > 面向对象编程（Object-Oriented Programming) 
   >
   > *主要目标*
@@ -62,72 +64,210 @@
   > - 容器类型包装函数：Stream：操作，收集，统计，约归容器中元素
   >
   > - **异步操作对象：Future/CompletableFuture（使用多线程和Future结果包装完成异步并发操作）**
-  >   
+  >
   >   - CompletableFuture方法概述
-  >   
+  >
   >     ​		**Future结果依赖执行**
-  >   
+  >
   >     - supplyAsync/runAsync：支持任务返回值与不支持返回值
-  >   
+  >
   >     - 包含async方法：从线程池中获取线程执行当前任务（并发执行），不以async结尾方法则使用当前线程继续执行（减少线程上下文切换）
-  >   
+  >
   >     - thenApply：将前面任务执行结果包装成Function函数装换（等待前面任务执行结果）
-  >   
+  >
   >     - thenCompose：**用来连接两个依赖的CompletableFuture**合并成一个新的CompletableFuture（等待前面任务执行结果）
-  >   
+  >
   >       ---
-  >   
+  >
   >       **And并行执行**
-  >   
+  >
   >     - thenCombine：**两个CompletableFuture并行执行**，并返回其结果
-  >   
+  >
   >     - thenAccepetBoth：两个任务并行执行完成后，将结果交给BiConsumer处理，无返回值
-  >   
+  >
   >     - runAfterBoth：两个任务并行执行完成后，执行下一步任务（Runnable）
-  >   
+  >
   >       ---
-  >   
+  >
   >       **Or聚合执行**
-  >   
+  >
   >     - applyToEither：两个CompletableFuture或逻辑执行，有返回值（执行快使用那个结果）
-  >   
+  >
   >     - acceptEither：同上，无返回结果
-  >   
+  >
   >     - runAfterEither：同上，进行下一步操作(Runnable类型任务)
-  >   
+  >
   >       ---
-  >   
+  >
   >       **多任务并行执行**
-  >   
+  >
   >     - allOf():当所有给定的 CompletableFuture 完成时，返回一个新的 CompletableFuture
-  >   
+  >
   >     - anyOf()：当任何一个给定的CompletablFuture完成时，返回一个新的CompletableFuture
-  >   
+  >
   >       **CompletableFuture结果处理**
-  >   
+  >
   >     - get/join：阻塞等待任务结果
-  >   
+  >
   >     - whenComplete：CompletableFuture执行完成时，使用结果或异常处理操作
-  >   
+  >
   >     - exceptionally：任务异常完成时，**给定函数的异常触发这个CompletableFuture的完成**
-  >   
+  >
   >     - handle()：任务返回的结果正常处理与异常处理
-  >   
+  >
   >     - isDone：判断任务是否执行完成
-  >   
+  >
   >     - cancel：取消任务计算
-  >   
+  >
   >   - 线程池大小：$N_{threads}= N_{CPU}*U_{CPU}*(1+W/C)$ 
-  >   
+  >
   >     > $U_{CPU}$是期望的CPU利用率， W/C是等待时间与计算时间的比率
-  >   
+  >
   >   - **计算密集型的操作**，并且没有I/O，那么使用Stream接口
-  >   
+  >
   >   - **涉及等待I/O的操作（包括网络连接等待）**，使用 CompletableFuture
-  >   
+  >
   >   - **Stream与CompletableFuture完成并发异步操作**
-  >   
+  >
   >     > ![image-20230113160522898](img\image-20230113160522898.png) 
+  >
+  > #### **Java9特性**
+  >
+  > **Java 9** 发布于 2017 年 9 月 21 日 。作为 Java 8 之后 3 年半才发布的新版本，Java 9 带来了很多重大的变化其中最重要的改动是 Java 平台模块系统的引入
+  >
+  > - JShell 命令工具
+  >
+  > - 模块化系统（Jlink命令可以制定轻量级，定制的JRE，减少Java运行时环境大小）
+  >
+  > - G1为默认垃圾回收器（JDK8使用CMS ）
+  >
+  >   > CMS与G1
+  >   >
+  >   > 1. CMS回收阶段（并发收集，系统停顿STW，GC线程会产生浮动垃圾，老年区存在内存碎片）
+  >   >
+  >   >    - 初始标记：枚举选出GCRoots（**所有线程停止并选举根节点在进行引用探测**）
+  >   >
+  >   >    - 并发标记：**对所有对象进行引用分析**（可达性分析），耗时（不会对系统运行造成影响）
+  >   >
+  >   >    - 重新标记：对老年区对象进行引用分析，并线程暂停状态（标记对象范围在老年区，速度快）
+  >   >
+  >   >    - 并发清除：在老年区进行标记-清除算法（耗时，不对系统运行造成影响）
+  >   >
+  >   > 2. G1回收阶段（标记-整理，局部采用复制，Java内存模型拆分成多等份域（Region），没有严格新老区区分，标记整理+Region间复制）
+  >   >    - 初始：标记一下GC Roots能直接关联到的对象（所有线程暂停）
+  >   >    - 并发：GC Root开始对堆中对象进行可达性分析（SATB解决并发时漏标，耗时长）
+  >   >    - 最终：对用户线程做一个短暂的暂停，用于处理并发标记阶段仍遗留下来的最后那少量的SATB记录(漏标对象)。 多个线程同时标记
+  >   >    - 筛选回收：负责更新Region的统计数据，对各个Region的回收价值和成本进行排序，根据用户所期望的停顿时间来制定回收计划，可以自由选择任意多个Region构成回收集，然后把决定回收的那一部分Region的存活对象复制到空的Region中，再清理掉整个旧Region的全部空间。这里的操作涉及存活对象的移动，是必须暂停用户线程，由多个收集器线程并行完成的。  ![image-20230206153200937](img\image-20230206153200937.png) 
+  >   >    
+  >   >    ![image-20230203160405679](img\image-20230203160405679.png) 
+  >   >    
+  >   >
+  >   > G1使用场景：-XX:MaxGCPauseMillis=200 （控制G1回收垃圾时间） -XX:+UseG1GC
+  >   >
+  >   > 1. **实时数据占用超过一半的堆空间**
+  >   > 2. **对象分配或者晋升的速度变化大**
+  >   > 3. **希望消除长时间的GC停顿（超过0.5-1秒）**
+  >   >
+  >
+  > - String存储结构优化
+  >
+  >   > String 由char[]转为byte[] 作为容器存储
+  >
+  > - 接口私有方法实现
+  >
+  >   ~~~java
+  >   public interface MyInterface {
+  >       private void methodPrivate(){
+  >       }
+  >   }
+  >   ~~~
+  >
+  > - Stream 与Optional方法增强
+  >
+  >   > - ofNullable
+  >   > - dropWhile：与takeWhile相反
+  >   > - takeWhile：从 `Stream` 中依次获取满足条件的元素，直到不满足条件为止结束获取
+  >
+  > - **Reactive Stream（基于发布/订阅模式的数据处理规范）** 
+  >
+  >   > - Publish：发布者方法
+  >   >   - subscribe(Subscriber<T> subscriber) ：实现Subscriber接口对象进行消费
+  >   > - Subscriber：订阅者，消费者
+  >   >   - onSubscribe（Subscription sub）：接收Subscription，发送处理事件
+  >   >   - onNext：接收下一项订阅数据回调（消费数据）
+  >   >   - onError：订阅者出现异常
+  >   >   - onComPlete：订阅者数据接收完成
+  >   > - Subscription：订阅事件
+  >   >   - request(long n) :被压流量
+  >   >   - cancel（）：停止生产数据
+  >   > - Processor：数据处理器（类似Function函数，既可做消费者，又可以做发布者）
+  >   >
+  >   > <img src="img\image-20230206112159289.png" alt="image-20230206112159289" style="zoom:67%;" /> 
+  >   >
+  >   > ```java
+  >   > // 实现Reactive Stream 第三方依赖
+  >   > <dependency>
+  >   >     <groupId>io.projectreactor</groupId>
+  >   >     <artifactId>reactor-core</artifactId>
+  >   >     <version>3.4.8</version>
+  >   > </dependency>
+  >   > ```
+  >   >
+  >   > [ProjectReactor](https://projectreactor.io/docs/core/snapshot/api/)
+  >   >
+  >   > - 生产数据流：Flux，Mono （产生0-N个元素的数据流，0-1个元素）
+  >   >
+  >   > - 订阅流：subscribe(Consumer  consumer)
+  >   >
+  >   > - 操作方法
+  >   >
+  >   > - | 序号 | 类型 | 操作符                                                       |
+  >   >   | ---- | :--: | ------------------------------------------------------------ |
+  >   >   | 1    | 转换 | as, cast, collect, collectList, collectMap, collectMultimap, collectSortedList, concatMap, concatMapDelayError, concatMapIterable, elapsed, expand, expandDeep, flatMap, flatMapDelayError, flatMapIterable, flatMapSequential, flatMapSequentialDelayError, groupJoin, handle, index, join, map, switchMap, switchOnFirst, then, thenEmpty, thenMany, timestamp, transform, transformDeferred |
+  >   >   | 2    | 筛选 | blockFirst, blockLast, distinct, distinctUntilChanged, elementAt, filter, filterWhen, ignoreElements, last, next, ofType, or, repeat, retry, single, singleOrEmpty, sort, take, takeLast, takeUntil, takeUntilOther, takeWhile |
+  >   >   | 3    | 组合 | concatWith, concatWithValues, mergeOrderWith, mergeWith, startWith, withLatestFrom, zipWith, zipWithIterable |
+  >   >   | 4    | 条件 | defaultIfEmpty, delayUntil, retryWhen, switchIfEmpty         |
+  >   >   | 5    | 时间 | delayElements, delaySequence, delaySubscription, sample, sampleFirst, sampleTimeout, skip, skipLast, skipUntil, skipUntilOther, skipWhile, timeout |
+  >   >   | 6    | 统计 | count, reduce, reduceWith, scan, scanWith                    |
+  >   >   | 7    | 匹配 | all, any, hasElement, hasElements                            |
+  >   >   | 8    | 分组 | buffer, bufferTimeout, bufferUntil, bufferUntilChanged, bufferWhen, groupBy, window, windowTimeout, windowUntil, windowUntilChanged, windowWhen, windowWhile |
+  >   >   | 9    | 事件 | doAfterTerminate, doFinally, doFirst, doOnCancel, doOnComplete, doOnDiscard, doOnEach, doOnError, doOnNext, doOnRequest, doOnSubscribe, doOnTerminate, onBackpressureBuffer, onBackpressureDrop, onBackpressureError, onBackpressureLatest, onErrorContinue, onErrorMap, onErrorResume, onErrorReturn, onErrorStop |
+  >   >   | 10   | 调试 | checkpoint, hide, log                                        |
+  >   >   | 11   | 其它 | cache, dematerialize, limitRate, limitRequest, materialize, metrics, name, onTerminateDetach, parallel, publish, publishNext, publishOn, replay, share, subscribeOn, subscriberContext, subscribeWith, tag |
+  >
+  > **JDK10** （发布与2018年3月20日，var关键字，垃圾回收器改善，GC改进，性能提升，线程管控）
+  >
+  > - **var（ 从初始值变量推导该变量类型，由编译判断变量类型）**
+  >
+  >   > 用于局部变量
+  >   >
+  >   > 声明时必须初始化
+  >   >
+  >   > 不能用作方法参数和对象属性
+  >
+  > - **G1并行FullGC**
+  >
+  > - List，Set，Map提供静态方法
+  >
+  > **JDK11** (2018年9月25日)
+  >
+  > - **Http Client标准化**
+  >
+  >   > 支持异步非阻塞
+  >
+  > - **ZGC（可伸缩延迟垃圾收集器）**
+  >
+  >   > *与CMS中的ParNew和G1类似，ZGC也采用标记-复制算法，不过ZGC对该算法做了重大改进：ZGC在标记、转移和重定位阶段几乎都是并发的，这是ZGC实现停顿时间小于10ms目标的最关键原因。*
+  >   >
+  >   > 1. GC停顿时间不超过10ms
+  >   > 2. 停顿时间不会随着堆的大小，或者活跃对象的大小而增加；
+  >   > 3. 支持8MB~4TB级别的堆（未来支持16TB）
+  >
+  > 
+  >
+  > **JDK17**（2021年9月14日）
+  >
+  > 
 
 - #### **容器**
 
@@ -274,15 +414,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                                             
+  >   > >                                                                                         
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                                             
+  >   > >                                                                                         
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                                             
+  >   > >                                                                                         
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -357,7 +497,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                                             
+  >   > >                                                                                         
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
