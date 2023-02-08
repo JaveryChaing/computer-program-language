@@ -1,5 +1,133 @@
 ## Java性能优化
 
+- #### **JVM内存模型**
+
+  > 1. Method Area（方法区，永久区、元空间）
+  >
+  >    > 存放Class类信息，及常量，静态变量，JDK1.8后使用本地内存存储数据（不需要GC），线程共享。
+  >    >
+  >    > 变量值存储在方法区中，字符串常量池，静态变量仍在堆中。
+  >
+  > 2. Heap （堆）
+  >
+  >    > 运行时数据区，所有类的实例和数组都是在堆上分配内存（由GC进行回收）线程共享
+  >    >
+  >    > **分代收集算法**
+  >    >
+  >    > 1. Young（1/3）：Eden（4/5），From Survivor （1/10），To Survivor（1/10）：由Minor GC回收
+  >    >
+  >    >    > Minor GC（标记-复制算法）：Eden空间不足时，触发GC（扫描Eden+From Survivor区域）将存活的对象复制到To Survivor区域中（To Survivor此时为空），同时清空Eden，FromSurvivor区域。From Survivor与 To Survivor角色互换，下次GC时将作为存活对象容器。
+  >    >    >
+  >    >    > 当From Survivor 与 To Survivior 交换超过15次时（MaxTenuringThreshold），To Survivor中存活对象将复制到Old区，Minor GC存在STW
+  >    >
+  >    > 2. Old（2/3)：由Major GC回收
+  >    >
+  >    >    > Major GC 触发机制：
+  >    >    >
+  >    >    > - Old 空间不足
+  >    >    > - To Survivor，Eden（超大对象） 复制到Old区空间不足
+  >    >    >
+  >    >    >  
+  >    >    >
+  >    >    > Full GC：Marjor GC与 Minor GC组合过程，清理Young与Old对象，通常与Marjor GC等价
+  >    >    >
+  >    >    > - System.gc()
+  >    >    > - Minor GC 存活的对象大小超过了老年代剩余空间
+  >    >    >
+  >    >    > 
+  >    >    >
+  >    >    > **Major GC:** 
+  >    >    >
+  >    >    > - CMS(Concurrent Mark Sweep)：**获取最短回收停顿时间为目标的收集器**
+  >    >    >
+  >    >    >   > 基于标记-清除算法实现（存在内存碎片）
+  >    >    >   >
+  >    >    >   > - 初始标记：SWT后，选举出GCRoots
+  >    >    >   > - 并发标记：开启GC线程（不影响用户线程），对Roots进行引用分析并进行标记
+  >    >    >   > - 重新标记：SATB漏标对象分析（修正并发期间其他线程创建对象引用分析，耗时长，且SWT）
+  >    >    >   > - 并发清除： GC 线程开始对未标记的区域做清扫
+  >    >    >   >
+  >    >    >   > <img src="img\image-20230208150412799.png" alt="image-20230208150412799" style="zoom:67%;" /> 
+  >    >    >   >
+  >    >    >   > -  对CPU资源敏感
+  >    >    >   >
+  >    >    >   > - 无法处理GC线程带来的浮动垃圾
+  >    >    >   > - 标记清除算法存在内存碎片
+  >    >    >   > - 并发收集，低停顿（用户线程与GC 线程并发执行）
+  >    >    >   >
+  >    >    >   > -XX:+UserConcurrentMarkSweepGC
+  >    >    >
+  >    >    > - G1(Garbage-First)分代分布并行收集器
+  >    >    >
+  >    >    >   > Region：将Java堆等大分区（分区大小范围为2的幂1,2,4,8,16,32） -XX:G1HeapRegionSize控制分区大小
+  >    >    >   >
+  >    >    >   > Region种类：可用区，Eden，Survivor，Humongous（超大对象分区），Old
+  >    >    >   >
+  >    >    >   > Rest：记录并跟踪其它Region指向该Region中对象的引用
+  >    >    >   >
+  >    >    >   > Card Table：Region中内部位置，供Rset记录
+  >    >    >   >
+  >    >    >   > <img src="img\image-20230208160331117.png" alt="image-20230208160331117" style="zoom:67%;" /> 
+  >    >    >   >
+  >    >    >   > **Young GC：Eden分区数量达到上限时触发（SWT），将Eden中数据复制到to Survivor或Old区中，同时清空所有Eden区数据**
+  >    >    >   >
+  >    >    >   > [Young GC 过程](https://cloud.tencent.com/developer/article/1824886)
+  >    >    >   >
+  >    >    >   > 
+  >    >    >   >
+  >    >    >   > **Mixed GC：**（Survivor+部分Old区）
+  >    >    >   >
+  >    >    >   > - 全局并发标记
+  >    >    >   >   1. 初始：标记一下GC Roots能直接关联到的对象（所有线程暂停）
+  >    >    >   >   2. 根区域扫描：GC Root开始对堆中对象进行可达性分析（SATB解决并发时漏标，耗时长）
+  >    >    >   > - 拷贝存活对象
+  >    >    >   >
+  >    >    >   > 
+  >    >    >   >
+  >    >    >   > G1使用场景：
+  >    >    >   >
+  >    >    >   > - XX:MaxGCPauseMillis=200 （控制G1回收垃圾时间） 
+  >    >    >   >
+  >    >    >   > - 实时数据占用超过一半的堆空间
+  >    >    >   >
+  >    >    >   > - 对象分配或者晋升的速度变化大
+  >    >    >   >
+  >    >    >   > - 希望消除长时间的GC停顿（超过0.5-1秒）
+  >    >    >   >
+  >    >    >   > -XX:+UseG1GC
+  >    >    >
+  >    >    > - **[ZGC](https://tech.meituan.com/2020/08/06/new-zgc-practice-in-meituan.html)**
+  >    >    >
+  >    >    > ---
+  >    >    >
+  >    >    > **三色标记法**
+  >    >    >
+  >    >    > - 白色：表示对象尚未被GC访问过，GC开始标记时所有对象都为白色
+  >    >    > - 黑色：该对象及该对象所有引用都被GC访问过
+  >    >    > - 灰色：该对象被GC访问过，其引用对象存在至少存在一个引用未被GC访问
+  >    >    >
+  >    >    > 三色标记遍历过程：
+  >    >    >
+  >    >    > 1. 初始时，对象都为白色
+  >    >    > 2. 选举出GC Roots节点，其对象标记灰色
+  >    >    > 3. 访问灰色对象的引用对象，将其标记为黑色，
+  >    >    > 4. 重复3步骤直到Roots节点都变为黑色
+  >    >    > 5. 扫描结束后，标记为白色的对象为回收对象
+  >    >    >
+  >    >    > 多标（浮动垃圾）：多线程情况下对象引用断开，导致存在垃圾对象被标记为黑色（需要下一轮GC才被回收）
+  >    >    >
+  >    >    > 漏标：多线程情况下灰色对象断开白色对象引用，黑色对象引用该白色对象
+  >    >    >
+  >    >    > CMS：写屏障+增量更新
+  >    >    >
+  >    >    > G1：写屏障+STAB
+  >
+  > 3. VM Stack（虚拟机栈）
+  >
+  > 4. Native Method Stack（本地方法栈）
+  >
+  > 5. Program Count Register（程序计数器）
+
 - #### 性能指标
 
   1. 预期吞吐量
@@ -100,7 +228,6 @@
     | -t         | 显示选择任务的线程的统计信息外的额外信息 |
     | -I         | 在SMP环境，表示任务的CPU使用率/内核数量  | 
     
-  
   - netstat （监测网络I/O使用情况）
   
     | 参数          | 说明                                            |

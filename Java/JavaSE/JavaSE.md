@@ -141,83 +141,55 @@
   >
   > - G1为默认垃圾回收器（JDK8使用CMS ）
   >
-  >   > CMS与G1
-  >   >
-  >   > 1. CMS回收阶段（并发收集，系统停顿STW，GC线程会产生浮动垃圾，老年区存在内存碎片）
-  >   >
-  >   >    - 初始标记：枚举选出GCRoots（**所有线程停止并选举根节点在进行引用探测**）
-  >   >
-  >   >    - 并发标记：**对所有对象进行引用分析**（可达性分析），耗时（不会对系统运行造成影响）
-  >   >
-  >   >    - 重新标记：对老年区对象进行引用分析，并线程暂停状态（标记对象范围在老年区，速度快）
-  >   >
-  >   >    - 并发清除：在老年区进行标记-清除算法（耗时，不对系统运行造成影响）
-  >   >
-  >   > 2. G1回收阶段（标记-整理，局部采用复制，Java内存模型拆分成多等份域（Region），没有严格新老区区分，标记整理+Region间复制）
-  >   >    - 初始：标记一下GC Roots能直接关联到的对象（所有线程暂停）
-  >   >    - 并发：GC Root开始对堆中对象进行可达性分析（SATB解决并发时漏标，耗时长）
-  >   >    - 最终：对用户线程做一个短暂的暂停，用于处理并发标记阶段仍遗留下来的最后那少量的SATB记录(漏标对象)。 多个线程同时标记
-  >   >    - 筛选回收：负责更新Region的统计数据，对各个Region的回收价值和成本进行排序，根据用户所期望的停顿时间来制定回收计划，可以自由选择任意多个Region构成回收集，然后把决定回收的那一部分Region的存活对象复制到空的Region中，再清理掉整个旧Region的全部空间。这里的操作涉及存活对象的移动，是必须暂停用户线程，由多个收集器线程并行完成的。  ![image-20230206153200937](img\image-20230206153200937.png) 
-  >   >    
-  >   >    ![image-20230203160405679](img\image-20230203160405679.png) 
-  >   >    
-  >   >
-  >   > G1使用场景：-XX:MaxGCPauseMillis=200 （控制G1回收垃圾时间） -XX:+UseG1GC
-  >   >
-  >   > 1. **实时数据占用超过一半的堆空间**
-  >   > 2. **对象分配或者晋升的速度变化大**
-  >   > 3. **希望消除长时间的GC停顿（超过0.5-1秒）**
-  >   >
-  >
   > - String存储结构优化
-  >
+  > 
   >   > String 由char[]转为byte[] 作为容器存储
-  >
+  > 
   > - 接口私有方法实现
-  >
+  > 
   >   ~~~java
   >   public interface MyInterface {
   >       private void methodPrivate(){
   >       }
   >   }
   >   ~~~
-  >
+  > 
   > - Stream 与Optional方法增强
-  >
+  > 
   >   > - ofNullable
   >   > - dropWhile：与takeWhile相反
   >   > - takeWhile：从 `Stream` 中依次获取满足条件的元素，直到不满足条件为止结束获取
-  >
+  > 
   > - **Reactive Stream（基于发布/订阅模式的数据处理规范）** 
-  >
+  > 
   >   > - Publish：发布者方法
   >   >   - subscribe(Subscriber<T> subscriber) ：实现Subscriber接口对象进行消费
   >   > - Subscriber：订阅者，消费者
   >   >   - onSubscribe（Subscription sub）：接收Subscription，发送处理事件
   >   >   - onNext：接收下一项订阅数据回调（消费数据）
   >   >   - onError：订阅者出现异常
-  >   >   - onComPlete：订阅者数据接收完成
+  >  >   - onComPlete：订阅者数据接收完成
   >   > - Subscription：订阅事件
-  >   >   - request(long n) :被压流量
+  >  >   - request(long n) :被压流量
   >   >   - cancel（）：停止生产数据
-  >   > - Processor：数据处理器（类似Function函数，既可做消费者，又可以做发布者）
+  >  > - Processor：数据处理器（类似Function函数，既可做消费者，又可以做发布者）
   >   >
-  >   > <img src="img\image-20230206112159289.png" alt="image-20230206112159289" style="zoom:67%;" /> 
+  >  > <img src="img\image-20230206112159289.png" alt="image-20230206112159289" style="zoom:67%;" /> 
   >   >
   >   > ```java
   >   > // 实现Reactive Stream 第三方依赖
   >   > <dependency>
   >   >     <groupId>io.projectreactor</groupId>
   >   >     <artifactId>reactor-core</artifactId>
-  >   >     <version>3.4.8</version>
+  >  >     <version>3.4.8</version>
   >   > </dependency>
-  >   > ```
+  >  > ```
   >   >
   >   > [ProjectReactor](https://projectreactor.io/docs/core/snapshot/api/)
   >   >
-  >   > - 生产数据流：Flux，Mono （产生0-N个元素的数据流，0-1个元素）
+  >  > - 生产数据流：Flux，Mono （产生0-N个元素的数据流，0-1个元素）
   >   >
-  >   > - 订阅流：subscribe(Consumer  consumer)
+  >  > - 订阅流：subscribe(Consumer  consumer)
   >   >
   >   > - 操作方法
   >   >
@@ -234,29 +206,29 @@
   >   >   | 9    | 事件 | doAfterTerminate, doFinally, doFirst, doOnCancel, doOnComplete, doOnDiscard, doOnEach, doOnError, doOnNext, doOnRequest, doOnSubscribe, doOnTerminate, onBackpressureBuffer, onBackpressureDrop, onBackpressureError, onBackpressureLatest, onErrorContinue, onErrorMap, onErrorResume, onErrorReturn, onErrorStop |
   >   >   | 10   | 调试 | checkpoint, hide, log                                        |
   >   >   | 11   | 其它 | cache, dematerialize, limitRate, limitRequest, materialize, metrics, name, onTerminateDetach, parallel, publish, publishNext, publishOn, replay, share, subscribeOn, subscriberContext, subscribeWith, tag |
-  >
+  > 
   > **JDK10** （发布与2018年3月20日，var关键字，垃圾回收器改善，GC改进，性能提升，线程管控）
-  >
+  > 
   > - **var（ 从初始值变量推导该变量类型，由编译判断变量类型）**
-  >
+  > 
   >   > 用于局部变量
   >   >
   >   > 声明时必须初始化
   >   >
   >   > 不能用作方法参数和对象属性
-  >
+  > 
   > - **G1并行FullGC**
-  >
+  > 
   > - List，Set，Map提供静态方法
-  >
+  > 
   > **JDK11** (2018年9月25日)
-  >
+  > 
   > - **Http Client标准化**
-  >
+  > 
   >   > 支持异步非阻塞
-  >
+  > 
   > - **ZGC（可伸缩延迟垃圾收集器）**
-  >
+  > 
   >   > *与CMS中的ParNew和G1类似，ZGC也采用标记-复制算法，不过ZGC对该算法做了重大改进：ZGC在标记、转移和重定位阶段几乎都是并发的，这是ZGC实现停顿时间小于10ms目标的最关键原因。*
   >   >
   >   > 1. GC停顿时间不超过10ms
@@ -268,7 +240,7 @@
   > **JDK17**（2021年9月14日）
   >
   > 
-
+  
 - #### **容器**
 
   > <img src="img/image-20220601001657543.png" alt="image-20220601001657543" style="zoom:50%;" /> 
@@ -414,15 +386,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                                                             
+  >   > >                                                                                                 
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                                                             
+  >   > >                                                                                                 
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                                                             
+  >   > >                                                                                                 
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -497,7 +469,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                                                             
+  >   > >                                                                                                 
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
