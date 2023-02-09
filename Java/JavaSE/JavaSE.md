@@ -386,15 +386,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                                                                 
+  >   > >                                                                                                     
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                                                                 
+  >   > >                                                                                                     
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                                                                 
+  >   > >                                                                                                     
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -469,7 +469,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                                                                 
+  >   > >                                                                                                     
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -911,7 +911,7 @@
   >
   > 委托加载机制（代理模式）：Java虚拟机区分类是否相同通过**类全名和类加载器是否一致**，**保证 Java 核心库的类型安全**（*不同的类加载器为相同名称的类创建了额外的名称空间。相同名称的类可以并存在 Java 虚拟机中，只需要用不同的类加载器来加载它们即可。不同类加载器加载的类之间是不兼容的，这就相当于在 Java 虚拟机内部创建了一个个相互隔离的 Java 类空间*）
   >
-  > <img src="img\image-20230129095427841.png" alt="image-20230129095427841" style="zoom:67%;" /> <img src="D:\code\computer-program-language\Java\JavaSE\img\image-20230129100913237.png" alt="image-20230129100913237" style="zoom:67%;" />
+  > <img src="img\image-20230129095427841.png" alt="image-20230129095427841" style="zoom:67%;" /> <img src="img\image-20230129100913237.png" alt="image-20230129100913237" style="zoom:67%;" /> 
   >
   > 
   >

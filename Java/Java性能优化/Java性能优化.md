@@ -8,7 +8,30 @@
   >    >
   >    > 变量值存储在方法区中，字符串常量池，静态变量仍在堆中。
   >    >
+  >    > 
+  >    >
   >    > **类加载器**
+  >    >
+  >    > - 引导类：负责加载系统类（从JAR文件rt.jar中加载）
+  >    >
+  >    > - 扩展类：从jre/lib/ext目录加载
+  >    >
+  >    > - 应用类：由CLASSPATH环境变量中加载类
+  >    >
+  >    > 委托加载机制（代理模式）：Java虚拟机区分类是否相同通过**类全名和类加载器是否一致**，**保证 Java 核心库的类型安全**（*不同的类加载器为相同名称的类创建了额外的名称空间。相同名称的类可以并存在 Java 虚拟机中，只需要用不同的类加载器来加载它们即可。不同类加载器加载的类之间是不兼容的，这就相当于在 Java 虚拟机内部创建了一个个相互隔离的 Java 类空间*）
+  >    >
+  >    > <img src="..\JavaSE\img\image-20230129095427841.png" alt="image-20230129095427841" style="zoom:67%;" />  <img src="..\JavaSE\img\image-20230129100913237.png" alt="image-20230129100913237" style="zoom:67%;" /> 
+  >    >
+  >    >   
+  >    >
+  >    > **Class加载过程**
+  >    >
+  >    > 加载 →连接（验证，准备，解析） → 初始化
+  >    >
+  >    > - 加载：读取Class文件将其静态存储结构转换为方法区的运行时数据结构，**并在Heap中生成代表该类的Class对象**
+  >    > - 准备：将对象中变量赋予初始值，**及静态变量属性对象创建**
+  >    > - 解析：将常量池内的符号引用替换为直接引用的过程，也就是得到类或者字段、方法在内存中的指针或者偏移量
+  >    > - 初始化：执行对象构造方法
   >    >
   >    > 
   >
@@ -186,6 +209,68 @@
   > 5. Program Count Register（程序计数器）
   >
   >    > 负责记录执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等功能
+  >
+  > **JVM重要参数**
+  >
+  > - -Xms <size> [unit]：JVM分配最小堆空间
+  >
+  > - -Xmx <size> [unit]：JVM分配最大堆空间
+  >
+  > - -XX:NewSize= <young size> [unit] ：Young 空间大小
+  >
+  > - -XX:MAXNewSize= <young size> [unit]：Young 最大空间
+  >
+  > - -XX:+UseSerialGC：串行垃圾收集器
+  >   -XX:+UseParallelGC：并行垃圾收集器
+  >   -XX:+UseParNewGC：CMS 垃圾收集器
+  >   -XX:+UseG1GC：G1 垃圾收集器
+  >
+  > - GC日志
+  >
+  >   ~~~sh
+  >   # 必选
+  >   # 打印基本 GC 信息
+  >   -XX:+PrintGCDetails
+  >   -XX:+PrintGCDateStamps
+  >   # 打印对象分布
+  >   -XX:+PrintTenuringDistribution
+  >   # 打印堆数据
+  >   -XX:+PrintHeapAtGC
+  >   # 打印Reference处理信息
+  >   # 强引用/弱引用/软引用/虚引用/finalize 相关的方法
+  >   -XX:+PrintReferenceGC
+  >   # 打印STW时间
+  >   -XX:+PrintGCApplicationStoppedTime
+  >   
+  >   # 可选
+  >   # 打印safepoint信息，进入 STW 阶段之前，需要要找到一个合适的 safepoint
+  >   -XX:+PrintSafepointStatistics
+  >   -XX:PrintSafepointStatisticsCount=1
+  >   
+  >   # GC日志输出的文件路径
+  >   -Xloggc:/path/to/gc-%t.log
+  >   # 开启日志文件分割
+  >   -XX:+UseGCLogFileRotation
+  >   # 最多分割几个文件，超过之后从头文件开始写
+  >   -XX:NumberOfGCLogFiles=14
+  >   # 每个文件上限大小，超过就触发分割
+  >   -XX:GCLogFileSize=50M
+  >   
+  >   ~~~
+  >
+  > - OOM内存快照
+  >
+  >   ~~~sh
+  >   # 指示 JVM 在遇到 OutOfMemoryError 错误时将 heap 转储到物理文件中。
+  >   -XX:+HeapDumpOnOutOfMemoryError
+  >   -XX:HeapDumpPath=./java_pid<pid>.hprof
+  >   # 用于发出紧急命令，以便在内存不足的情况下执行; 应该在 cmd args 空间中使用适当的命令
+  >   -XX:OnOutOfMemoryError="< cmd args >;< cmd args >"
+  >   # 它限制在抛出 OutOfMemory 错误之前在 GC 中花费的 VM 时间的比例
+  >   -XX:+UseGCOverheadLimit
+  >   ~~~
+  >
+  > **JDK监控和故障处理工具**
   >
   > 
 
