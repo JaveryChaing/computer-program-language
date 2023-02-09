@@ -241,12 +241,12 @@
   >   -XX:+PrintReferenceGC
   >   # 打印STW时间
   >   -XX:+PrintGCApplicationStoppedTime
-  >   
+  >
   >   # 可选
   >   # 打印safepoint信息，进入 STW 阶段之前，需要要找到一个合适的 safepoint
   >   -XX:+PrintSafepointStatistics
   >   -XX:PrintSafepointStatisticsCount=1
-  >   
+  >
   >   # GC日志输出的文件路径
   >   -Xloggc:/path/to/gc-%t.log
   >   # 开启日志文件分割
@@ -255,7 +255,7 @@
   >   -XX:NumberOfGCLogFiles=14
   >   # 每个文件上限大小，超过就触发分割
   >   -XX:GCLogFileSize=50M
-  >   
+  >
   >   ~~~
   >
   > - OOM内存快照
@@ -272,7 +272,47 @@
   >
   > **JDK监控和故障处理工具**
   >
-  > 
+  > - jps 
+  >
+  > - **jstat** -<option> [-t] [-h] <vmid> [ interval] [count] ：用于收集 HotSpot 虚拟机各方面的运行数据
+  >
+  >   > **jstat -gcutil <pid> 1000 5** ：查看pid 内存区域使用情况及GC次数，耗时
+  >   >
+  >   > ![image-20230209142604954](img\image-20230209142604954.png) 
+  >   >
+  >   > S0、S1：表示Survival使用率
+  >   >
+  >   > E：Eden使用率
+  >   >
+  >   > O：老年代使用率
+  >   >
+  >   > M：元空间使用率（动态）
+  >   >
+  >   > YGC：YounGC的总次数
+  >   >
+  >   > YGCT：表示 YoungGC的总耗时(秒)
+  >   >
+  >   > FGC：表示 FullGC的次数
+  >   >
+  >   > FGCT：表示 FullGC的总耗时(秒)
+  >   >
+  >   >  
+  >   >
+  >   > **jstat -class vmid **：展示类加载情况
+  >   >
+  >   > **jstat  -gc vmid** ： 显示与 GC 相关的堆信息
+  >
+  > - **jinfo -flag [+ | -] name vmid ：在不重启JVM情况下动态修改JVM参数**
+  >
+  >   > ~~~sh
+  >   > // -XX:-PrintGC 取消GC日志打印
+  >   > jinfo  -flag  PrintGC 17340
+  >   > jinfo  -flag  +PrintGC 17340
+  >   > ~~~
+  >
+  > - **jmap：生成堆转储快照 dump**
+  > - **jhat：分析heapdump文件，并可以在浏览器访问分析结果**
+  > - jstack：生成虚拟机当前时刻的线程快照
 
 - #### 性能指标
 
