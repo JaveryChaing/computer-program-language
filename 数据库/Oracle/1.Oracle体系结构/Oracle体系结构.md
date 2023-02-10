@@ -1,12 +1,61 @@
 ## Oracle 体系结构
 
+#### **JDBC连接方式**
+
+> service_name连接方式：jdbc:oracle:thin:@//<host>:<port>/<service_name>
+>
+> > ~~~sql
+> > sqlplus / as sysdba
+> > -- 服务名称，一个数据库可以拥有多个实例（集群），其service_names是唯一的
+> > select value from v$parameter where name=‘service_names’;
+> > ~~~
+>
+> SID连接方式：jdbc:oracle:thin:@<host>:<port>:<SID>
+>
+> > ~~~sql
+> > sqlplus / as sysdba
+> > -- 实例名称，响应某个数据库操作的数据库管理系统的名称 
+> > select value from v$parameter where name=‘instance_name’;
+> > ~~~
+>
+> TNSName连接方式：jdbc:oracle:thin:@<TNSName>
+
+#### **Oracle结构**
+
 > - **实例（Oracle Instance）**
 >
->   > 相当与应用，运行在物理机上，一个实例只有一个数据库，一个数据库可以有n个实例组成集群。不同实例可以建相同名字的用户。
+>   > Oracle12及以上版本一个实例可以运行多个数据库。
+>   >
+>   > ~~~sql
+>   > sqlplus / as sysdba
+>   > -- 实例启动
+>   > startup;
+>   > -- oracle 端口监听启动
+>   > lsnrctl start
+>   > ~~~
 >
 > - **数据库（DataBase）**
 >
 >   > 基于磁盘的数据文件、控制文件、日志文件、参数文件和归档日志文件等组成的物理文件集合
+>   >
+>   > **CDB：数据库容器**
+>   >
+>   > **PDB：可插拔数据库**
+>   >
+>   > ~~~sql
+>   > -- 查看当前是否处于容器CDB
+>   > show con_name;
+>   > -- 查看pdbs容器中的数据库名
+>   > show pdbs;
+>   > -- 切换当前登录会话（切换数据库）、启动PDB数据库
+>   > alter session set container=ORCLPDB
+>   > -- 启动PDB数据库
+>   > alter pluggable database PDBEPPS open;
+>   > -- g关闭PDB数据库
+>   > alter pluggable database PDBEPPS close;
+>   > -- 切换到CDB  （CDB中的用户必须以C##开头）
+>   > alter session set container=CDB&ROOT
+>   > ~~~
 >
 > - **表空间**(逻辑划分)
 >
@@ -156,5 +205,5 @@
 >
 > - **备份文件**
 >
->    
+> 
 
