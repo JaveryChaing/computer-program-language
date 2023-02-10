@@ -10,11 +10,13 @@
   > - 阶码位 （存储指数，$E=e+(2^{n-1}-1)$ E 表示阶码，e表示指数真值，8位阶码的指数范围为[-126，127]）
   > - 有效数（存储有效数） 
   
-- #### **面向对象**
+- #### **JDK**
 
+  > [OpenJdk](https://jdk.java.net/archive/)
+  >
   > 面向对象编程（Object-Oriented Programming) 
   >
-  >  *主要目标*
+  > *主要目标*
   >
   > - 可维护
   > - 可重用
@@ -44,7 +46,201 @@
   > - Serializable  序列化
   > - Hessian 序列化
   > - JSON 数据交互格式
-
+  >
+  > ---
+  >
+  > **函数式编程**
+  >
+  > - 转换类型：Function<T,R>：元素转换函数
+  >
+  > - 消费类型函数：Consumer ：包装执行逻辑操作
+  >
+  > - 生产类型函数：Supplier：包装new对象操作
+  >
+  > - 判断类型函数：Predicate：包装条件判断逻辑操作
+  >
+  > - null类型包装函数：Optional：包装单元素操作对象（消除 if obj != null 代码)
+  >
+  > - 容器类型包装函数：Stream：操作，收集，统计，约归容器中元素
+  >
+  > - **异步操作对象：Future/CompletableFuture（使用多线程和Future结果包装完成异步并发操作）**
+  >
+  >   - CompletableFuture方法概述
+  >
+  >     ​		**Future结果依赖执行**
+  >
+  >     - supplyAsync/runAsync：支持任务返回值与不支持返回值
+  >
+  >     - 包含async方法：从线程池中获取线程执行当前任务（并发执行），不以async结尾方法则使用当前线程继续执行（减少线程上下文切换）
+  >
+  >     - thenApply：将前面任务执行结果包装成Function函数装换（等待前面任务执行结果）
+  >
+  >     - thenCompose：**用来连接两个依赖的CompletableFuture**合并成一个新的CompletableFuture（等待前面任务执行结果）
+  >
+  >       ---
+  >
+  >       **And并行执行**
+  >
+  >     - thenCombine：**两个CompletableFuture并行执行**，并返回其结果
+  >
+  >     - thenAccepetBoth：两个任务并行执行完成后，将结果交给BiConsumer处理，无返回值
+  >
+  >     - runAfterBoth：两个任务并行执行完成后，执行下一步任务（Runnable）
+  >
+  >       ---
+  >
+  >       **Or聚合执行**
+  >
+  >     - applyToEither：两个CompletableFuture或逻辑执行，有返回值（执行快使用那个结果）
+  >
+  >     - acceptEither：同上，无返回结果
+  >
+  >     - runAfterEither：同上，进行下一步操作(Runnable类型任务)
+  >
+  >       ---
+  >
+  >       **多任务并行执行**
+  >
+  >     - allOf():当所有给定的 CompletableFuture 完成时，返回一个新的 CompletableFuture
+  >
+  >     - anyOf()：当任何一个给定的CompletablFuture完成时，返回一个新的CompletableFuture
+  >
+  >       **CompletableFuture结果处理**
+  >
+  >     - get/join：阻塞等待任务结果
+  >
+  >     - whenComplete：CompletableFuture执行完成时，使用结果或异常处理操作
+  >
+  >     - exceptionally：任务异常完成时，**给定函数的异常触发这个CompletableFuture的完成**
+  >
+  >     - handle()：任务返回的结果正常处理与异常处理
+  >
+  >     - isDone：判断任务是否执行完成
+  >
+  >     - cancel：取消任务计算
+  >
+  >   - 线程池大小：$N_{threads}= N_{CPU}*U_{CPU}*(1+W/C)$ 
+  >
+  >     > $U_{CPU}$是期望的CPU利用率， W/C是等待时间与计算时间的比率
+  >
+  >   - **计算密集型的操作**，并且没有I/O，那么使用Stream接口
+  >
+  >   - **涉及等待I/O的操作（包括网络连接等待）**，使用 CompletableFuture
+  >
+  >   - **Stream与CompletableFuture完成并发异步操作**
+  >
+  >     > ![image-20230113160522898](img\image-20230113160522898.png) 
+  >
+  > #### **Java9特性**
+  >
+  > **Java 9** 发布于 2017 年 9 月 21 日 。作为 Java 8 之后 3 年半才发布的新版本，Java 9 带来了很多重大的变化其中最重要的改动是 Java 平台模块系统的引入
+  >
+  > - JShell 命令工具
+  >
+  > - 模块化系统（Jlink命令可以制定轻量级，定制的JRE，减少Java运行时环境大小）
+  >
+  > - G1为默认垃圾回收器（JDK8使用CMS ）
+  >
+  > - String存储结构优化
+  > 
+  >   > String 由char[]转为byte[] 作为容器存储
+  > 
+  > - 接口私有方法实现
+  > 
+  >   ~~~java
+  >   public interface MyInterface {
+  >       private void methodPrivate(){
+  >       }
+  >   }
+  >   ~~~
+  > 
+  > - Stream 与Optional方法增强
+  > 
+  >   > - ofNullable
+  >   > - dropWhile：与takeWhile相反
+  >   > - takeWhile：从 `Stream` 中依次获取满足条件的元素，直到不满足条件为止结束获取
+  > 
+  > - **Reactive Stream（基于发布/订阅模式的数据处理规范）** 
+  > 
+  >   > - Publish：发布者方法
+  >   >   - subscribe(Subscriber<T> subscriber) ：实现Subscriber接口对象进行消费
+  >   > - Subscriber：订阅者，消费者
+  >   >   - onSubscribe（Subscription sub）：接收Subscription，发送处理事件
+  >   >   - onNext：接收下一项订阅数据回调（消费数据）
+  >   >   - onError：订阅者出现异常
+  >  >   - onComPlete：订阅者数据接收完成
+  >   > - Subscription：订阅事件
+  >  >   - request(long n) :被压流量
+  >   >   - cancel（）：停止生产数据
+  >  > - Processor：数据处理器（类似Function函数，既可做消费者，又可以做发布者）
+  >   >
+  >  > <img src="img\image-20230206112159289.png" alt="image-20230206112159289" style="zoom:67%;" /> 
+  >   >
+  >   > ```java
+  >   > // 实现Reactive Stream 第三方依赖
+  >   > <dependency>
+  >   >     <groupId>io.projectreactor</groupId>
+  >   >     <artifactId>reactor-core</artifactId>
+  >  >     <version>3.4.8</version>
+  >   > </dependency>
+  >  > ```
+  >   >
+  >   > [ProjectReactor](https://projectreactor.io/docs/core/snapshot/api/)
+  >   >
+  >  > - 生产数据流：Flux，Mono （产生0-N个元素的数据流，0-1个元素）
+  >   >
+  >  > - 订阅流：subscribe(Consumer  consumer)
+  >   >
+  >   > - 操作方法
+  >   >
+  >   > - | 序号 | 类型 | 操作符                                                       |
+  >   >   | ---- | :--: | ------------------------------------------------------------ |
+  >   >   | 1    | 转换 | as, cast, collect, collectList, collectMap, collectMultimap, collectSortedList, concatMap, concatMapDelayError, concatMapIterable, elapsed, expand, expandDeep, flatMap, flatMapDelayError, flatMapIterable, flatMapSequential, flatMapSequentialDelayError, groupJoin, handle, index, join, map, switchMap, switchOnFirst, then, thenEmpty, thenMany, timestamp, transform, transformDeferred |
+  >   >   | 2    | 筛选 | blockFirst, blockLast, distinct, distinctUntilChanged, elementAt, filter, filterWhen, ignoreElements, last, next, ofType, or, repeat, retry, single, singleOrEmpty, sort, take, takeLast, takeUntil, takeUntilOther, takeWhile |
+  >   >   | 3    | 组合 | concatWith, concatWithValues, mergeOrderWith, mergeWith, startWith, withLatestFrom, zipWith, zipWithIterable |
+  >   >   | 4    | 条件 | defaultIfEmpty, delayUntil, retryWhen, switchIfEmpty         |
+  >   >   | 5    | 时间 | delayElements, delaySequence, delaySubscription, sample, sampleFirst, sampleTimeout, skip, skipLast, skipUntil, skipUntilOther, skipWhile, timeout |
+  >   >   | 6    | 统计 | count, reduce, reduceWith, scan, scanWith                    |
+  >   >   | 7    | 匹配 | all, any, hasElement, hasElements                            |
+  >   >   | 8    | 分组 | buffer, bufferTimeout, bufferUntil, bufferUntilChanged, bufferWhen, groupBy, window, windowTimeout, windowUntil, windowUntilChanged, windowWhen, windowWhile |
+  >   >   | 9    | 事件 | doAfterTerminate, doFinally, doFirst, doOnCancel, doOnComplete, doOnDiscard, doOnEach, doOnError, doOnNext, doOnRequest, doOnSubscribe, doOnTerminate, onBackpressureBuffer, onBackpressureDrop, onBackpressureError, onBackpressureLatest, onErrorContinue, onErrorMap, onErrorResume, onErrorReturn, onErrorStop |
+  >   >   | 10   | 调试 | checkpoint, hide, log                                        |
+  >   >   | 11   | 其它 | cache, dematerialize, limitRate, limitRequest, materialize, metrics, name, onTerminateDetach, parallel, publish, publishNext, publishOn, replay, share, subscribeOn, subscriberContext, subscribeWith, tag |
+  > 
+  > **JDK10** （发布与2018年3月20日，var关键字，垃圾回收器改善，GC改进，性能提升，线程管控）
+  > 
+  > - **var（ 从初始值变量推导该变量类型，由编译判断变量类型）**
+  > 
+  >   > 用于局部变量
+  >   >
+  >   > 声明时必须初始化
+  >   >
+  >   > 不能用作方法参数和对象属性
+  > 
+  > - **G1并行FullGC**
+  > 
+  > - List，Set，Map提供静态方法
+  > 
+  > **JDK11** (2018年9月25日)
+  > 
+  > - **Http Client标准化**
+  > 
+  >   > 支持异步非阻塞
+  > 
+  > - **ZGC（可伸缩延迟垃圾收集器）**
+  > 
+  >   > *与CMS中的ParNew和G1类似，ZGC也采用标记-复制算法，不过ZGC对该算法做了重大改进：ZGC在标记、转移和重定位阶段几乎都是并发的，这是ZGC实现停顿时间小于10ms目标的最关键原因。*
+  >   >
+  >   > 1. GC停顿时间不超过10ms
+  >   > 2. 停顿时间不会随着堆的大小，或者活跃对象的大小而增加；
+  >   > 3. 支持8MB~4TB级别的堆（未来支持16TB）
+  >
+  > 
+  >
+  > **JDK17**（2021年9月14日）
+  >
+  > 
+  
 - #### **容器**
 
   > <img src="img/image-20220601001657543.png" alt="image-20220601001657543" style="zoom:50%;" /> 
@@ -190,15 +386,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                 
+  >   > >                                                                                                     
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                 
+  >   > >                                                                                                     
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                 
+  >   > >                                                                                                     
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -273,7 +469,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                 
+  >   > >                                                                                                     
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -699,6 +895,219 @@
   >
   > *在**代码编译时期**对注解进行处理 @Data 并生成Java文件，减少手动输入代码过程*
   
+- #### **Locale语言转换**
+
+  > ![image-20230129092633518](img\image-20230129092633518.png) 
+  
+- #### **安全**
+
+  > **类加载器**：负责在运行时将 Java 类动态加载到JVM（按需加载）
+  >
+  > - 引导类：负责加载系统类（从JAR文件rt.jar中加载）
+  >
+  > - 扩展类：从jre/lib/ext目录加载
+  >
+  > - 应用类：由CLASSPATH环境变量中加载类
+  >
+  > 委托加载机制（代理模式）：Java虚拟机区分类是否相同通过**类全名和类加载器是否一致**，**保证 Java 核心库的类型安全**（*不同的类加载器为相同名称的类创建了额外的名称空间。相同名称的类可以并存在 Java 虚拟机中，只需要用不同的类加载器来加载它们即可。不同类加载器加载的类之间是不兼容的，这就相当于在 Java 虚拟机内部创建了一个个相互隔离的 Java 类空间*）
+  >
+  > <img src="img\image-20230129095427841.png" alt="image-20230129095427841" style="zoom:67%;" /> <img src="img\image-20230129100913237.png" alt="image-20230129100913237" style="zoom:67%;" /> 
+  >
+  > 
+  >
+  > loadClass 类加载器源码
+  >
+  > ~~~java
+  > // name 全类名
+  > protected Class<?> loadClass(String name, boolean resolve)
+  >             throws ClassNotFoundException {
+  >         synchronized (getClassLoadingLock(name)) {
+  >             //首先,检查类文件是否已经被加载过
+  >             Class<?> c = findLoadedClass(name);
+  >             //类文件未被加载过
+  >             if (c == null) {
+  >                 //设定加载时间起始点
+  >                 long t0 = System.nanoTime();
+  >                 try {
+  >                     //其父加载器不为空,说明父加载器为引导加载器
+  >                     if (parent != null) {
+  >                         //通过父加载器搜索name指定的类文件
+  >                         c = parent.loadClass(name, false);
+  >                     } else {
+  >                         //父加载器为空,说明父加载器为启动加载器搜索类文件
+  >                         //启用bootstrap class loader
+  >                         c = findBootstrapClassOrNull(name);
+  >                     }
+  >                 } catch (ClassNotFoundException e) {
+  >                     //如果非空父加载器中找不到name指定的类文件
+  >                     //抛出ClassNotFoundException异常
+  >                 }
+  >                 //父加载器或者启动加载器中都未搜索到该类文件
+  >                 if (c == null) {
+  >                    //设定加载时间结点
+  >                     long t1 = System.nanoTime();
+  >                     //当前加载器内搜索name指定的类文件
+  >                     c = findClass(name);
+  >                     // this is the defining class loader; record the stats
+  >                     sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+  >                     sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+  >                     sun.misc.PerfCounter.getFindClasses().increment();
+  >                 }
+  >             }
+  >             //resolve为true时处理类文件
+  >             if (resolve) {
+  >                 resolveClass(c);
+  >             }
+  >             return c;
+  >         }
+  >     }
+  > ~~~
+  >
+  > **自定义类加载器**（防止反编译，网络中加载源代码，依赖冲突，热加载/热部署）
+  >
+  > ~~~java
+  > package org.example;
+  > 
+  > import cn.hutool.core.io.file.FileReader;
+  > import jdk.internal.perf.PerfCounter;
+  > import lombok.SneakyThrows;
+  > import lombok.extern.slf4j.Slf4j;
+  > 
+  > import java.io.File;
+  > import java.util.Scanner;
+  > 
+  > @Slf4j
+  > public class ClassLoaderExample extends ClassLoader {
+  > 
+  > 
+  >     private String codePath;
+  > 
+  >     // 类加载目录位置
+  >     public ClassLoaderExample(String codePath) {
+  >         this.codePath = codePath;
+  >     }
+  > 
+  >     /**
+  >      *
+  >      * @param parent
+  >      * @param codePath
+  >      */
+  >     public ClassLoaderExample(ClassLoader parent, String codePath) {
+  >         super(parent);
+  >         this.codePath = codePath;
+  >     }
+  > 
+  > 
+  >     @Override
+  >     @SneakyThrows
+  >     protected Class<?> findClass(String name) throws ClassNotFoundException {
+  >         Scanner scanner = new Scanner(System.in);
+  >         // 判断该类名是否已被加载
+  >         Class<?> loadedClass = findLoadedClass(name);
+  >         if (loadedClass != null) {
+  >             return loadedClass;
+  >         } else {
+  >             //获取父类加载器
+  >             ClassLoader parent = this.getParent();
+  >             try {
+  >                 loadedClass = parent.loadClass(codePath);
+  >             } catch (ClassNotFoundException e) {
+  >                 log.error("{}，父类加载失败，未找到该路径代码path：{}", e.getMessage(), codePath);
+  >             }
+  > 
+  >             if (loadedClass != null) {
+  >                 return loadedClass;
+  >             } else {
+  >                 // 访问加密
+  >                 int serial = 20000456;
+  >                 while (true) {
+  >                     int inSerial = scanner.nextInt();
+  >                     if (serial == inSerial) break;
+  >                     System.err.println("序列号输入错误，请重新输入！");
+  >                 }
+  >                 // 全路径
+  >                 String rootPath = codePath + "/" + name.replace(".", File.separator) + ".class";
+  >                 FileReader fileReader = new FileReader(rootPath);
+  >                 byte[] bytes = fileReader.readBytes();
+  > 
+  >                 if (bytes == null || bytes.length == 0) throw new ClassNotFoundException();
+  > 
+  >                 Class<?> aClass = defineClass(name, bytes, 0, bytes.length);
+  > 
+  >                 return aClass;
+  >             }
+  >         }
+  > 
+  >     }
+  > 
+  > 
+  >     /**
+  >      * 打破双亲委派机制，指定包路径使用自定义类加载器
+  >      *
+  >      * @param name    The <a href="#binary-name">binary name</a> of the class
+  >      * @param resolve If {@code true} then resolve the class
+  >      * @return
+  >      * @throws ClassNotFoundException
+  >      */
+  >     @Override
+  >     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+  >         synchronized (getClassLoadingLock(name)) {
+  > 
+  >             Class<?> c = findLoadedClass(name);
+  >             if (c == null) {
+  >                 long t1 = System.nanoTime();
+  >                 //如果包名是org开头的，调用自定义类的findClass方法，否则调用父类的loadClass方法
+  >                 if (name.startsWith("org")) {
+  >                     c = this.findClass(name);
+  >                 } else {
+  >                     c = this.getParent().loadClass(name);
+  >                 }
+  >                 // this is the defining class loader; record the stats
+  >                 PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+  >                 PerfCounter.getFindClasses().increment();
+  >             }
+  >             if (resolve) {
+  >                 resolveClass(c);
+  >             }
+  >             return c;
+  >         }
+  > 
+  >     }
+  > }
+  > 
+  > // 使用SPI类加载器 ServiceLoader （基于接口反射）
+  > // resource/META-INF/services 配置文件
+  > org.example.loader.SPILoaderA
+  > org.example.loader.SPILoaderB
+  > 
+  > ServiceLoader<SPILoader> serviceLoader = ServiceLoader.load(SPILoader.class);
+  >     SPILoader spiLoader = serviceLoader.findFirst().get();
+  > spiLoader.printStr("abc");
+  > 
+  > ~~~
+  > 
+  > **字节码校验**
+  >
+  
+- #### **RMI** (Remote Method Invocation)
+
+  > JRMP：Java远程消息交换协议，能够让Java虚拟机上的对象调用另个虚拟机上对象方法
+  >
+  > ~~~java
+  >         SomeThing someThing = new SomeThing();
+  >         LocateRegistry.createRegistry(8888);
+  >         // 把远程对象注册到RMI注册服务器上 命名为someThing
+  >         Naming.bind("rmi://localhost:8888/someThing", someThing);
+  >         log.info("=================");
+  > 
+  >         IRemote lookup = (IRemote) Naming.lookup("rmi://localhost:8888/someThing");
+  > 
+  >         lookup.callRemote("qweqweqwe");
+  >         lookup.doSomething();
+  > ~~~
+  >
+  > 
+  
 - #### 并发
 
   > *并发与并行，并发是指在某个时间段内，多任务交替处理能力，并行是指同时处理多任务能力*
@@ -708,9 +1117,9 @@
   > 线程安全实现方案：
   >
   > 1. 数据单线程内可见（ThreadLocal，存储在线程局部变量表中）
-  > 2. 只读对象（final关键字修饰的字段，String，Interger等）
-  > 3. 线程安全类（StringBuffer等使用synchronized等关键字修饰,**序列化访问共享资源**）
-  > 4. 同步与锁机制（**序列化访问共享资源**）
+  > 2. 多线程多实例资源
+  > 3. 只读对象（final关键字修饰的字段，String，Interger等）
+  > 4. 线程安全类，同步锁机制（StringBuffer等使用synchronized等关键字修饰,**序列化访问共享资源**）
   >
   > ---
   >
@@ -874,12 +1283,18 @@
   >
   >   > *支持一个线程对资源重复加锁，获取锁时公平和非公平选择*
   >
-  > - ReadWriteLock
+  > - ReadWriteLock（ReentrantReadWriteLock）适用于读多写少的场景
   >
   >   > - int getReadLockCount() 返回当前读锁获取次数
   >   > - int getReadHoldCount() 返回当前线程获取读锁次数（ThreadLocal实现）
   >   > - boolean isWriteLocked() 判断写锁是否被获取
   >   > - int getWriteHoldCount() 返回当前写锁获取次数
+  >
+  > - StampedLock显示锁
+  >
+  >   > 悲观锁：假定会发生并发冲突，则屏蔽一切可能违反数据完整性的操作
+  >   >
+  >   > 乐观锁：假设不会发生并发冲突，只在提交数据时检测数据完整性
   >
   > - **CountDownLatch**  设置等待线程数，当计数为0时往下执行 
   >
@@ -942,10 +1357,6 @@
   >   > - RecursiveTask：用于有结果返回任务
   >   >
   >   > ForkJoinPool：ForkJoinTask通过线程池执行
-  >
-  > - **FutureTask 异步任务**
-  >
-  >   > FutureTask 未启动或已启动状态时使用get()获取结构会导致调用线程阻塞
   >
   > ---
   >
@@ -1425,6 +1836,7 @@
   >
   >   *使用static修饰的ThreadLocal不适用于弱引用机制收回线程变量。必须显式remove操作*
   
+
 #### **单元测试**
 
 > - **Junit 单元测试框架**
