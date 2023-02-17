@@ -156,3 +156,48 @@
   >
   > 
 
+- #### **Springboot 多模块构建  settings.gradle**
+
+  > ~~~groovy
+  > plugins {
+  >     id 'java-library'
+  >     id 'org.springframework.boot' version '3.0.2'
+  >     id 'io.spring.dependency-management' version '1.1.0'
+  >     id 'org.hibernate.orm' version '6.1.6.Final'
+  >     id 'org.graalvm.buildtools.native' version '0.9.18'
+  > }
+  > 
+  > 
+  > allprojects {
+  >     group = 'com.example'
+  >     version = '0.0.1-SNAPSHOT'
+  >     sourceCompatibility = '17'
+  >     targetCompatibility = '17'
+  >     apply plugin: 'java-library'
+  >     apply plugin: 'org.springframework.boot'
+  >     apply plugin: 'io.spring.dependency-management'
+  >     apply plugin: 'org.hibernate.orm'
+  >     apply plugin: 'org.graalvm.buildtools.native'
+  > 
+  >     repositories {
+  >         maven {
+  >             url 'https://maven.aliyun.com/repository/public'
+  >         }
+  >         mavenCentral()
+  >     }
+  > }
+  > // 公共依赖
+  > subprojects {
+  >     dependencies {
+  >         implementation 'org.springframework.boot:spring-boot-starter-webflux'
+  >         compileOnly 'org.projectlombok:lombok'
+  >         annotationProcessor 'org.projectlombok:lombok'
+  >         testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  >         testImplementation 'io.projectreactor:reactor-test'
+  >     }
+  > 
+  > }
+  > 
+  > ~~~
+  >
+  > 
