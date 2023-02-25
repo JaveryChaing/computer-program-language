@@ -205,5 +205,114 @@
 >
 > - **备份文件**
 >
-> 
 
+#### **Oracle系统权限，对象权限**
+
+> 系统权限：允许用户使用数据库权限
+>
+> **常见系统角色** （创建表、创建索引、连接实例）
+>
+> 1. DBA：系统最高权限（可以创建数据库，PDB）
+> 2. Resource：允许用户创建自己对象（表，索引，存储过程）
+> 3. Connect：允许登录Oracle实例，不可以创建实体对象
+>
+> | 权限编码 （Any可以在任何表空间执行操作） | 权限                   |
+> | ---------------------------------------- | ---------------------- |
+> | CREATE SESSION                           | 创建会话               |
+> | CREATE SEQUENCE                          | 创建序列               |
+> | CREATE SYNONYM                           | 创建同名对象           |
+> | CREATE TABLE                             | 在用户模式中创建表     |
+> | DROP TABLE                               | 删除表                 |
+> | CREATE PROCEDURE                         | 创建存储过程           |
+> | EXECUTE PROCEDURE                        | 执行任何模式的存储过程 |
+> | CREATE USER                              | 创建用户               |
+> | DROP USER                                | 删除用户               |
+> | CREATE VIEW                              | 创建视图               |
+>
+> 
+>
+> ~~~sql
+> -- 赋值角色（普通用户授权dba可以拥有system一样权限）
+> grant connect, resource, dba to [用户名] [用户名1]
+> --  移除dab 角色权限（dba）
+> revoke dba from MIAOMIAOLE;
+> 
+> -- 查看数据库中所有用户（dba）
+> select * from dba_users;
+> 
+> -- 查询系统所有角色（dba）
+> select * from dba_roles;
+> 
+> -- 查询当前用户拥有角色
+> select * from dba_role_privs;
+> select * from user_role_privs;
+> 
+> -- 查询系统权限
+> select * from DBA_SYS_PRIVS;
+> -- 查询用户系统权限
+> select * from USER_SYS_PRIVS;
+> 
+> --  查询当前登录用户所有权限
+> select * from session_privs;
+> 
+> -- 查看当前用户可以看到用户
+> select * from all_users;
+> 
+> -- 查询当前所有用户
+> select * from dba_users;
+> ~~~
+>
+> **对象权限** （读取视图，可更新某些列、执行存储过程）
+>
+> - 对象拥有者拥有对象所有权限
+> - 对象拥有者可以向外分配权限
+>
+> ![image-20230218172843834](img\image-20230218172843834.png) 
+>
+> ~~~sql
+> -- 将object除drop以外所有权限赋值给user
+> -- public 表示所有用户
+> grant all on object to user  with admin option
+> -- 将object权限分配给user with admin option 用于系统权限授权 with grant option 用于对象授权。
+> -- with admin option 不会传播（系统管理员将A权限权限收回，不会影响B的权限）
+> -- with grant option 具有传播性（收回用户A对象权限，用户B也将收回）
+> 
+> 
+> 
+> -- 赋值修改列名对象给用户
+> grant update(column) on 表名 to user
+> 
+> -- 表的访问权限
+> select * from TABLE_PRIVILEGES;
+> -- 某个角色被赋予的相关表的权限
+> select * from  ROLE_TAB_PRIVS;
+> 
+> select * from ALL_TAB_PRIVS;
+> 
+> -- 当前用户赋予过的角色（包含系统角色）
+> Select * from SESSION_ROLES order by ROLE  
+> Select * from USER_ROLE_PRIVS    
+> 
+> -- User_* 当前拥有的对象信息  ALL_* 当前拥有且授权的对象信息  DBA 所有对象信息
+> -- 查询用户所有对象
+> SELECT table_name, owner FROM all_tables WHERE owner = 'SCOTT';
+> 
+> -- 查询并赋值当前用户表权限
+> select 'Grant all on '||table_name ||' to COMMON_PDB ;' from all_tables where owner ='MIAOMIAOLE';
+> 
+> ~~~
+>
+> **不同用户下访问同一张表解决方案**
+>
+> - 使用用户名前缀
+>
+> - 在其他用户中创建视图
+>
+> - 使用同义词   
+>
+>   ~~~sql
+>   -- 在用户B下使用table_name 代替用户A.table_name
+>   create synonym table_name for A.table_name
+>   ~~~
+>
+>   
