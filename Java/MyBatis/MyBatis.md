@@ -137,7 +137,7 @@
   >   //获取UserMapper代理对象（数据库与Pojo映射）
   >   UserMapper usermapper= sqlSession.getMapper(UserMapper.class);
   >   User user = usermapper.getUser(1);  
-  >       
+  >         
   >   // 方式二配置
   >   Reader mybatisConfig = Resources.getResourceAsReader("mybatis-config.xml");
   >   SqlSessionManager sqlSessionManager = SqlSessionManager.newInstance(mybatisConfig);
@@ -176,7 +176,7 @@
   >   >         throw ExceptionUtil.unwrapThrowable(t);
   >   >       }
   >   >     }
-  >   >       
+  >   >         
   >   >     private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
   >   >       try {
   >   >         return MapUtil.computeIfAbsent(methodCache, method, m -> {
@@ -397,6 +397,38 @@
 > > method：拦截方法，固定为Mybatis中prepare
 > >
 > > args：method中方法入参
+>
+> **加入SpringBoot管理**
+>
+> > ~~~java
+> >     @Bean
+> >     public ConfigurationCustomizer configurationCustomizer() {
+> >         return new ConfigurationCustomizer() {
+> >             @Override
+> >             public void customize(MybatisConfiguration configuration) {
+> >                 //插件拦截链采用了责任链模式，执行顺序和加入连接链的顺序有关
+> >                 MybatisInterceptor myPlugin = new MybatisInterceptor();
+> >                 configuration.addInterceptor(myPlugin);
+> >             }
+> >         };
+> >     }
+> >  @Autowired
+> >     private SqlSessionFactory sqlSessionFactory;
+> > 
+> >     @Autowired
+> >     private SnowflakeIdGenerator snowflakeIdGenerator;
+> > 
+> >     @PostConstruct
+> >     public void addInterceptor() {
+> >         this.sqlSessionFactory.getConfiguration().addInterceptor(new PaginationInterceptor());
+> >         this.sqlSessionFactory.getConfiguration().addInterceptor(new CatMybatisPlugin());
+> > 
+> >         MybatisConfiguration mybatisConfiguration = (MybatisConfiguration) this.sqlSessionFactory.getConfiguration();
+> >         mybatisConfiguration.getGlobalConfig().setIdentifierGenerator(snowflakeIdGenerator);
+> >     } 
+> > ~~~
+> >
+> > 
 >
 > **自定义分页插件**
 >
