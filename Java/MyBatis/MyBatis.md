@@ -137,7 +137,7 @@
   >   //获取UserMapper代理对象（数据库与Pojo映射）
   >   UserMapper usermapper= sqlSession.getMapper(UserMapper.class);
   >   User user = usermapper.getUser(1);  
-  >         
+  >           
   >   // 方式二配置
   >   Reader mybatisConfig = Resources.getResourceAsReader("mybatis-config.xml");
   >   SqlSessionManager sqlSessionManager = SqlSessionManager.newInstance(mybatisConfig);
@@ -176,7 +176,7 @@
   >   >         throw ExceptionUtil.unwrapThrowable(t);
   >   >       }
   >   >     }
-  >   >         
+  >   >           
   >   >     private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
   >   >       try {
   >   >         return MapUtil.computeIfAbsent(methodCache, method, m -> {
@@ -401,31 +401,92 @@
 > **加入SpringBoot管理**
 >
 > > ~~~java
-> >     @Bean
-> >     public ConfigurationCustomizer configurationCustomizer() {
-> >         return new ConfigurationCustomizer() {
-> >             @Override
-> >             public void customize(MybatisConfiguration configuration) {
-> >                 //插件拦截链采用了责任链模式，执行顺序和加入连接链的顺序有关
-> >                 MybatisInterceptor myPlugin = new MybatisInterceptor();
-> >                 configuration.addInterceptor(myPlugin);
-> >             }
-> >         };
-> >     }
+> >  @Bean
+> >  public ConfigurationCustomizer configurationCustomizer() {
+> >      return new ConfigurationCustomizer() {
+> >          @Override
+> >          public void customize(MybatisConfiguration configuration) {
+> >              //插件拦截链采用了责任链模式，执行顺序和加入连接链的顺序有关
+> >              MybatisInterceptor myPlugin = new MybatisInterceptor();
+> >              configuration.addInterceptor(myPlugin);
+> >          }
+> >      };
+> >  }
+> > @Autowired
+> >  private SqlSessionFactory sqlSessionFactory;
+> > 
 > >  @Autowired
-> >     private SqlSessionFactory sqlSessionFactory;
+> >  private SnowflakeIdGenerator snowflakeIdGenerator;
 > > 
-> >     @Autowired
-> >     private SnowflakeIdGenerator snowflakeIdGenerator;
+> >  @PostConstruct
+> >  public void addInterceptor() {
+> >      this.sqlSessionFactory.getConfiguration().addInterceptor(new PaginationInterceptor());
+> >      this.sqlSessionFactory.getConfiguration().addInterceptor(new CatMybatisPlugin());
 > > 
-> >     @PostConstruct
-> >     public void addInterceptor() {
-> >         this.sqlSessionFactory.getConfiguration().addInterceptor(new PaginationInterceptor());
-> >         this.sqlSessionFactory.getConfiguration().addInterceptor(new CatMybatisPlugin());
+> >      MybatisConfiguration mybatisConfiguration = (MybatisConfiguration) this.sqlSessionFactory.getConfiguration();
+> >      mybatisConfiguration.getGlobalConfig().setIdentifierGenerator(snowflakeIdGenerator);
+> >  } 
 > > 
-> >         MybatisConfiguration mybatisConfiguration = (MybatisConfiguration) this.sqlSessionFactory.getConfiguration();
-> >         mybatisConfiguration.getGlobalConfig().setIdentifierGenerator(snowflakeIdGenerator);
-> >     } 
+> > 
+> > /**
+> >  * 自定义Mybatis插件
+> >  * <p>
+> >  * 实现表动态插入
+> >  * <p>
+> >  * method：插入实现方法
+> >  * type：拦截位置：Executor  ParameterHandler StatementHandler ResultSetHandler
+> >  */
+> > @Intercepts({
+> >         @Signature(method = "prepare", type = StatementHandler.class,
+> >                 args = {Connection.class, Integer.class})
+> > })
+> > @Slf4j
+> > public class MybatisInterceptor implements Interceptor {
+> > 
+> >     private String tableName;
+> > 
+> >     @Override
+> >     public Object intercept(Invocation invocation) throws Throwable {
+> > 
+> >         // 获取拦截对象目标
+> >         RoutingStatementHandler handler = (RoutingStatementHandler) invocation.getTarget();
+> >         // 当前执行的SQL
+> >         StatementHandler delegate = (StatementHandler) ReflectUtil.getFieldValue(handler, "delegate");
+> > 
+> >         BoundSql boundSql = delegate.getBoundSql();
+> > 
+> >         // SQL入参
+> >         Object parameterObject = boundSql.getParameterObject();
+> >         // SQL 片段
+> >         MappedStatement mappedStatement = (MappedStatement) ReflectUtil.getFieldValue(delegate, "mappedStatement");
+> >         String id = mappedStatement.getId();
+> >         if (parameterObject instanceof ColdAlarmStorageTarget && id.contains("IColdStorageFlow.insert")) {
+> >             // SQL 操作对象
+> >             ColdAlarmStorageTarget coldAlarmStorageTarget = (ColdAlarmStorageTarget) parameterObject;
+> >             String sql = boundSql.getSql();
+> >             String newSql = sql.replace("cold_alarm_storage_target", coldAlarmStorageTarget.getDeviceId());
+> > 
+> >             log.info("===替换表名： {} 为 {} ","cold_alarm_storage_target === ",coldAlarmStorageTarget.getDeviceId());
+> > 
+> >             ReflectUtil.setFieldValue(boundSql, "sql", newSql);
+> >         }
+> > 
+> > 
+> >         // 拦截后执行的方法
+> >         return invocation.proceed();
+> >     }
+> > 
+> > 
+> >     @Override
+> >     public Object plugin(Object target) {
+> >         return Plugin.wrap(target, this);
+> >     }
+> > 
+> >     // 外部注入的属性值
+> >     @Override
+> >     public void setProperties(Properties properties) {
+> >         this.tableName = properties.getProperty("tableName");
+> >     }
 > > ~~~
 > >
 > > 
@@ -438,7 +499,7 @@
 >
 > ![image-20230101015315879](img\image-20230101015315879.png) 
 >
-> <img src="img\image-20230101015341582.png" alt="image-20230101015341582" style="zoom:67%;" /> 
+> <img src="img\image-20230101015341582.png" alt="image-20230101015341582" style="zoom:%;" /> 
 >
 > **自定义慢SQL统计插件**
 >
