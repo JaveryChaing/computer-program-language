@@ -137,7 +137,7 @@
   >   //获取UserMapper代理对象（数据库与Pojo映射）
   >   UserMapper usermapper= sqlSession.getMapper(UserMapper.class);
   >   User user = usermapper.getUser(1);  
-  >     
+  >       
   >   // 方式二配置
   >   Reader mybatisConfig = Resources.getResourceAsReader("mybatis-config.xml");
   >   SqlSessionManager sqlSessionManager = SqlSessionManager.newInstance(mybatisConfig);
@@ -176,7 +176,7 @@
   >   >         throw ExceptionUtil.unwrapThrowable(t);
   >   >       }
   >   >     }
-  >   >     
+  >   >       
   >   >     private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
   >   >       try {
   >   >         return MapUtil.computeIfAbsent(methodCache, method, m -> {
@@ -372,12 +372,31 @@
 >
 > Mybaits插件实际上是一个拦截器，实现Interceptor接口
 >
-> 自定义拦截器允许在以下4中组件方法中进行拦截
+> **自定义拦截器允许在以下4中组件方法中进行拦截**
 >
 > - Executor（update, query, flushStatements, commit, rollback, getTransaction, close, isClosed）
+>
+>   > SQL内部执行器
+>
 > - ParameterHandler（getParameterObject, setParameters）ResultSetHandler（handleResultSets, handleOutputParameters）
+>
+>   > 参数的处理
+>
 > - StatementHandler（prepare, parameterize, batch, update,query）
+>
+>   > sql的构建
+>
 > - ResultSetHandler（handleResultSets, handleOutputParameters）
+>
+>   > 结果的处理
+>
+> **@Signature**
+>
+> > type：拦截类型
+> >
+> > method：拦截方法，固定为Mybatis中prepare
+> >
+> > args：method中方法入参
 >
 > **自定义分页插件**
 >
