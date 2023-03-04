@@ -270,7 +270,7 @@
 >   > |   raw(size)、Long raw(size)    |               原始二进制数据，最大为2000B/2GB                |
 >   > |              Blob              |      二进制大型对象，最大存储为(4GB-1) * DB_BLOCK_SIZE       |
 >   >
->   >  
+>   > 
 >   >
 >   > **临时表** （非永久保存，基于session，或一个事务中有效）
 >   >
@@ -281,52 +281,74 @@
 >   > CREATE GLOBAL TEMPORARY TABLE  tableName () on commit preserve rows;
 >   > ~~~
 >   >
->   >  
+>   > 
 >   >
 >   > **索引组织表** （Index Organized Table)
 >   >
->   >    *区别于表的存储方式（默认堆表，无组织的存储方式，存在可用空间就能存储），IOT表采用B-树索引结构存储表中的索引列（叶子节点存储该行的RowId）*
+>   > *区别于表的存储方式（默认堆表，无组织的存储方式，存在可用空间就能存储），IOT表采用B-树索引结构存储表中的索引列（叶子节点存储该行的RowId）*
 >   >
->   >  
+>   > 
 >   >
 >   > **对象表**
 >   >
->   >    对象表具有自身就是对象或类型定义实例化的行。可通过对象ID（Object ID，OID）引用对象表中的行，这与关系表或普通表中的主键形成对比。然而，与关系表一样，对象表仍可以有主键和唯一键。
+>   > 定义复合型数据类型，供关系表，函数，存储过程使用
 >   >
 >   > ~~~sql
+>   > -- 对象表中不包含  LONG、LONG RAW ROWID 等数据类型
 >   > create type PERS_TYP as object (
+>   >     COL varchar2,
+>   >     COL1 varchar2,
+>   >     COL2 date,
+>   >     -- 在对象表中定义函数，存储过程(构造方法，类方法，映射方法，排序方法)
+>   >     COL3 procedure change_name(params varchar2) is 
+>   >      begin 
+>   >      ...
+>   >     end change_name
+>   >      ,
+>   >     -- 构造方法
+>   >     static function new(...params Type) return 
 >   > )
+>   > create table t_name(
+>   >   COL PERS_TYP,
+>   >   COL2 varchar2,
+>   >   COL3 varchar3
+>   >  )
+>   > -- 插入表数据
+>   > insert into t_name values ( PERS_TYP('value','value','value'),1234,11);
+>   > -- 使用对象表字段
+>   > select a.COL.COL from t_name;
 >   > ~~~
 >   >
 >   > **外部表**
 >   >
->   >    *不存在数据库中的表，通过Oracle数据字典描述外部表数据，外部表的数据只能进行select操作。*
+>   > *不存在数据库中的表，通过Oracle数据字典描述外部表数据，外部表的数据只能进行select操作。*
 >   >
->   >  ~~~sql
->   >  -- 创建外部表
->   >  create table example ( 
->   >      
->   >   ) ORGANIZATION EXTERNAL (
->   >       TYPE oracle_loader   -- 访问方式     
->   >       DEFAULT DIRECTORY oracle_loader_data_dir  -- 外部文件实际位置
->   >        ACCESS PARAMETERS (     
->   >           RECORDS DELIMITED BY NEWLINE CHARACTERSET US7ASCII  -- 记录用换行符分隔
->   >           SKIP 0 -- 跳过0行
->   >           BADFILE ‘ORACLE_LOADER_BAD_DIR’ : ‘example.bad’ -- 外表的坏文件
->   >           LOGFILE ‘ORACLE_LOADER_LOG_DIR’ : ‘example.log’ -- 外表的日志文件
->   >           FIELDS TERMINATED BY ‘,’ -- 以 , 终止字段，即以 , 分隔字段
->   >           LRTRIM --  删除首尾空白字符
->   >           MISSING FIELD VALUES ARE NULL -- 某些字段空缺值都设为NULL 
->   >           REJECT ROWS WITH ALL NULL FIELDS  ( -- 数据类型装换，与上面表字段名对应
->   >                CREATE_DATE DATE "YYYY/MM/DD HH24:MI:SS",
->   >                GNAME CHAR(200),
->   >           )
+>   > ~~~sql
+>   > -- 创建外部表
+>   > create table example ( 
+>   >    COL Type 
+>   >    ... 
+>   > ) ORGANIZATION EXTERNAL (
+>   >    TYPE oracle_loader   -- 访问方式     
+>   >    DEFAULT DIRECTORY oracle_loader_data_dir  -- 外部文件实际位置
+>   >     ACCESS PARAMETERS (     
+>   >        RECORDS DELIMITED BY NEWLINE CHARACTERSET US7ASCII  -- 记录用换行符分隔
+>   >        SKIP 0 -- 跳过0行
+>   >        BADFILE ‘ORACLE_LOADER_BAD_DIR’ : ‘example.bad’ -- 外表的坏文件
+>   >        LOGFILE ‘ORACLE_LOADER_LOG_DIR’ : ‘example.log’ -- 外表的日志文件
+>   >        FIELDS TERMINATED BY ‘,’ -- 以 , 终止字段，即以 , 分隔字段
+>   >        LRTRIM --  删除首尾空白字符
+>   >        MISSING FIELD VALUES ARE NULL -- 某些字段空缺值都设为NULL 
+>   >        REJECT ROWS WITH ALL NULL FIELDS  ( -- 数据类型装换，与上面表字段名对应
+>   >             CREATE_DATE DATE "YYYY/MM/DD HH24:MI:SS",
+>   >             GNAME CHAR(200),
 >   >        )
->   >       LOCATION (‘1.csv’,‘2.csv’) -- 数据文件名为 ‘1.csv’ 和 ‘2.csv’
->   >   )
->   >  PARALLEL                   -- 并行处理
->   >  REJECT LIMIT UNLIMITED;  -- 读入整个文件
->   >  ~~~
+>   >     )
+>   >    LOCATION (‘1.csv’,‘2.csv’) -- 数据文件名为 ‘1.csv’ 和 ‘2.csv’
+>   > )
+>   > PARALLEL                   -- 并行处理
+>   > REJECT LIMIT UNLIMITED;  -- 读入整个文件
+>   > ~~~
 >
 > - **约束(constraint)**
 >
@@ -364,9 +386,8 @@
 >   >   > as
 >   >   > select p.pid as id, p.name, a.address from test_person p,test_address a
 >   >   > where p.pid = a.aid;
->   >   > 
 >   >   > ~~~
->
+>   
 > - **PL/SQL**
 >
 >   > - 存储过程/函数（用于执行系列的SQL）
