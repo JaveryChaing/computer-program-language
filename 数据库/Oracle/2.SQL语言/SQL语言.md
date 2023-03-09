@@ -189,7 +189,7 @@
   >      select * from dual where rownum <= 5;
   >      -- 使用子查询分页 (嵌套2层查询，查询前20条数据，在过滤前10条数据)
   >      select * from (select rownum no ,t.* from dual t where rownum <=20) where no >10;
-  >       
+  >          
   >      -- 分页排序查询（嵌套3层查询）
   >      -- 跳过10前10行
   >      select * from (
@@ -234,9 +234,9 @@
 >- 索引
 > 
 >   > **逻辑上**
->  >
+>   >
 >   > - 单行索引/多行索引
->  >
+>   >
 >   >   ~~~sql
 >   >   create index index_name on table_name(column_1,column_2);
 >   >   ~~~
@@ -285,16 +285,14 @@
 >   > - Partitioned：分区索引，优化索引存储空间
 >   >
 >   > - Domain：域索引（用户开放式索引)
-> 
 > - 特殊字符
 > 
 >   > 1.  %  用来表示任意数量的字符，或者可能根本没有字符。
->  > 2.  _    任意单字符
+>   > 1.  _    任意单字符
 >   > 3.  []  与特定范围或集合的任意单字符匹配
->  > 4.  ‘  描述字符串或日期
+>   > 4.  ‘  描述字符串或日期
 >   > 5.  “ 描述包含特殊字符或空格或日期
 >   > 6.  escape 转义标识符  
-> 
 > - 分区表（表数据量过大超过2G，通过某个字段进行分区，优化查询方案）
 > 
 >   > ~~~sql
@@ -337,9 +335,9 @@
 > - **索引优化**
 > 
 >   > RBO：基于规则的优化
->  >
+>   >
 >   > CBO：基于成本的优化
->  >
+>   >
 >   > ~~~sql
 >   > -- 生成执行计划，并存入 Plan_Table中
 >   > explain plan for + SQL;
@@ -369,7 +367,6 @@
 >   >   - index join
 >   >   - cartestian join
 >   > - 其他运算方式
-> 
 
 - #### **PLSQL**
 
@@ -397,6 +394,10 @@
   >     v_name table1.col%type,
   >    );
   >     v_str_arr  str_arr;
+  >   -- 立即执行SQL  将结果集赋值某个变量
+  >   EXECUTE IMMEDIATE SQL into params
+  >   -- 执行带参数SQL   :1  :2填充参数
+  >   EXECUTE IMMEDIATE SQL using 'params' 'params'
   >   ~~~
   >
   > - 数组属性和相关函数
@@ -447,7 +448,7 @@
   >
   > - FOR - IN REVERSE -- LOOP END LOOP
   >
-  >  
+  > 
   >
   > 游标
   >
@@ -519,6 +520,8 @@
   >   > -- FOR UPDATE OF COL 字段锁（锁定当前行的列不允许其他事务更改）
   >   > -- WHERE CURRENT OF 
   >   > ~~~
+  >   >
+  >   > 
   >
   > 异常处理
   >
@@ -527,14 +530,12 @@
   > - 用户定义的异常
   >
   >   > ~~~sql
-  >  > -- 定义异常
+  >   > -- 定义异常
   >   > DECLARE exception_name EXCEPTION;
   >   > -- 抛出异常
   >   > RAISE exception_name;
   >   > -- 捕获异常 （内层块发生错误时，异常会立即传播到外层）
   >   > EXCEPTION WHEN exception_name THEN 
-  >   > ~~~
-  > 
   > - 内置异常
   >
   >   |        异常        |                             描述                             |
@@ -555,7 +556,7 @@
   >   |   TOO_MANY_ROWS    |             当`SELECT INTO`语句返回多行时引发。              |
   >   |    VALUE_ERROR     |    当发生算术，转换，截断或者`sizeconstraint`错误时引发。    |
   >   |    ZERO_DIVIDE     |                  当尝试将数字除以零时引发。                  |
-  > 
+  >
   
 - **触发器**
 
@@ -620,4 +621,50 @@
   >> - 在触发语句影响每一行**之后**触发的行触发器
   >> - 在触发语句**之后**触发的语句触发器
   >
-  >
+
+~~~SQL
+CREATE OR REPLACE TYPE "TYPE_ARRAY" IS TABLE OF VARCHAR2 (4000);
+
+CREATE OR REPLACE FUNCTION f_split (p_str IN VARCHAR2, p_delimiter IN VARCHAR2)
+  RETURN type_array
+IS
+  j INT := 0;
+  i INT := 1;
+  len INT := 0;
+  len1 INT := 0;
+  str VARCHAR2 (4000);
+  str_split type_array := type_array ();
+/***********************************************************
+           date：2011.04.06
+           purpose：实现字符串的split功能
+           param：p_str 需要进行分割的字符串
+                        p_delimiter 分隔符
+          return : 返回一个type_array的数组
+***********************************************************/
+BEGIN
+  len := LENGTH (p_str);
+  len1 := LENGTH (p_delimiter);
+  WHILE j < len
+  LOOP
+    j := INSTR (p_str, p_delimiter, i);
+    IF j = 0
+    THEN
+        j := len;
+        str := SUBSTR (p_str, i);
+        str_split.EXTEND;
+        str_split (str_split.COUNT) := str;
+        IF i >= len
+        THEN
+          EXIT;
+        END IF;
+    ELSE
+        str := SUBSTR (p_str, i, j - i);
+        i := j + len1;
+        str_split.EXTEND;
+        str_split (str_split.COUNT) := str;
+    END IF;
+  END LOOP;
+  RETURN str_split;
+END f_split;
+~~~
+
