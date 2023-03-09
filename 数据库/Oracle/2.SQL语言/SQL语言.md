@@ -189,7 +189,7 @@
   >      select * from dual where rownum <= 5;
   >      -- 使用子查询分页 (嵌套2层查询，查询前20条数据，在过滤前10条数据)
   >      select * from (select rownum no ,t.* from dual t where rownum <=20) where no >10;
-  >    
+  >       
   >      -- 分页排序查询（嵌套3层查询）
   >      -- 跳过10前10行
   >      select * from (
@@ -224,16 +224,11 @@
   >
   > - nvl：将为空的字段替换
   >
-  > - 
-  >
   > - <img src="img/image-20211126225347135.png" alt="image-20211126225347135" style="zoom: 80%;" /> 
   >
   > - <img src="img/image-20211126225415576.png" alt="image-20211126225415576" style="zoom:80%;" /> 
   >
   > - <img src="img/image-20211126225457254.png" alt="image-20211126225457254" style="zoom:80%;" /> 
-  >
-  > - 
-  
   
 
 >- 索引
@@ -303,29 +298,29 @@
 > - 分区表（表数据量过大超过2G，通过某个字段进行分区，优化查询方案）
 > 
 >   > ~~~sql
->  > -- oracle 创建表时候未建分区，后续必须转为分区表才能添加分区
+>   > -- oracle 创建表时候未建分区，后续必须转为分区表才能添加分区
 >   > create table table_name(
->  >      column_1 datatype,
->   >      column_2 datatype,
->   >      column_3 datatype,
->   >      column_4 datatype,
->   >  ) 
->   >  -- 创建range类型分区
+>   >   column_1 datatype,
+>   >   column_2 datatype,
+>   >   column_3 datatype,
+>   >   column_4 datatype,
+>   > ) 
+>   > -- 创建range类型分区
 >   > partition by range(column_1)(
->   >   partition region_name values less then('value'),
->   >   partition region_name values less then('value'),
->   >   partition region_name values less then('value'),
+>   > partition region_name values less then('value'),
+>   > partition region_name values less then('value'),
+>   > partition region_name values less then('value'),
 >   > )
 >   > -- partition 哈希模
 >   > partition by hash(column_1)(
->   >   partition 2
->   >   partition 4
->   >   partition 8
+>   > partition 2
+>   > partition 4
+>   > partition 8
 >   > )
 >   > -- list 分区
 >   > partition by list(column_1)(
->   >   partition Li_ke value ('value','value','value') tablespace xxx,
->   >   partition Li_ke_1 value ('value','value','value') tablespace xxx
+>   > partition Li_ke value ('value','value','value') tablespace xxx,
+>   > partition Li_ke_1 value ('value','value','value') tablespace xxx
 >   > )
 >   > -- 组合分区
 >   > partition by range(score)
@@ -335,10 +330,9 @@
 >   > 		partition part1 values less than(60),
 >   > 		partition part2 values less than(80),
 >   > 		partition part3 values less than(maxvalue)
->   >     );
+>   >  );
 >   > -- 添加分区
 >   > alter table table_name add partition region_name values less then('value');
->   > ~~~
 > 
 > - **索引优化**
 > 
