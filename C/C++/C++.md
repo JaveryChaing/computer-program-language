@@ -53,25 +53,29 @@
 >
 > - CMake（**跨平台自动化构建工具**，可以在不同平台普通生成makefile，供GNU进行编译）
 >
+> **头文件**
+>
+> - 头文件：预处理中#include代替源文件，头文件一般声明变量，数据结构，源文件实现头文件中声明函数或方法
+>
 > **C++关键字**  [详细](https://www.runoob.com/w3cnote/cpp-keyword-intro.html)
 >
-> | asm（指令字符串）        | **else**  | **new**          | **this** |
-> | ------------------------ | --------- | ---------------- | -------- |
-> | auto                     | enum      | operator         | throw    |
-> | bool                     | explicit  | private          | true     |
-> | break                    | export    | protected        | try      |
-> | case                     | extern    | public           | typedef  |
-> | catch                    | false     | register         | typeid   |
-> | char                     | float     | reinterpret_cast | typename |
-> | class                    | for       | return           | union    |
-> | const                    | friend    | short            | unsigned |
-> | const_cast               | goto      | signed           | using    |
-> | continue                 | if        | sizeof           | virtual  |
-> | default                  | inline    | static           | void     |
-> | delete                   | int       | static_cast      | volatile |
-> | do                       | long      | struct           | wchar_t  |
-> | double                   | mutable   | switch           | while    |
-> | dynamic_cast（动态转换） | namespace | template         |          |
+> | asm（指令字符串）        | **else**  | **new**          | **this**                              |
+> | ------------------------ | --------- | ---------------- | ------------------------------------- |
+> | auto                     | enum      | operator         | throw                                 |
+> | bool                     | explicit  | private          | true                                  |
+> | break                    | export    | protected        | try                                   |
+> | case                     | extern    | public           | typedef                               |
+> | catch                    | false     | register         | typeid                                |
+> | char                     | float     | reinterpret_cast | typename                              |
+> | class                    | for       | return           | union                                 |
+> | const                    | friend    | short            | unsigned                              |
+> | const_cast               | goto      | signed           | using                                 |
+> | continue                 | if        | sizeof           | **virtual（基类指针指向派生类对象）** |
+> | default                  | inline    | static           | void                                  |
+> | delete                   | int       | static_cast      | volatile                              |
+> | do                       | long      | struct           | wchar_t                               |
+> | double                   | mutable   | switch           | while                                 |
+> | dynamic_cast（动态转换） | namespace | template         |                                       |
 >
 > **C++数据类型**
 >
@@ -151,11 +155,11 @@
 >   ~~~C++
 >   // 数据类型别名声明
 >   typedef type newName;
->   
+>
 >   // 声明枚举数据类型 enumName
 >   typedef enum { fieldName,fieldName1,...} enumName;
 >   typedef enum enumName{ fieldName,fieldName1,...} ;
->   
+>
 >   // 声明枚举类型变量variable1 variable2 variable3 
 >   // 枚举值可以赋值为int类型，int类型不能转为枚举
 >   enum enumName {
@@ -167,7 +171,7 @@
 >   enum enumName variable = fieldName;
 >   // int 转枚举
 >   enum enumName variable = (enum ennumName) 1;
->   
+>
 >   // 时间复合数据
 >   #include <ctime>
 >   struct tm {
@@ -187,7 +191,7 @@
 >   char*ctime(const time_t *time)
 >   // 返回本地时间tm
 >   struct tm *localtime(const time_t *time);
->   
+>
 >   //定义复合型数据类型
 >   struct type_name{
 >       member_type member_name;
@@ -268,7 +272,7 @@
 >   };
 >   // 定义类方法
 >   type className::methodName(){
->       
+>
 >   }
 >   ~~~
 >
@@ -281,7 +285,7 @@
 >   // 3.has a 关系时，外部对象析构函数调用时，内部对象也被调用
 >   // 4. is a 关系时， 子类调用析构函数，基类析构函数也被调用
 >   className::~className(void){
->       
+>
 >   }
 >   ~~~
 >
@@ -289,12 +293,62 @@
 >
 >   ~~~C++
 >   class Base {
->       
+>   
 >   }
 >   // 公有继承 
 >   class Derived :public Base{
 >   }
 >   ~~~
+>
+> - **运算符重载**（定义对象运算方法）
+>
+>   ~~~c++
+>   class Box {
+>      public:
+>       // 运算符重载方法
+>       Box operator+(const Box& b){
+>           Box box;
+>            box.length = this->length + b.length;
+>            box.breadth = this->breadth + b.breadth;
+>            box.height = this->height + b.height;
+>            return box;
+>       }
+>   }
+>   Box box1;
+>   Box box2;
+>   // 对象相加
+>   Box3 box3 = box1+box2 
+>   ~~~
+>
+>   **可重载运算符**
+>
+>   - 双目算术运算符（`+ - * / % ++  --`)
+>   - 关系运算符 `== != < > <= >=`
+>   - 逻辑运算符（ ||  &&  ！）
+>   - 单目运算符（+ ，-， * ，&）
+>   - 位运算符 （| ，&，~，^，<<，>>)
+>   - 赋值运算符(=, +=, -=, *=, /= , % = , &=, |=, ^=, <<=, >>=)
+>   - 空间申请与释放（new，delete，new[]，delete[]）
+>   - 其他运算符**()**(函数调用)，**->**(成员访问)，**,**(逗号)，**[]**(下标）
+>
+>   **不允许重载运算符**
+>
+>   - **.**：成员访问运算符
+>   - **.\***, **->\***：成员指针访问运算符
+>   - **::**：域运算符
+>   - **sizeof**：长度运算符
+>   - **?:**：条件运算符
+>   - **#**： 预处理符号
+>
+> - **C++多态**
+>
+>   > 使用基类指针调用基类方法（静态编译）
+>   >
+>   > **virtual：根据赋值类型执行相应方法（虚函数）**
+>   >
+>   > > **声明编译器不要静态链接到该函数，后续根据赋值类型动态调用，虚函数可以无方法体**
+>
+>   
 >
 >   
 >
