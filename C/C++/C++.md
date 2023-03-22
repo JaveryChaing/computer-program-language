@@ -437,11 +437,11 @@
 > ~~~C++
 > // 泛型函数
 > template <typename Type> returnType funName (paramter list){
->     
+> 
 > } 
 > // 泛型类
 > template <class Type> class ClassName {
->     
+> 
 > }
 > 
 > ~~~
@@ -507,7 +507,7 @@
 > 4.arg：运行函数的参数
 > // 线程完成工作后无需继续存在时被调用
 > pthread_exit (status) 
->   
+> 
 > // 多线程执行方法 thread 为pthread传入的参数    
 > void *PrintHello(void *thread){
 >    int tid = *((int*)threadid);
@@ -522,6 +522,10 @@
 > // 开启一个线程执行PrintHello函数
 > // value 为PrintHello函数入参，必须是void*类型指针 
 > pthread_create(&threads[i],NULL,PrintHello,(void *)&(value))
+>     
+> pthread_join(threadid, status) 调用线程等待子线程终止
+> pthread_detach (threadid) 
+>   
 > ~~~
 >
 > 
