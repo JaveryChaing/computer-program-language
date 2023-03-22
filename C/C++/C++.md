@@ -53,9 +53,13 @@
 >
 > - CMake（**跨平台自动化构建工具**，可以在不同平台普通生成makefile，供GNU进行编译）
 >
+> 
+>
 > **头文件**
 >
 > - 头文件：预处理中#include代替源文件，头文件一般声明变量，数据结构，源文件实现头文件中声明函数或方法
+>
+> 
 >
 > **C++关键字**  [详细](https://www.runoob.com/w3cnote/cpp-keyword-intro.html)
 >
@@ -76,6 +80,8 @@
 > | do                       | long      | struct           | wchar_t                               |
 > | double                   | mutable   | switch           | while                                 |
 > | dynamic_cast（动态转换） | namespace | template         |                                       |
+>
+> 
 >
 > **C++数据类型**
 >
@@ -237,25 +243,6 @@
 >
 > 
 >
-> **C++输入输出流**
->
-> - IO库头文件
->
->   | 头文件     | 函数和描述                                                   |
->   | :--------- | :----------------------------------------------------------- |
->   | <iostream> | 该文件定义了 **cin、cout、cerr** 和 **clog** 对象，分别对应于标准输入流、标准输出流、非缓冲标准错误流和缓冲标准错误流。 |
->   | <iomanip>  | 该文件通过所谓的参数化的流操纵器（比如 **setw** 和 **setprecision**），来声明对执行标准化 I/O 有用的服务。 |
->   | <fstream>  | 该文件为用户控制的文件处理声明服务                           |
->
-> - **iostream**
->
->   1. cout：标准输出流
->   2. cin：标准输入流
->   3. cerr：错误输出流
->   4. clog：标准日志流
->   5. <<  ，>>：流重定向操作符（用来输出整型、浮点型、double 型、字符串和指针 ）
->   6. end，endl：流边界操作符
->
 > **C++类与对象**
 >
 > - 类定义
@@ -293,7 +280,7 @@
 >
 >   ~~~C++
 >   class Base {
->   
+>
 >   }
 >   // 公有继承 
 >   class Derived :public Base{
@@ -348,9 +335,196 @@
 >   >
 >   > > **声明编译器不要静态链接到该函数，后续根据赋值类型动态调用，虚函数可以无方法体**
 >
->   
+> 
 >
+> **C++标准库**
+>
+> - **C++输入输出流**
+>
+>   - IO库头文件
+>
+>     | 头文件     | 函数和描述                                                   |
+>     | :--------- | :----------------------------------------------------------- |
+>     | <iostream> | 该文件定义了 **cin、cout、cerr** 和 **clog** 对象，分别对应于标准输入流、标准输出流、非缓冲标准错误流和缓冲标准错误流。 |
+>     | <iomanip>  | 该文件通过所谓的参数化的流操纵器（比如 **setw** 和 **setprecision**），来声明对执行标准化 I/O 有用的服务。 |
+>     | <fstream>  | 该文件为用户控制的文件处理声明服务                           |
+>
+>   - **iostream**
+>
+>     1. cout：标准输出流
+>     2. cin：标准输入流
+>     3. cerr：错误输出流
+>     4. clog：标准日志流
+>     5. <<  ，>>：流重定向操作符（用来输出整型、浮点型、double 型、字符串和指针 ）
+>     6. end，endl：流边界操作符
+>
+> - **文件输入输出流**
+>
+>   | 数据类型 | 描述                                                         |
+>   | :------- | :----------------------------------------------------------- |
+>   | ofstream | 该数据类型表示输出文件流，用于创建文件并向文件写入信息。     |
+>   | ifstream | 该数据类型表示输入文件流，用于从文件读取信息。               |
+>   | fstream  | 该数据类型通常表示文件流，且同时具有 ofstream 和 ifstream 两种功能，这意味着它可以创建文件，向文件写入信息，从文件读取信息。 |
+>
+>   - **打开文件模式**
+>
+>     | 模式标志   | 描述                                                         |
+>     | :--------- | :----------------------------------------------------------- |
+>     | ios::app   | 追加模式。所有写入都追加到文件末尾。                         |
+>     | ios::ate   | 文件打开后定位到文件末尾。                                   |
+>     | ios::in    | 打开文件用于读取。                                           |
+>     | ios::out   | 打开文件用于写入。                                           |
+>     | ios::trunc | 如果该文件已经存在，其内容将在打开文件之前被截断，即把文件长度设为 0。 |
+>
+> 
+>
+> **C++异常处理**
+>
+> - throw：任意的表达式，表达式的结果的类型决定了抛出的异常的类型
+>
+> - 自定义异常
+>
+>   ~~~C++
+>   // 结构体
+>   struct MyException : public exception{
+>     const char * what () const throw (){
+>       return "C++ Exception";
+>     }
+>   };
+>   ~~~
+>
+> - C++标准异常
+>
+>   <img src="img\uyn.png" alt="image-20230321163911534" style="zoom:50%;" /> 
+>
+>   | 异常                   | 描述                                                         |
+>   | :--------------------- | :----------------------------------------------------------- |
+>   | **std::exception**     | 该异常是所有标准 C++ 异常的父类。                            |
+>   | std::bad_alloc         | 该异常可以通过 **new** 抛出。                                |
+>   | std::bad_cast          | 该异常可以通过 **dynamic_cast** 抛出。                       |
+>   | std::bad_typeid        | 该异常可以通过 **typeid** 抛出。                             |
+>   | std::bad_exception     | 这在处理 C++ 程序中无法预期的异常时非常有用。                |
+>   | **std::logic_error**   | 编译异常（通常语法错误抛出）                                 |
+>   | std::domain_error      | 当使用了一个无效的数学域时，会抛出该异常。                   |
+>   | std::invalid_argument  | 当使用了无效的参数时，会抛出该异常。                         |
+>   | std::length_error      | 当创建了太长的 std::string 时，会抛出该异常。                |
+>   | std::out_of_range      | 该异常可以通过方法抛出，例如 std::vector 和 std::bitset<>::operator[]()。 |
+>   | **std::runtime_error** | 理论上不可以通过读取代码来检测到的异常。                     |
+>   | std::overflow_error    | 当发生数学上溢时，会抛出该异常。                             |
+>   | std::range_error       | 当尝试存储超出范围的值时，会抛出该异常。                     |
+>   | std::underflow_error   | 当发生数学下溢时，会抛出该异常。                             |
+>
+> 
+>
+> **C++命名空间** （区别相同函数名和变量）
+>
+> ~~~C++
+> // 创建命名空间
+> namespace first_space {
+>   void func(){}    
+> }
+> // 调用该空间变量
+> first_space::func();
+> // 简化命名空间调用
+> using namespace std;
+> 
+> ~~~
+>
+> 
+>
+> **C++泛型函数**
+>
+> ~~~C++
+> // 泛型函数
+> template <typename Type> returnType funName (paramter list){
+>     
+> } 
+> // 泛型类
+> template <class Type> class ClassName {
+>     
+> }
+> 
+> ~~~
+>
+> 
+>
+> **C++预处理**  （代替变量，代替其他源文件）
+>
+> ~~~C++
+> // 用于创建符号常量或函数。该符号常量通常称为宏
+> #define  PI
+> 
+> // 参数宏
+> #define MIN(a,b) (a<b ? a : b)
+> 
+> // 条件编译 将NULL 使用0代替
+> #ifdef NULL
+>     #define NULL 0
+> #endif  
+> 
+> ~~~
+>
+> - 预定宏
+>
+>   | 宏       | 描述                                                         |
+>   | :------- | :----------------------------------------------------------- |
+>   | __LINE__ | 这会在程序编译时包含当前行号。                               |
+>   | __FILE__ | 这会在程序编译时包含当前文件名。                             |
+>   | __DATE__ | 这会包含一个形式为 month/day/year 的字符串，它表示把源文件转换为目标代码的日期。 |
+>   | __TIME__ | 这会包含一个形式为 hour:minute:second 的字符串，它表示程序被编译的时间。 |
+>
+> 
+>
+> **C++中断监听函数** 
+>
+> ~~~C++
+> // 监听的信号，信号发生后回调
+> void (*signal (int sig,void (*func)(int)))(int);
+> signal(SIGINT, signalHandler);  
+> // 程序内部生成信号（自中断）
+> int raise (signal sig)
+> ~~~
+>
+> | 信号    | 描述                                         |
+> | :------ | :------------------------------------------- |
+> | SIGABRT | 程序的异常终止，如调用 **abort**。           |
+> | SIGFPE  | 错误的算术运算，比如除以零或导致溢出的操作。 |
+> | SIGILL  | 检测非法指令。                               |
+> | SIGINT  | 程序终止(interrupt)信号。                    |
+> | SIGSEGV | 非法访问内存。                               |
+> | SIGTERM | 发送到程序的终止请求。                       |
+>
+> **C++多线程** （Pthreads线程库）
+>
+> ~~~C++
+> // 导入pthread线程库文件
+> #include <pthread.h>
+> 
+> pthread_create (thread, attr, start_routine, arg) 
+> 1.thread：接收线程标识符指针
+> 2.attr：设置线程属性
+> 3.start_routine：线程运行函数起始地址（多线程执行点）
+> 4.arg：运行函数的参数
+> // 线程完成工作后无需继续存在时被调用
+> pthread_exit (status) 
 >   
+> // 多线程执行方法 thread 为pthread传入的参数    
+> void *PrintHello(void *thread){
+>    int tid = *((int*)threadid);
+>    cout << "Hello Runoob! 线程 ID, " << tid << endl;
+>    pthread_exit(NULL);
+> }
+> //线程数组
+> pthread_t  threads [5]
+> // 线程下标
+> int indexes[NUM_THREADS];
+> // &threads[i]：返回当前创建线程指针
+> // 开启一个线程执行PrintHello函数
+> // value 为PrintHello函数入参，必须是void*类型指针 
+> pthread_create(&threads[i],NULL,PrintHello,(void *)&(value))
+> ~~~
+>
+> 
 >
 > **C++标准化**
 >
