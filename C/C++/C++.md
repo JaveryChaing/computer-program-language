@@ -43,7 +43,7 @@
 >   >
 >   > ar：生成静态库
 >   >
->   > make：根据makefile文件对源码生成可执行程序或库文件（编译+链接）
+>   > **make：根据makefile文件对源码编译生成可执行程序或库文件（编译+链接）**
 >   >
 >   > gdb：调试器
 >   >
@@ -51,13 +51,112 @@
 >
 > - MinGW（Window环境GNU工具）
 >
-> - CMake（**跨平台自动化构建工具**，可以在不同平台普通生成makefile，供GNU进行编译）
+> - CMake（**跨平台自动化构建工具，可以在不同平台普通生成makefile，project**，供GNU进行编译）
 >
-> 
->
-> **头文件**
->
-> - 头文件：预处理中#include代替源文件，头文件一般声明变量，数据结构，源文件实现头文件中声明函数或方法
+>   > cmake 命令
+>   >
+>   > | 参数 | 操作                                                 |
+>   > | ---- | ---------------------------------------------------- |
+>   > | -S   | 指定源文件根目录，必须包含一个CMakeLists.txt文件     |
+>   > | -B   | 指定构建目录，构建生成的中间文件和目标文件的生成路径 |
+>   > | -D   | 指定变量，格式为-D <var>=<value>                     |
+>   >
+>   > makefile：描述了整个软件工程的编译规则和各个文件之间的依赖关系
+>   >
+>   > ~~~makefile
+>   > // 定义编译器（C编译器）
+>   > CC = gcc  
+>   > // 定义语法
+>   > STD=-std=gun99 
+>   > // 检查标准
+>   > FLAG = -Wall -Werror
+>   > // 编译后的目标文件
+>   > OBJECT= main.o tools.o
+>   > // 编译命令
+>   > $(TARGE):$(OBJECT) $(CC) $(OBJECT) -o $(TARGE)
+>   > ~~~
+>   >
+>   > CMakeLists.txt
+>   >
+>   > ~~~Cmake
+>   > # 生成makefile文件
+>   > cmake . 
+>   > # 定义Cmake版本
+>   > cmake_minimum_required(VERSION 3.24)
+>   > # 工程名称
+>   > project(<project> [version] [languages])
+>   > 
+>   > 
+>   > # 定义预编译变量（环境变量）
+>   > set (var_name var_value)
+>   > # 指定变量数组（包含空格或特殊字符使用 ""代替）
+>   > set (var_name var_vaue;be)
+>   > # 批量设置多个变量，并将变量保存在CMakeCache.txt中
+>   > set (<variable> <value> <variable> <value> <variable> <value>)
+>   > # 环境变量
+>   > set(ENV{ENV_VAR} "value")
+>   > # 将lib输出路径设置为当前工程顶层目录下的lib文件夹下
+>   > set (CMAKE_LIBRARY_OUTPUT_DIRECTORY &{PROJECT_SOURCE_DIR}/lib)
+>   > # list 操作
+>   > # APPEND LENGTH  JOIN(将元素用指定分隔符连接)
+>   > list(<operate> <variable> <element> )
+>   > 
+>   > # 内置特殊变量名称 CMAKE 开头
+>   > # CMAKE_C_STANDARD ：C语言版本
+>   > # CMAKE_CXX_STANDARD ：C++版本
+>   > # CMAKE_C_FLAGS CMAKE_CXX_FLAGS :编译选项
+>   > set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -std=c99")
+>   > set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -std=c++11")
+>   > 
+>   > 
+>   > # 终端输出自定义信息
+>   > # DEBUG： 调试信息
+>   > # WARNING：CMake警告，不会打断进程
+>   > # SEND_ERROR：产生错误时输出信息并跳过
+>   > # STATUS：输出前缀为–的信息
+>   > # FATAL_ERROR，立即终止所有CMake的过程。
+>   > MESSAGE(<mode> "msg str" ${log_dir})
+>   > 
+>   > #Cmake条件编译
+>   > set(EMPTY_STR "")
+>   > if (NOT EMPTY_STR AND FLAG AND NUM LESS 50 AND NOT NOT_DEFINE_VAR)
+>   >     message("The first if branch...")
+>   > elseif (EMPTY_STR)
+>   >     message("EMPTY_STR is not empty")
+>   > else ()
+>   >     message("All other case")
+>   > endif()
+>   > 
+>   > #添加全局宏定义,将CMake变量转为宏变量
+>   > add_definitions(-D<DBR> ...)
+>   > 
+>   > # 设置头文件的搜索目录
+>   > include_directories(<path>)
+>   > 
+>   > # 链接源文件 GLOB_RECURSE 表示执行递归查找, directoryName标识这些文件夹
+>   > file(GLOB_RECURSE <directoryName> <path>)
+>   > # STATIC 静态  SHARED动态  MODULE 模块
+>   > add_library(<libraryName> STATIC ${directoryName})
+>   > 
+>   > # 为当前目录及以下目录中的可执行文件、共享库或模块库目标的链接步骤添加选项，如链接phread库
+>   > add_link_options(-pthread)
+>   > 
+>   > # 生成可执行文件并命名
+>   > add_executable(<buildName> <filePath>)
+>   > ADD_EXECUTABLE(test ${SRC_LIST}) 
+>   > 
+>   > 
+>   > # 添加工程源码目录
+>   > add_subdirectory(${PROJECT_SOURCE_DIR}/src/base)
+>   > 
+>   > #自动扫描当前路径下的所有源文件存到变量SRC_FILE内（添加源码）
+>   > aux_source_directory(. SRC_FILE)
+>   > 
+>   > #安装非目标文件可执行文件（将应用安装到指定位置）
+>   > INSTALL(PROGRAMES runhello.sh DESTINATION bin)
+>   > 
+>   > 
+>   > ~~~
 >
 > 
 >
@@ -101,52 +200,21 @@
 >
 >   ~~~c++
 >       cout << "type: \t\t" << "************size**************"<< endl;  
->       cout << "bool: \t\t" << "所占字节数：" << sizeof(bool);  
->       cout << "\t最大值：" << (numeric_limits<bool>::max)();  
->       cout << "\t\t最小值：" << (numeric_limits<bool>::min)() << endl;  
->       cout << "char: \t\t" << "所占字节数：" << sizeof(char);  
->       cout << "\t最大值：" << (numeric_limits<char>::max)();  
->       cout << "\t\t最小值：" << (numeric_limits<char>::min)() << endl;  
->       cout << "signed char: \t" << "所占字节数：" << sizeof(signed char);  
->       cout << "\t最大值：" << (numeric_limits<signed char>::max)();  
->       cout << "\t\t最小值：" << (numeric_limits<signed char>::min)() << endl;  
->       cout << "unsigned char: \t" << "所占字节数：" << sizeof(unsigned char);  
->       cout << "\t最大值：" << (numeric_limits<unsigned char>::max)();  
->       cout << "\t\t最小值：" << (numeric_limits<unsigned char>::min)() << endl;  
->       cout << "wchar_t: \t" << "所占字节数：" << sizeof(wchar_t);  
->       cout << "\t最大值：" << (numeric_limits<wchar_t>::max)();  
->       cout << "\t\t最小值：" << (numeric_limits<wchar_t>::min)() << endl;  
->       cout << "short: \t\t" << "所占字节数：" << sizeof(short);  
->       cout << "\t最大值：" << (numeric_limits<short>::max)();  
->       cout << "\t\t最小值：" << (numeric_limits<short>::min)() << endl;  
->       cout << "int: \t\t" << "所占字节数：" << sizeof(int);  
->       cout << "\t最大值：" << (numeric_limits<int>::max)();  
->       cout << "\t最小值：" << (numeric_limits<int>::min)() << endl;  
->       cout << "unsigned: \t" << "所占字节数：" << sizeof(unsigned);  
->       cout << "\t最大值：" << (numeric_limits<unsigned>::max)();  
+>     
 >       cout << "\t最小值：" << (numeric_limits<unsigned>::min)() << endl;  
 >       cout << "long: \t\t" << "所占字节数：" << sizeof(long);  
 >       cout << "\t最大值：" << (numeric_limits<long>::max)();  
 >       cout << "\t最小值：" << (numeric_limits<long>::min)() << endl;  
 >       cout << "unsigned long: \t" << "所占字节数：" << sizeof(unsigned long);  
 >       cout << "\t最大值：" << (numeric_limits<unsigned long>::max)();  
->       cout << "\t最小值：" << (numeric_limits<unsigned long>::min)() << endl;  
->       cout << "double: \t" << "所占字节数：" << sizeof(double);  
->       cout << "\t最大值：" << (numeric_limits<double>::max)();  
->       cout << "\t最小值：" << (numeric_limits<double>::min)() << endl;  
->       cout << "long double: \t" << "所占字节数：" << sizeof(long double);  
->       cout << "\t最大值：" << (numeric_limits<long double>::max)();  
->       cout << "\t最小值：" << (numeric_limits<long double>::min)() << endl;  
->       cout << "float: \t\t" << "所占字节数：" << sizeof(float);  
->       cout << "\t最大值：" << (numeric_limits<float>::max)();  
->       cout << "\t最小值：" << (numeric_limits<float>::min)() << endl;  
+>    
 >       cout << "size_t: \t" << "所占字节数：" << sizeof(size_t);  
 >       cout << "\t最大值：" << (numeric_limits<size_t>::max)();  
 >       cout << "\t最小值：" << (numeric_limits<size_t>::min)() << endl;  
 >       cout << "string: \t" << "所占字节数：" << sizeof(string) << endl;  
 >       cout << "type: \t\t" << "************size**************"<< endl;  
 >   ~~~
->
+>   
 > - **常量** （必须初始化，不允许赋值）
 >
 >   ~~~c++
@@ -451,6 +519,7 @@
 > **C++预处理**  （代替变量，代替其他源文件）
 >
 > ~~~C++
+> // 头文件：预处理中#include代替源文件，头文件一般声明变量，数据结构，源文件实现头文件中声明函数或方法
 > // 用于创建符号常量或函数。该符号常量通常称为宏
 > #define  PI
 > 
@@ -522,33 +591,66 @@
 > // 开启一个线程执行PrintHello函数
 > // value 为PrintHello函数入参，必须是void*类型指针 
 > pthread_create(&threads[i],NULL,PrintHello,(void *)&(value))
->     
+> 
 > pthread_join(threadid, status) 调用线程等待子线程终止
 > pthread_detach (threadid) 
->   
+> 
 > ~~~
 >
 > 
 >
-> **C++标准化**
+> **C++特性**
 >
-> | **发布时间** | **通称**                    | **备注**                       |
-> | :----------- | :-------------------------- | :----------------------------- |
-> | **2020**     | **C++20, C++2a**            | **ISO/IEC 14882:2020**         |
-> | **2017**     | **C++17**                   | **第五个C++标准**              |
-> | **2017**     | **coroutines TS**           | **协程库扩展**                 |
-> | **2017**     | **ranges TS**               | **提供范围机制**               |
-> | **2017**     | **library fundamentals TS** | **标准库扩展**                 |
-> | **2016**     | **concurrency TS**          | **用于并发计算的扩展**         |
-> | **2015**     | **concepts TS**             | **概念库，用于优化编译期信息** |
-> | **2015**     | **TM TS**                   | **事务性内存操作**             |
-> | **2015**     | **parallelism TS**          | **用于并行计算的扩展**         |
-> | **2015**     | **filesystem TS**           | **文件系统**                   |
-> | **2014**     | **C++14**                   | **第四个C++标准**              |
-> | **2011**     | **-**                       | **十进制浮点数扩展**           |
-> | **2011**     | **C++11**                   | **第三个C++标准**              |
-> | **2010**     | **-**                       | **数学函数扩展**               |
-> | **2007**     | **C++TR1**                  | **C++技术报告：库扩展**        |
-> | **2006**     | **-**                       | **C++性能技术报告**            |
-> | **2003**     | **C++03**                   | **第二个C++标准**              |
-> | **1998**     | **C++98**                   | **第一个C++标准**              |
+> | **发布时间** | **通称**                | **备注**                   |
+> | :----------- | :---------------------- | :------------------------- |
+> | 2020         | C++20, C++2a            | ISO/IEC 14882:2020         |
+> | 2017         | C++17                   | 第五个C++标准              |
+> | 2017         | coroutines TS           | 协程库扩展                 |
+> | 2017         | ranges TS               | 提供范围机制               |
+> | 2017         | library fundamentals TS | 标准库扩展                 |
+> | 2016         | concurrency TS          | 用于并发计算的扩展         |
+> | 2015         | concepts TS             | 概念库，用于优化编译期信息 |
+> | 2015         | TM TS                   | 事务性内存操作             |
+> | 2015         | parallelism TS          | 用于并行计算的扩展         |
+> | 2015         | filesystem TS           | 文件系统                   |
+> | 2014         | C++14                   | 第四个C++标准              |
+> | 2011         | -                       | 十进制浮点数扩展           |
+> | 2011         | C++11                   | 第三个C++标准              |
+> | 2010         | -                       | 数学函数扩展               |
+> | 2007         | C++TR1                  | C++技术报告：库扩展        |
+> | 2006         | -                       | C++性能技术报告            |
+> | 2003         | C++03                   | 第二个C++标准              |
+> | 1998         | C++98                   | 第一个C++标准              |
+>
+> - C++11
+>
+>   > decltype ：编译时期进行自动类型推导 
+>   >
+>   > ~~~C++
+>   > // exp 通过其他变量，或指定类型推导varname变量类型
+>   > decltype (exp) varname = value;
+>   > ~~~
+>   >
+>   > lambda：匿名函数
+>   >
+>   > 1. captures：捕获列表，可以对当期局部变量动态使用
+>   > 2. tparams：模板参数列表
+>   > 3. params：参数列表
+>   >
+>   > ~~~c++
+>   > auto plus = [] (int  v1,int v2) -> int {return v1+v2 ;}
+>   > int sum = plus(1,2);
+>   > ~~~
+>   >
+>   > 智能指针
+>   >
+>   > 支持并发编程
+>
+> - C++17
+>
+>   > 函数多返回值
+>   >
+>   > 并行STL，提供并行算法和新数据结构
+>   >
+>   > 
+
