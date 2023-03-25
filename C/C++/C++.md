@@ -1,5 +1,14 @@
 ## C++
 
+#### **C语言**
+
+> **函数，指针，数组**
+>
+> - 指针指向数组时，指针变量存储数组首元素内存地址（数组名实际为指针）
+> - 指针指向数组可以通过`+ -` 操作符移动指针指向数组中元素
+
+#### **C++**
+
 > **标准库**
 >
 > - 核心语法
@@ -200,21 +209,21 @@
 >
 >   ~~~c++
 >       cout << "type: \t\t" << "************size**************"<< endl;  
->     
+>
 >       cout << "\t最小值：" << (numeric_limits<unsigned>::min)() << endl;  
 >       cout << "long: \t\t" << "所占字节数：" << sizeof(long);  
 >       cout << "\t最大值：" << (numeric_limits<long>::max)();  
 >       cout << "\t最小值：" << (numeric_limits<long>::min)() << endl;  
 >       cout << "unsigned long: \t" << "所占字节数：" << sizeof(unsigned long);  
 >       cout << "\t最大值：" << (numeric_limits<unsigned long>::max)();  
->    
+>
 >       cout << "size_t: \t" << "所占字节数：" << sizeof(size_t);  
 >       cout << "\t最大值：" << (numeric_limits<size_t>::max)();  
 >       cout << "\t最小值：" << (numeric_limits<size_t>::min)() << endl;  
 >       cout << "string: \t" << "所占字节数：" << sizeof(string) << endl;  
 >       cout << "type: \t\t" << "************size**************"<< endl;  
 >   ~~~
->   
+>
 > - **常量** （必须初始化，不允许赋值）
 >
 >   ~~~c++
