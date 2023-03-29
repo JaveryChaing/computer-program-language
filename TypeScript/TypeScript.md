@@ -105,6 +105,13 @@
 > class child_class_name extends super_interface_name{
 >     
 > }
+> // 默认从0开始定义对应值
+> enum Days {
+>     Sun, Mon, Tue, Wed, Thu, Fri, Sat
+> }
+> Days["Sum"] == 0
+> Days[0] == "Sun"
+> 
 > 
 > // 引用其他ts文件
 > /// <reference path = "IShape.ts" /> 
