@@ -265,21 +265,21 @@
 >   ~~~c++
 >    // 声明常量 identifier （不用指定数据类型）
 >     #define identifier value
->     
+>   
 >      // 修饰全局变量时，只对定义在同一文件中的函数可见
 >     // 修饰局部变量时，表明该变量的值不会因为函数终止销毁
 >     // 修饰函数时，表明该函数只在同一文件中调用
 >     // 静态类方法不能访问成员变量
 >     static
->          // 节省不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝,不允许二次赋值
->       const
+>     // 节省不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝,不允许二次赋值
+>     const
 >       // 指针型const，变量p不允许二次变动，a变量地址可以变动
 >       int * const p = a
 >       // 变量p允许指向其它地址  a变量存储的地址不允许二次变动
 >       const int* p = a
 >       // 变量p不允许二次变动
 >       const int p = 32
->     
+>   
 >         // 引用不会开辟新内存空间，与引用的变量使用同一个内存地址
 >       // 引用在定义时必须初始化，并且不能在引用其它变量
 >       int &rl = ci
@@ -287,26 +287,26 @@
 >       int &func(int &a,int &b);
 >       // const 修饰的引用可以直接引用值 变量rb不允许二次变动，变量b看原修饰
 >       const int & rb = b;
->     
+>   
 >         // const 修饰方法可以访问成员变量，只能访问const修饰的方法
 >       int  fun() const;
 >       // 声明常量 identifier
 >       const type identifier = value;
 >   ~~~
 >
->   
+> 
 >
 > - **复合数据类型**
 >
 >   ~~~C++
->     
+>   
 >       // 数据类型别名声明
 >       typedef type newName;
->     
+>   
 >         // 声明枚举数据类型 enumName
 >       typedef enum { fieldName,fieldName1,...} enumName;
 >       typedef enum enumName{ fieldName,fieldName1,...} ;
->     
+>   
 >         // 声明枚举类型变量variable1 variable2 variable3 
 >       // 枚举值可以赋值为int类型，int类型不能转为枚举
 >       enum enumName {
@@ -318,7 +318,7 @@
 >       enum enumName variable = fieldName;
 >       // int 转枚举
 >       enum enumName variable = (enum ennumName) 1;
->     
+>   
 >         // 时间复合数据
 >       #include <ctime>
 >       struct tm {
@@ -338,7 +338,7 @@
 >       char*ctime(const time_t *time)
 >       // 返回本地时间tm
 >       struct tm *localtime(const time_t *time);
->     
+>   
 >         //定义复合型数据类型
 >       struct type_name{
 >           member_type member_name;
@@ -350,8 +350,6 @@
 >       type variable = object_namepointer -> member_name
 >   ~~~
 >
->   
->
 > - **类型装换**
 >
 >  1. 静态：static_cast <type>(value)
@@ -359,30 +357,57 @@
 >   3. 常量：const_cast<type&>(value)
 >   4. 重新解释  reinterpret_cast<float&>(value)，强制装换（可能导致值未定义）
 >
-> - **运算符**
->
->  1. sizeof：返回变量大小
->   2. 三元表达式
->   3. & 指针运算符，返回变量地址
->   4. `*` 引用指针，**返回变量对应的值**（使用变量地址读取值)
->
 > - **指针**
 >
->  1. 指针算术运算（通常操作数组）
->
->     ~~~C++
->      // 移动到下一个指针位置
->      pointer ++  pointer --
->     ~~~
->
->  2. 引用（引用不为NULL，**且不允许二次引用**）
->
->     ~~~C++
->      // 定义referenceName引用变量（定义在引用变量前）
->      type& referenceName = variable
->      // 定义pointerName指针变量
->      type *pointerName = &variable
->     ~~~
+>   ~~~C++
+>   // int类型指针变量 prt
+>   // & 右值表达式中为取址  
+>   int *prt = &10;
+>   // & 左值表达式中为引用类型变量ref
+>   int &ref 
+>   // * 右值表达式取值操作（prt为指针变量)
+>   int p = *prt
+>       
+>       
+>   // 声明空指针 
+>   int *p1 = nullptr;
+>   // 使用空指针变量赋值
+>   p1 = reinterpret_cast<int *>(10);
+>   // void 指针 可以存放任意类型变量地址，但不能直接操作void`*`指针所指的对象
+>   void * prt ;
+>   // 指针判断 两个类型相同的合法指针，可以用相等操作符（==）或者不相等操作符（!=）进行比较
+>   // 指针相等的三种可能：（1）都为空 （2）都指向同一对象 （3）都指向了同一对象的下一地址。
+>   
+>   
+>   // 指针迭代器，向后移动一位
+>   prt++; 
+>   // 指针迭代器，向前移动一位
+>   prt--
+>   // 向后移动i位
+>   prt+i
+>   // 获取容器开始指针
+>   begin(ia);
+>   // 获取容器结束指针
+>   end(ia);
+>   // >, >= ,<,<= 判断指针前后关系
+>   //指针相减，等于指针间隔元素（不允许指针相加）
+>   
+>   //函数不能直接返回数组，通常使用别名加上指针或引用代替
+>   // int 类型别名改为 arr[10]
+>   typedef int arr[10];
+>   using arr = int[10];
+>   arr* func(int i);
+>   
+>   //指针函数(声明一个返回为bool，入参为const string 的指针变量 length)
+>   bool length(const string &);
+>   // 使用函数指针赋值函数体，函数体入参，出参必须与函数指针一致
+>   length = lengthFunc;
+>   //同上
+>   length = &lengthFunc;
+>   // 不指向任何函数
+>   length = 0;
+>   
+>   ~~~
 >
 > 
 >
