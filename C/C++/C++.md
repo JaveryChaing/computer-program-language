@@ -407,15 +407,27 @@
 >   #include <memory>
 >   // 独占性，不允许多个auto_prt 指向同一份资源（赋值后对象所有权将转移，源指针为空）
 >   auto_ptr<int>pdu(new int)
->   // 强引用指针，允许多个指针引用同一份资源（当所有shared_ptr都全部释放时，该处资源才释放）
+>   // 排它指针（同auto_prt,增加编译约束），左侧赋值时使用move()修饰
+>   unique_ptr<double>pdu(new double)
+>   pdu = std::move(pdu)
+>       
+>   //共享指针，允许多个指针引用同一份资源（当所有shared_ptr都全部释放时，该处资源才释放）
 >   // 模型循环依赖时，可能导致对象内存泄漏
->   shared_ptr<string>pdu(new string)
+>   shared_ptr<string>pdu(new string);
+>   // 重置指针
+>   pdu.reset()
+>   //将p重置为p1（的值）,p 管控的对象计数减1，p接管对p1指针的管控
+>   p.reset(p1); 
+>   //将p重置为p1（的值），p 管控的对象计数减1并使用d作为删除器
+>   p.reset(p1,d); 
+>   // 交换指针对象，引用值不变
+>   p.swap(p2);
+>   
 >   //弱引用指针
 >   weak_prt<string>pud(new string)
->   // 强引用指针（
->   unique_ptr<double>pdu(new double)
 >   
->       
+>
+> 
 >
 >  **C++类与对象**
 >
@@ -433,7 +445,7 @@
 >     };
 >     // 定义类方法
 >     type className::methodName(){
->   
+>
 >    }
 >   ~~~
 >
