@@ -12,4 +12,6 @@
 > - 算法库
 > - 数值库（数学函数）
 > - 模板
+>
+> [C++ STL库](./cpp-standard-library-msvc-170.pdf)
 
