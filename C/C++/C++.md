@@ -352,10 +352,10 @@
 >
 > - **类型装换**
 >
->  1. 静态：static_cast <type>(value)
->   2. 动态：dynamic_cast<type>(value)，向下转换（通常用作基类转为子类）
->   3. 常量：const_cast<type&>(value)
->   4. 重新解释  reinterpret_cast<float&>(value)，强制装换（可能导致值未定义）
+>     1. 静态：static_cast <type>(value)
+>      2. 动态：dynamic_cast<type>(value)，向下转换（通常用作基类转为子类）
+>      3. 常量：const_cast<type&>(value)
+>      4. 重新解释  reinterpret_cast<float&>(value)，强制装换（可能导致值未定义）
 >
 > - **指针**
 >
@@ -410,7 +410,7 @@
 >   // 排它指针（同auto_prt,增加编译约束），左侧赋值时使用move()修饰
 >   unique_ptr<double>pdu(new double)
 >   pdu = std::move(pdu)
->       
+>   
 >   //共享指针，允许多个指针引用同一份资源（当所有shared_ptr都全部释放时，该处资源才释放）
 >   // 模型循环依赖时，可能导致对象内存泄漏
 >   shared_ptr<string>pdu(new string);
@@ -425,9 +425,28 @@
 >   
 >   //弱引用指针
 >   weak_prt<string>pud(new string)
->   
 >
-> 
+> - **函数**
+>
+>   - lambda表达式（匿名函数），通过上下文中数据决定执行哪个lambda函数（捕获列表）
+>
+>     ![image-20230423105420670](image-20230423105420670.png) 
+>
+>     1. 捕获列表（捕获上下文其他变量，类似于参数列表）
+>
+>        - `[]`不捕获任何变量，即使用时调用
+>        - `[var]`：按值传递，捕获变量var，变量var可更具上下文变动在函数体中使用
+>        - `[=]`：值传递方式捕获所有局部变量（包含this）
+>        - `[&var]`：同上，使用引用传递
+>        - `[&]`：同上，所有局部变量使用引用传递
+>        - `[this]`：按值传递方式捕获当前类对象
+>
+>     2. 参数列表（同函数）
+>
+>     3. 函数修饰符（默认是const，可以通过mutable取消常量限制）
+>
+>        
+>
 >
 >  **C++类与对象**
 >
