@@ -39,10 +39,10 @@
 >   // 二分查找
 >   void *bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *))
 >   // 数组排序
->   void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))
+>   void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))  
 >   ~~~
 >
->   ![image-20230328172913170](img\image-20230328172913170.png) 
+>   ![image-20230328172913170](img\image-20230328172913170.png)
 
 #### **C++**
 
@@ -231,7 +231,7 @@
 >
 > - **基本数据类型**
 >
->  | 类型                                 | 关键字                                                       | 默认值 |
+>   | 类型                                 | 关键字                                                       | 默认值 |
 >   | :----------------------------------- | :----------------------------------------------------------- | ------ |
 >   | 布尔型                               | bool                                                         | false  |
 >   | 字符型                               | char（1）                                                    | '\0'   |
@@ -243,22 +243,24 @@
 >   | 基本类型空间大小修饰(与操作系统相关) | signed(1)，unsigned(1)，short(2)，long(8)                    |        |
 >   | 数据类型限定符                       | const：常量<br />volatile：变量的值可能会被程序以外的因素改变<br />restrict：约束变量为指针操作<br />mutable：const修饰方法中成员变量允许被修改（默认不允许修改）<br />static：静态变量<br />register：寄存器变量（修饰频繁使用的变量，不能使用位运算） |        |
 >
->  ~~~c++
->       cout << "type: \t\t" << "************size**************"<< endl;  
-> 
->      cout << "\t最小值：" << (numeric_limits<unsigned>::min)() << endl;  
->       cout << "long: \t\t" << "所占字节数：" << sizeof(long);  
->       cout << "\t最大值：" << (numeric_limits<long>::max)();  
->       cout << "\t最小值：" << (numeric_limits<long>::min)() << endl;  
->       cout << "unsigned long: \t" << "所占字节数：" << sizeof(unsigned long);  
->       cout << "\t最大值：" << (numeric_limits<unsigned long>::max)();  
-> 
->      cout << "size_t: \t" << "所占字节数：" << sizeof(size_t);  
->       cout << "\t最大值：" << (numeric_limits<size_t>::max)();  
->       cout << "\t最小值：" << (numeric_limits<size_t>::min)() << endl;  
->       cout << "string: \t" << "所占字节数：" << sizeof(string) << endl;  
->       cout << "type: \t\t" << "************size**************"<< endl;  
->  ~~~
+>   ~~~C++
+>    cout << "type: \t\t" << "************size**************"<< endl;  
+>   
+>        cout << "\t最小值：" << (numeric_limits<unsigned>::min)() << endl;  
+>         cout << "long: \t\t" << "所占字节数：" << sizeof(long);  
+>         cout << "\t最大值：" << (numeric_limits<long>::max)();  
+>         cout << "\t最小值：" << (numeric_limits<long>::min)() << endl;  
+>         cout << "unsigned long: \t" << "所占字节数：" << sizeof(unsigned long);  
+>         cout << "\t最大值：" << (numeric_limits<unsigned long>::max)();  
+>   
+>        cout << "size_t: \t" << "所占字节数：" << sizeof(size_t);  
+>         cout << "\t最大值：" << (numeric_limits<size_t>::max)();  
+>         cout << "\t最小值：" << (numeric_limits<size_t>::min)() << endl;  
+>         cout << "string: \t" << "所占字节数：" << sizeof(string) << endl;  
+>         cout << "type: \t\t" << "************size**************"<< endl;  
+>   ~~~
+>
+>   
 >
 > - **常量** （必须初始化，不允许赋值）
 >
@@ -294,31 +296,31 @@
 >       const type identifier = value;
 >   ~~~
 >
-> 
->
 > - **复合数据类型**
 >
 >   ~~~C++
->
+>   
 >       // 数据类型别名声明
 >       typedef type newName;
->
+>   
 >         // 声明枚举数据类型 enumName
 >       typedef enum { fieldName,fieldName1,...} enumName;
 >       typedef enum enumName{ fieldName,fieldName1,...} ;
->
->         // 声明枚举类型变量variable1 variable2 variable3 
+>   
+>        // 声明枚举类型变量variable1 variable2 variable3 
 >       // 枚举值可以赋值为int类型，int类型不能转为枚举
 >       enum enumName {
 >           fieldName = 1
 >           filedName1
 >           ....
 >       } variable1, variable2, variable3;
+>       
 >       // 赋值枚举
 >       enum enumName variable = fieldName;
 >       // int 转枚举
 >       enum enumName variable = (enum ennumName) 1;
->
+>   
+>   
 >         // 时间复合数据
 >       #include <ctime>
 >       struct tm {
@@ -338,7 +340,7 @@
 >       char*ctime(const time_t *time)
 >       // 返回本地时间tm
 >       struct tm *localtime(const time_t *time);
->
+>   
 >         //定义复合型数据类型
 >       struct type_name{
 >           member_type member_name;
@@ -350,12 +352,27 @@
 >       type variable = object_namepointer -> member_name
 >   ~~~
 >
-> - **类型装换**
+> - **类型转换**
+>
+>     标准转换
+>
+>     - 整形提升
+>     - 整型转换
+>     - 浮点转换
+>     - 浮点转换和整型转换
+>     - 算术转换
+>
+> - 指针转换（指向基类引用，指向void* 指针（代替非const，volatile修饰的所有变量）
+>
+>     - 引用转换
+>     - 指向成员的指针转换
+>
+>     手动转换
 >
 >     1. 静态：static_cast <type>(value)
 >      2. 动态：dynamic_cast<type>(value)，向下转换（通常用作基类转为子类）
 >      3. 常量：const_cast<type&>(value)
->      4. 重新解释  reinterpret_cast<float&>(value)，强制装换（可能导致值未定义）
+>      4. 重新解释  reinterpret_cast<float&>(value)，强制转换（可能导致值未定义）
 >
 > - **指针**
 >
@@ -445,7 +462,7 @@
 >
 >     3. 函数修饰符（默认是const，可以通过mutable取消常量限制）
 >
->        
+> 
 >
 >
 >  **C++类与对象**
