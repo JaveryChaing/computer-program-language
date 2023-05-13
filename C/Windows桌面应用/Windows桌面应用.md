@@ -14,15 +14,26 @@
 >
 >      <img src="image-20230513010418560.png" alt="image-20230513010418560" style="zoom:50%;" /> 
 >      <img src="image-20230513013021558.png" alt="image-20230513013021558" style="zoom:50%;" /> 
->      
->      
 >
 
-- ## Windows应用开发语言
+- #### Windows应用开发语言与集成环境
 
   - C/C++（性能最好）
   - C#(.NET)（支持跨平台开发）
   - Rust
+  - WindowsSDK（WinUI3）
+  - .NET MAUI(跨平台)
+  - Web应用（PWA）
+  - ReactNative
 
-- 
+- #### Windows应用SDK
 
+  >  Windows 应用 SDK 提供一组统一的 API 和工具，可供从 Windows 11 到 Windows 10 版本 1809 上的任何桌面应用以一致的方式使用。
+  >
+  > 包含内容
+  >
+  > - <img src="image-20230513160249383.png" alt="image-20230513160249383" style="zoom:80%;" /> 
+  > -  WindowsUI库
+  > - Windows运行时API
+  >
+  > [Windows应用SDK](https://learn.microsoft.com/zh-cn/windows/apps/api-reference/)
