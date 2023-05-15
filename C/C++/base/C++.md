@@ -297,14 +297,14 @@
 > - **复合数据类型**
 >
 >   ~~~C++
->   
+>
 >       // 数据类型别名声明
 >       typedef type newName;
->   
+>
 >         // 声明枚举数据类型 enumName
 >       typedef enum { fieldName,fieldName1,...} enumName;
 >       typedef enum enumName{ fieldName,fieldName1,...} ;
->   
+>
 >        // 声明枚举类型变量variable1 variable2 variable3 
 >       // 枚举值可以赋值为int类型，int类型不能转为枚举
 >       enum enumName {
@@ -312,7 +312,7 @@
 >           filedName1
 >           ....
 >       } variable1, variable2, variable3;
->   
+>
 >       // 赋值枚举
 >       enum enumName variable = fieldName;
 >       // int 转枚举
@@ -336,7 +336,7 @@
 >     char*ctime(const time_t *time)
 >     // 返回本地时间tm
 >     struct tm *localtime(const time_t *time);
->   
+>
 >       //定义复合型数据类型
 >     struct type_name{
 >         member_type member_name;
@@ -435,6 +435,17 @@
 >     2. 参数列表（同函数）
 >
 >     3. 函数修饰符（默认是const，可以通过mutable取消常量限制）
+>   
+> - #### 内联函数
+>
+>   *在C中，保持效率的一个方法是使用宏（macro）。宏可以不要普通的函数调用代价 就可使之看起来像函数调用。宏的实现是用预处理器而不是编译器。预处理器直接用宏代 码代替宏调用，所以就没有了参数压栈、生成汇编语言的CALL、返回参数、执行汇编语 言的RETURN等的开销。所有的工作由预处理器来完成*
+>
+>   1. 内联函数必须函数体与声明结合在前一起（定义在头文件中）
+>   2. 在class中定义的方法与方法体自动成为内联函数
+>   3. 内联函数限制
+>      - 循环
+>      - 大函数体
+>      - 显示或隐式取函数地址
 >
 >  **C++类与对象**
 >
@@ -452,7 +463,7 @@
 >     };
 >     // 定义类方法
 >     type className::methodName(){
->   
+>
 >    }
 >
 > - **析构函数**
