@@ -42,7 +42,7 @@
 >   void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))  
 >   ~~~
 >
->   ![image-20230328172913170](img\image-20230328172913170.png)
+>   ![image-20230328172913170](img\image-20230328172913170.png) 
 
 #### **C++**
 
@@ -203,8 +203,6 @@
 >   > 
 >   > ~~~
 >
-> 
->
 > **C++关键字**  [详细](https://www.runoob.com/w3cnote/cpp-keyword-intro.html)
 >
 > | asm（指令字符串）        | **else**  | **new**          | **this**                              |
@@ -260,14 +258,14 @@
 >         cout << "type: \t\t" << "************size**************"<< endl;  
 >   ~~~
 >
->   
+> 
 >
 > - **常量** （必须初始化，不允许赋值）
 >
 >   ~~~c++
 >    // 声明常量 identifier （不用指定数据类型）
 >     #define identifier value
->   
+>
 >      // 修饰全局变量时，只对定义在同一文件中的函数可见
 >     // 修饰局部变量时，表明该变量的值不会因为函数终止销毁
 >     // 修饰函数时，表明该函数只在同一文件中调用
@@ -281,7 +279,7 @@
 >       const int* p = a
 >       // 变量p不允许二次变动
 >       const int p = 32
->   
+>
 >         // 引用不会开辟新内存空间，与引用的变量使用同一个内存地址
 >       // 引用在定义时必须初始化，并且不能在引用其它变量
 >       int &rl = ci
@@ -289,7 +287,7 @@
 >       int &func(int &a,int &b);
 >       // const 修饰的引用可以直接引用值 变量rb不允许二次变动，变量b看原修饰
 >       const int & rb = b;
->   
+>
 >         // const 修饰方法可以访问成员变量，只能访问const修饰的方法
 >       int  fun() const;
 >       // 声明常量 identifier
@@ -314,134 +312,110 @@
 >           filedName1
 >           ....
 >       } variable1, variable2, variable3;
->       
+>   
 >       // 赋值枚举
 >       enum enumName variable = fieldName;
 >       // int 转枚举
 >       enum enumName variable = (enum ennumName) 1;
+>      // 时间复合数据
+>     #include <ctime>
+>     struct tm {
+>       int tm_sec;   // 秒，正常范围从 0 到 59，但允许至 61
+>       int tm_min;   // 分，范围从 0 到 59
+>       int tm_hour;  // 小时，范围从 0 到 23
+>       int tm_mday;  // 一月中的第几天，范围从 1 到 31
+>       int tm_mon;   // 月，范围从 0 到 11
+>       int tm_year;  // 自 1900 年起的年数
+>       int tm_wday;  // 一周中的第几天，范围从 0 到 6，从星期日算起
+>       int tm_yday;  // 一年中的第几天，范围从 0 到 365，从 1 月 1 日算起
+>       int tm_isdst; // 夏令时
+>     };
+>     // C库函数 返回系统时间（时间戳，秒）
+>     time_t  time(time_t *seconds)
+>     // C库函数，返回系统时间（字符串）
+>     char*ctime(const time_t *time)
+>     // 返回本地时间tm
+>     struct tm *localtime(const time_t *time);
 >   
->   
->         // 时间复合数据
->       #include <ctime>
->       struct tm {
->         int tm_sec;   // 秒，正常范围从 0 到 59，但允许至 61
->         int tm_min;   // 分，范围从 0 到 59
->         int tm_hour;  // 小时，范围从 0 到 23
->         int tm_mday;  // 一月中的第几天，范围从 1 到 31
->         int tm_mon;   // 月，范围从 0 到 11
->         int tm_year;  // 自 1900 年起的年数
->         int tm_wday;  // 一周中的第几天，范围从 0 到 6，从星期日算起
->         int tm_yday;  // 一年中的第几天，范围从 0 到 365，从 1 月 1 日算起
->         int tm_isdst; // 夏令时
->       };
->       // C库函数 返回系统时间（时间戳，秒）
->       time_t  time(time_t *seconds)
->       // C库函数，返回系统时间（字符串）
->       char*ctime(const time_t *time)
->       // 返回本地时间tm
->       struct tm *localtime(const time_t *time);
->   
->         //定义复合型数据类型
->       struct type_name{
->           member_type member_name;
->           ...
->       }object_names;
->       // 复合数据类型指针
->       struct object_names *object_namepointer = &object_names
->       // 访问成员变量
->       type variable = object_namepointer -> member_name
->   ~~~
+>       //定义复合型数据类型
+>     struct type_name{
+>         member_type member_name;
+>         ...
+>     }object_names;
+>     // 复合数据类型指针
+>     struct object_names *object_namepointer = &object_names
+>     // 访问成员变量
+>     type variable = object_namepointer -> member_name
 >
-> - **类型转换**
+> - **指针操作**
 >
->     标准转换
->
->     - 整形提升
->     - 整型转换
->     - 浮点转换
->     - 浮点转换和整型转换
->     - 算术转换
->
-> - 指针转换（指向基类引用，指向void* 指针（代替非const，volatile修饰的所有变量）
->
->     - 引用转换
->     - 指向成员的指针转换
->
->     手动转换
->
->     1. 静态：static_cast <type>(value)
->      2. 动态：dynamic_cast<type>(value)，向下转换（通常用作基类转为子类）
->      3. 常量：const_cast<type&>(value)
->      4. 重新解释  reinterpret_cast<float&>(value)，强制转换（可能导致值未定义）
->
-> - **指针**
->
->   ~~~C++
->   // int类型指针变量 prt
->   // & 右值表达式中为取址  
->   int *prt = &10;
->   // & 左值表达式中为引用类型变量ref
->   int &ref 
->   // * 右值表达式取值操作（prt为指针变量)
->   int p = *prt
->   // 声明空指针 
->   int *p1 = nullptr;
->   // 使用空指针变量赋值
->   p1 = reinterpret_cast<int *>(10);
->   // void 指针 可以存放任意类型变量地址，但不能直接操作void`*`指针所指的对象
->   void * prt ;
->   // 指针判断 两个类型相同的合法指针，可以用相等操作符（==）或者不相等操作符（!=）进行比较
->   // 指针相等的三种可能：（1）都为空 （2）都指向同一对象 （3）都指向了同一对象的下一地址。
->   // 指针迭代器，向后移动一位
->   prt++; 
->   // 指针迭代器，向前移动一位
->   prt--
->   // 向后移动i位
->   prt+i
->   // 获取容器开始指针
->   begin(ia);
->   // 获取容器结束指针
->   end(ia);
->   // >, >= ,<,<= 判断指针前后关系
->   //指针相减，等于指针间隔元素（不允许指针相加）
->   
->   //函数不能直接返回数组，通常使用别名加上指针或引用代替
->   // int 类型别名改为 arr[10]
->   typedef int arr[10];
->   using arr = int[10];
->   arr* func(int i);
->   
->   //指针函数(声明一个返回为bool，入参为const string 的指针变量 length)
->   bool length(const string &);
->   // 使用函数指针赋值函数体，函数体入参，出参必须与函数指针一致
->   length = lengthFunc;
->   //同上
->   length = &lengthFunc;
->   // 不指向任何函数
->   length = 0;
->   
->   // 智能指针
->   #include <memory>
->   // 独占性，不允许多个auto_prt 指向同一份资源（赋值后对象所有权将转移，源指针为空）
->   auto_ptr<int>pdu(new int)
->   // 排它指针（同auto_prt,增加编译约束），左侧赋值时使用move()修饰
->   unique_ptr<double>pdu(new double)
->   pdu = std::move(pdu)
->   
->   //共享指针，允许多个指针引用同一份资源（当所有shared_ptr都全部释放时，该处资源才释放）
->   // 模型循环依赖时，可能导致对象内存泄漏
->   shared_ptr<string>pdu(new string);
->   // 重置指针
->   pdu.reset()
->   //将p重置为p1（的值）,p 管控的对象计数减1，p接管对p1指针的管控
->   p.reset(p1); 
->   //将p重置为p1（的值），p 管控的对象计数减1并使用d作为删除器
->   p.reset(p1,d); 
->   // 交换指针对象，引用值不变
->   p.swap(p2);
->   
->   //弱引用指针
->   weak_prt<string>pud(new string)
+> > ~~~C++
+> >   // int类型指针变量 prt
+> >   // & 右值表达式中为取址  
+> >   int *prt = &10;
+> >   // & 左值表达式中为引用类型变量ref
+> >   int &ref 
+> >   // * 右值表达式取值操作（prt为指针变量)
+> >   int p = *prt
+> >   // 声明空指针 
+> >   int *p1 = nullptr;
+> >   // 使用空指针变量赋值
+> >   p1 = reinterpret_cast<int *>(10);
+> >   // void 指针 可以存放任意类型变量地址，但不能直接操作void`*`指针所指的对象
+> >   void * prt ;
+> >   // 指针判断 两个类型相同的合法指针，可以用相等操作符（==）或者不相等操作符（!=）进行比较
+> >   // 指针相等的三种可能：（1）都为空 （2）都指向同一对象 （3）都指向了同一对象的下一地址。
+> >   // 指针迭代器，向后移动一位
+> >   prt++; 
+> >   // 指针迭代器，向前移动一位
+> >   prt--
+> >   // 向后移动i位
+> >   prt+i
+> >   // 获取容器开始指针
+> >   begin(ia);
+> >   // 获取容器结束指针
+> >   end(ia);
+> >   // >, >= ,<,<= 判断指针前后关系
+> >   //指针相减，等于指针间隔元素（不允许指针相加）
+> > 
+> >   //函数不能直接返回数组，通常使用别名加上指针或引用代替
+> >   // int 类型别名改为 arr[10]
+> >   typedef int arr[10];
+> >   using arr = int[10];
+> >   arr* func(int i);
+> > 
+> >   //指针函数(声明一个返回为bool，入参为const string 的指针变量 length)
+> >   bool length(const string &);
+> >   // 使用函数指针赋值函数体，函数体入参，出参必须与函数指针一致
+> >   length = lengthFunc;
+> >   //同上
+> >   length = &lengthFunc;
+> >   // 不指向任何函数
+> >   length = 0;
+> > 
+> >   // 智能指针
+> >   #include <memory>
+> >   // 独占性，不允许多个auto_prt 指向同一份资源（赋值后对象所有权将转移，源指针为空）
+> >   auto_ptr<int>pdu(new int)
+> >   // 排它指针（同auto_prt,增加编译约束），左侧赋值时使用move()修饰
+> >   unique_ptr<double>pdu(new double)
+> >   pdu = std::move(pdu)
+> > 
+> >   //共享指针，允许多个指针引用同一份资源（当所有shared_ptr都全部释放时，该处资源才释放）
+> >   // 模型循环依赖时，可能导致对象内存泄漏
+> >   shared_ptr<string>pdu(new string);
+> >   // 重置指针
+> >   pdu.reset()
+> >   //将p重置为p1（的值）,p 管控的对象计数减1，p接管对p1指针的管控
+> >   p.reset(p1); 
+> >   //将p重置为p1（的值），p 管控的对象计数减1并使用d作为删除器
+> >   p.reset(p1,d); 
+> >   // 交换指针对象，引用值不变
+> >   p.swap(p2);
+> > 
+> >   //弱引用指针
+> >   weak_prt<string>pud(new string)
+> > ~~~
 >
 > - **函数**
 >
@@ -462,9 +436,6 @@
 >
 >     3. 函数修饰符（默认是const，可以通过mutable取消常量限制）
 >
-> 
->
->
 >  **C++类与对象**
 >
 > - 类定义
@@ -481,9 +452,8 @@
 >     };
 >     // 定义类方法
 >     type className::methodName(){
->
+>   
 >    }
->   ~~~
 >
 > - **析构函数**
 >
