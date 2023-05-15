@@ -223,8 +223,6 @@
 > | double                   | mutable   | switch           | while                                 |
 > | dynamic_cast（动态转换） | namespace | template         |                                       |
 >
-> 
->
 > **C++数据类型**
 >
 > - **基本数据类型**
@@ -242,35 +240,34 @@
 >   | 数据类型限定符                       | const：常量<br />volatile：变量的值可能会被程序以外的因素改变<br />restrict：约束变量为指针操作<br />mutable：const修饰方法中成员变量允许被修改（默认不允许修改）<br />static：静态变量<br />register：寄存器变量（修饰频繁使用的变量，不能使用位运算） |        |
 >
 >   ~~~C++
->    cout << "type: \t\t" << "************size**************"<< endl;  
->   
->        cout << "\t最小值：" << (numeric_limits<unsigned>::min)() << endl;  
+>         cout << "type: \t\t" << "************size**************"<< endl;  
+>         cout << "\t最小值：" << (numeric_limits<unsigned>::min)() << endl;  
 >         cout << "long: \t\t" << "所占字节数：" << sizeof(long);  
 >         cout << "\t最大值：" << (numeric_limits<long>::max)();  
 >         cout << "\t最小值：" << (numeric_limits<long>::min)() << endl;  
 >         cout << "unsigned long: \t" << "所占字节数：" << sizeof(unsigned long);  
 >         cout << "\t最大值：" << (numeric_limits<unsigned long>::max)();  
->   
->        cout << "size_t: \t" << "所占字节数：" << sizeof(size_t);  
+>         cout << "size_t: \t" << "所占字节数：" << sizeof(size_t);  
 >         cout << "\t最大值：" << (numeric_limits<size_t>::max)();  
 >         cout << "\t最小值：" << (numeric_limits<size_t>::min)() << endl;  
 >         cout << "string: \t" << "所占字节数：" << sizeof(string) << endl;  
 >         cout << "type: \t\t" << "************size**************"<< endl;  
 >   ~~~
 >
-> 
->
 > - **常量** （必须初始化，不允许赋值）
 >
 >   ~~~c++
 >    // 声明常量 identifier （不用指定数据类型）
 >     #define identifier value
->
+>   
 >      // 修饰全局变量时，只对定义在同一文件中的函数可见
 >     // 修饰局部变量时，表明该变量的值不会因为函数终止销毁
 >     // 修饰函数时，表明该函数只在同一文件中调用
 >     // 静态类方法不能访问成员变量
+>    // extern 修饰全局变量，头文件中声明的变量默认extern static，
 >     static
+>   
+>      
 >     // 节省不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝,不允许二次赋值
 >     const
 >       // 指针型const，变量p不允许二次变动，a变量地址可以变动
@@ -279,7 +276,7 @@
 >       const int* p = a
 >       // 变量p不允许二次变动
 >       const int p = 32
->
+>   
 >         // 引用不会开辟新内存空间，与引用的变量使用同一个内存地址
 >       // 引用在定义时必须初始化，并且不能在引用其它变量
 >       int &rl = ci
@@ -287,12 +284,14 @@
 >       int &func(int &a,int &b);
 >       // const 修饰的引用可以直接引用值 变量rb不允许二次变动，变量b看原修饰
 >       const int & rb = b;
->
+>   
 >         // const 修饰方法可以访问成员变量，只能访问const修饰的方法
 >       int  fun() const;
 >       // 声明常量 identifier
 >       const type identifier = value;
 >   ~~~
+>
+>   
 >
 > - **复合数据类型**
 >
@@ -435,7 +434,7 @@
 >     2. 参数列表（同函数）
 >
 >     3. 函数修饰符（默认是const，可以通过mutable取消常量限制）
->   
+>
 > - #### 内联函数
 >
 >   *在C中，保持效率的一个方法是使用宏（macro）。宏可以不要普通的函数调用代价 就可使之看起来像函数调用。宏的实现是用预处理器而不是编译器。预处理器直接用宏代 码代替宏调用，所以就没有了参数压栈、生成汇编语言的CALL、返回参数、执行汇编语 言的RETURN等的开销。所有的工作由预处理器来完成*
