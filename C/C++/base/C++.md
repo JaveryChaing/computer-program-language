@@ -266,85 +266,84 @@
 >     // 静态类方法不能访问成员变量
 >    // extern 修饰全局变量，头文件中声明的变量默认extern static，
 >     static
+>   // 节省不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝,不允许二次赋值
+>   const
+>     // 指针型const，变量p不允许二次变动，a变量地址可以变动
+>     int * const p = a
+>     // 变量p允许指向其它地址  a变量存储的地址不允许二次变动
+>     const int* p = a
+>     // 变量p不允许二次变动
+>     const int p = 32
 >   
->      
->     // 节省不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝,不允许二次赋值
->     const
->       // 指针型const，变量p不允许二次变动，a变量地址可以变动
->       int * const p = a
->       // 变量p允许指向其它地址  a变量存储的地址不允许二次变动
->       const int* p = a
->       // 变量p不允许二次变动
->       const int p = 32
+>       // 引用不会开辟新内存空间，与引用的变量使用同一个内存地址
+>     // 引用在定义时必须初始化，并且不能在引用其它变量
+>     int &rl = ci
+>     // 引用做返回值必须确保在函数作用域内变量不会消失
+>     int &func(int &a,int &b);
+>     // const 修饰的引用可以直接引用值 变量rb不允许二次变动，变量b看原修饰
+>     const int & rb = b;
 >   
->         // 引用不会开辟新内存空间，与引用的变量使用同一个内存地址
->       // 引用在定义时必须初始化，并且不能在引用其它变量
->       int &rl = ci
->       // 引用做返回值必须确保在函数作用域内变量不会消失
->       int &func(int &a,int &b);
->       // const 修饰的引用可以直接引用值 变量rb不允许二次变动，变量b看原修饰
->       const int & rb = b;
->   
->         // const 修饰方法可以访问成员变量，只能访问const修饰的方法
->       int  fun() const;
->       // 声明常量 identifier
->       const type identifier = value;
+>       // const 修饰方法可以访问成员变量，只能访问const修饰的方法
+>     int  fun() const;
+>     // 声明常量 identifier
+>     const type identifier = value;
 >   ~~~
->
 >   
->
-> - **复合数据类型**
->
->   ~~~C++
->
->       // 数据类型别名声明
->       typedef type newName;
->
->         // 声明枚举数据类型 enumName
->       typedef enum { fieldName,fieldName1,...} enumName;
->       typedef enum enumName{ fieldName,fieldName1,...} ;
->
->        // 声明枚举类型变量variable1 variable2 variable3 
->       // 枚举值可以赋值为int类型，int类型不能转为枚举
->       enum enumName {
->           fieldName = 1
->           filedName1
->           ....
->       } variable1, variable2, variable3;
->
->       // 赋值枚举
->       enum enumName variable = fieldName;
->       // int 转枚举
->       enum enumName variable = (enum ennumName) 1;
->      // 时间复合数据
->     #include <ctime>
->     struct tm {
->       int tm_sec;   // 秒，正常范围从 0 到 59，但允许至 61
->       int tm_min;   // 分，范围从 0 到 59
->       int tm_hour;  // 小时，范围从 0 到 23
->       int tm_mday;  // 一月中的第几天，范围从 1 到 31
->       int tm_mon;   // 月，范围从 0 到 11
->       int tm_year;  // 自 1900 年起的年数
->       int tm_wday;  // 一周中的第几天，范围从 0 到 6，从星期日算起
->       int tm_yday;  // 一年中的第几天，范围从 0 到 365，从 1 月 1 日算起
->       int tm_isdst; // 夏令时
->     };
->     // C库函数 返回系统时间（时间戳，秒）
->     time_t  time(time_t *seconds)
->     // C库函数，返回系统时间（字符串）
->     char*ctime(const time_t *time)
->     // 返回本地时间tm
->     struct tm *localtime(const time_t *time);
->
->       //定义复合型数据类型
->     struct type_name{
->         member_type member_name;
->         ...
->     }object_names;
->     // 复合数据类型指针
->     struct object_names *object_namepointer = &object_names
->     // 访问成员变量
->     type variable = object_namepointer -> member_name
+>   - **复合数据类型**
+>   
+>     ~~~C++
+>         // 数据类型别名声明
+>           typedef type newName;
+>     
+>             // 声明枚举数据类型 enumName
+>           typedef enum { fieldName,fieldName1,...} enumName;
+>           typedef enum enumName{ fieldName,fieldName1,...} ;
+>     
+>            // 声明枚举类型变量variable1 variable2 variable3 
+>           // 枚举值可以赋值为int类型，int类型不能转为枚举
+>           enum enumName {
+>               fieldName = 1
+>               filedName1
+>               ....
+>           } variable1, variable2, variable3;
+>     
+>           // 赋值枚举
+>           enum enumName variable = fieldName;
+>           // int 转枚举
+>           enum enumName variable = (enum ennumName) 1;
+>          // 时间复合数据
+>         #include <ctime>
+>         struct tm {
+>           int tm_sec;   // 秒，正常范围从 0 到 59，但允许至 61
+>           int tm_min;   // 分，范围从 0 到 59
+>           int tm_hour;  // 小时，范围从 0 到 23
+>           int tm_mday;  // 一月中的第几天，范围从 1 到 31
+>           int tm_mon;   // 月，范围从 0 到 11
+>           int tm_year;  // 自 1900 年起的年数
+>           int tm_wday;  // 一周中的第几天，范围从 0 到 6，从星期日算起
+>           int tm_yday;  // 一年中的第几天，范围从 0 到 365，从 1 月 1 日算起
+>           int tm_isdst; // 夏令时
+>         };
+>         // C库函数 返回系统时间（时间戳，秒）
+>         time_t  time(time_t *seconds)
+>         // C库函数，返回系统时间（字符串）
+>         char*ctime(const time_t *time)
+>         // 返回本地时间tm
+>         struct tm *localtime(const time_t *time);
+>     
+>           //定义复合型数据类型
+>         struct type_name{
+>             member_type member_name;
+>             ...
+>         }object_names;
+>         // 复合数据类型指针
+>         struct object_names *object_namepointer = &object_names
+>         // 访问成员变量
+>         type variable = object_namepointer -> member_name
+>        
+>        // 全局变量（在源文件中定义，其他文件使用时候需要extern关键字再次声明
+>        // 静态局部变量具有局部作用于，只能初始化一次（不能更改），直到程序运行结束
+>     ~~~
 >
 > - **指针操作**
 >
