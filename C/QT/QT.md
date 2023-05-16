@@ -8,6 +8,7 @@
 > - 定义应用程序的外观
 > - 解析程序外部参数及命令
 
+
 #### QWidget
 
 > QWidget 是所有用户界面元素的基类，窗口和控件都是直接或间接继承自 QWidget，QMainWindow、QWidget、QDialog 三个类就是用来创建窗口的，可以直接使用也可以继承后再使用
