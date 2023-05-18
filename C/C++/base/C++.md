@@ -264,7 +264,8 @@
 >     // 修饰局部变量时，表明该变量的值不会因为函数终止销毁
 >     // 修饰函数时，表明该函数只在同一文件中调用
 >     // 静态类方法不能访问成员变量
->    // extern 修饰全局变量，头文件中声明的变量默认extern static，
+>    // extern 修饰全局变量，头文件中声明的变量默认extern static
+>   // static的初始化随机，若文件中存在依赖引用static变量可能导致程序出错
 >     static
 >   // 节省不必要的内存分配，const定义的常量在程序运行过程中只有一份拷贝,不允许二次赋值
 >   const
@@ -288,9 +289,9 @@
 >     // 声明常量 identifier
 >     const type identifier = value;
 >   ~~~
->   
+>
 >   - **复合数据类型**
->   
+>
 >     ~~~C++
 >         // 数据类型别名声明
 >           typedef type newName;
@@ -340,8 +341,8 @@
 >         struct object_names *object_namepointer = &object_names
 >         // 访问成员变量
 >         type variable = object_namepointer -> member_name
->        
->        // 全局变量（在源文件中定义，其他文件使用时候需要extern关键字再次声明
+>     
+>       
 >        // 静态局部变量具有局部作用于，只能初始化一次（不能更改），直到程序运行结束
 >     ~~~
 >
@@ -447,7 +448,7 @@
 >
 >  **C++类与对象**
 >
-> - 类定义
+> - **类定义**
 >
 >   ~~~C++
 >    class className {
@@ -474,6 +475,23 @@
 >     // 4. is a 关系时， 子类调用析构函数，基类析构函数也被调用
 >     className::~className(void){ }
 >   ~~~
+>
+> - **动态对象**
+>
+>   ~~~C++
+>   // 使用C方式为对象创建内存空间
+>   Obj * obj = (Obj*) malloc(sizeof(Obj));
+>   // 调用对象方法初始化成员函数
+>   obj ->initialize();
+>   
+>   // 使用操作符new创建对象(new 返回对象地址)
+>   MyType *fp = new MyType(1,2);
+>   // 使用delete回收对象空间 (delete删除void*类型变量不会执行该对象的析构函数，导致内存溢出)
+>   delete fp;
+>   
+>   ~~~
+>
+>   
 >
 > - **C++继承**（多继承）
 >
