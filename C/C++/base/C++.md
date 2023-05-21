@@ -295,11 +295,11 @@
 >     ~~~C++
 >         // 数据类型别名声明
 >           typedef type newName;
->     
+>       
 >             // 声明枚举数据类型 enumName
 >           typedef enum { fieldName,fieldName1,...} enumName;
 >           typedef enum enumName{ fieldName,fieldName1,...} ;
->     
+>       
 >            // 声明枚举类型变量variable1 variable2 variable3 
 >           // 枚举值可以赋值为int类型，int类型不能转为枚举
 >           enum enumName {
@@ -307,7 +307,7 @@
 >               filedName1
 >               ....
 >           } variable1, variable2, variable3;
->     
+>       
 >           // 赋值枚举
 >           enum enumName variable = fieldName;
 >           // int 转枚举
@@ -331,7 +331,7 @@
 >         char*ctime(const time_t *time)
 >         // 返回本地时间tm
 >         struct tm *localtime(const time_t *time);
->     
+>       
 >           //定义复合型数据类型
 >         struct type_name{
 >             member_type member_name;

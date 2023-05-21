@@ -171,6 +171,8 @@
 >
 >   8. volatile：线程同步变量，改动后对其他线程可见
 >
+>   9. mutable ：可变数据成员（修饰类的非静态，非常量成员）
+>
 > - 作用域
 >
 >   1. 全局作用域
@@ -408,7 +410,7 @@
 > - friend：友元，定义在类中但不属于类的成员（获得了特殊访问权限的普通外部函数，不受类访问控制）
 >
 >   > friend void ChangePrivate( Point & );
->   
+>
 > - **指针与引用**
 >
 >   > ~~~C++
@@ -423,7 +425,7 @@
 >   > int *p1 = nullptr;
 >   > ~~~
 >
-> - 对象生存期和资源管理（RALL：资源获取即初始化)
+> - **对象生存期和资源管理**（RALL：资源获取即初始化)
 >
 >   > 防止对象泄漏方法
 >   >
@@ -431,23 +433,187 @@
 >   >
 >   > 2. **使用智能指针** <memory>
 >   >
->   >    > unique_ptr：独占指针（任何时刻数据只能绑定一个变量）
+>   >    > **unique_ptr：独占指针**（任何时刻数据只能绑定一个变量）
 >   >    >
 >   >    > ~~~C++
->   >    > // 声明类型
+>   >    > // 声明类型  不要对智能指针本身使用 new 或 malloc 表达式
 >   >    > unique_prt<Song> var_name(new Song())
 >   >    > auto var_name = make_unique<Song>();
+>   >    > 
 >   >    > //可移动，不可复制，将var_name变量所有权移动给song，var_name变量为nullprt
 >   >    > auto song = std::move(var_name)
->   >    > // 
 >   >    > ~~~
 >   >    >
->   >    > shared_prt：分享指针
+>   >    > | 名称                                                         | 说明                                                    |
+>   >    > | :----------------------------------------------------------- | :------------------------------------------------------ |
+>   >    > | [`get`](https://learn.microsoft.com/zh-cn/cpp/standard-library/unique-ptr-class?view=msvc-170#get) | 返回 `stored_ptr`。                                     |
+>   >    > | [`get_deleter`](https://learn.microsoft.com/zh-cn/cpp/standard-library/unique-ptr-class?view=msvc-170#get_deleter) | 返回对 `stored_deleter` 的引用。                        |
+>   >    > | [`release`](https://learn.microsoft.com/zh-cn/cpp/standard-library/unique-ptr-class?view=msvc-170#release) | 将 `pointer()` 存储在 `stored_ptr` 中并返回其先前内容。 |
+>   >    > | [`reset`](https://learn.microsoft.com/zh-cn/cpp/standard-library/unique-ptr-class?view=msvc-170#reset) | 释放当前拥有的资源并接受新资源。                        |
+>   >    > | [`swap`](https://learn.microsoft.com/zh-cn/cpp/standard-library/unique-ptr-class?view=msvc-170#swap) | 使用提供的 `deleter` 交换资源和 `unique_ptr`。          |
+>   >    >
+>   >    > 
+>   >    >
+>   >    > **shared_prt：分享指针**（资源可由多个 `shared_ptr` 对象拥有，最后一个 `shared_ptr` 对象被销毁后，资源将释放）**线程安全**
+>   >    >
+>   >    > | **成员函数**                                                 |                                                              |
+>   >    > | ------------------------------------------------------------ | ------------------------------------------------------------ |
+>   >    > | [`get`](https://learn.microsoft.com/zh-cn/cpp/standard-library/shared-ptr-class?view=msvc-170#get) | 获取拥有的资源的地址。                                       |
+>   >    > | [`owner_before`](https://learn.microsoft.com/zh-cn/cpp/standard-library/shared-ptr-class?view=msvc-170#owner_before) | 如果此 `shared_ptr` 排在提供的指针之前（或小于该指针），则返回 true。 |
+>   >    > | [`reset`](https://learn.microsoft.com/zh-cn/cpp/standard-library/shared-ptr-class?view=msvc-170#reset) | 替换拥有的资源。                                             |
+>   >    > | [`swap`](https://learn.microsoft.com/zh-cn/cpp/standard-library/shared-ptr-class?view=msvc-170#swap) | 交换两个 `shared_ptr` 对象。                                 |
+>   >    > | [`unique`](https://learn.microsoft.com/zh-cn/cpp/standard-library/shared-ptr-class?view=msvc-170#unique) | 测试拥有的资源是否是唯一的。                                 |
+>   >    > | [`use_count`](https://learn.microsoft.com/zh-cn/cpp/standard-library/shared-ptr-class?view=msvc-170#use_count) | 计算资源所有者的数目。                                       |
+>   >    >
+>   >    >  
+>   >    >
+>   >    > **weak_ptf：弱指针与shared_prt使用**，声明weak_ptf的指针不会影响shared_prt资源的引用计数，**当shared_prt回收时，weak_ptf指向资源为空**
+>   >
+>   > 
+>   >
+>   > 析构函数：对象超出范围或通过调用 **`delete`** 显式销毁对象时，会自动调用析构函数，不会对成员变量进行回收，需要手动定义析构函数删除
+>   >
+>   > - 不接收参数，无返回值
+>   >
+>   > - 不能声明为const，volatile，static
+>   >
+>   > - 允许虚拟（**`virtual`**）
+>   >
+>   > - 与构造函数相反执行（先构造的对象最后回收）
+>   >
+>   >   
+>   >
+>   > 多继承：子类继承多个基类按照基类继承顺序执行构造函数，析构函数正好相反
 >
-> - 
+> - **函数与Lambda表达式**
 >
+>   > 函数声明
+>   >
+>   > 1. **`constexpr`**：函数的返回值是常量值，可以在编译时进行计算
+>   > 2. extern，static
+>   > 3. inline：函数执行时不进行入栈，出栈执行，提高函数执行效率
+>   >    - 内联函数必须函数体与声明结合
+>   >    - 在lass中定义的方法与方法体自动成为内联函数
+>   >
+>   > **lambda表达式**（函数语法）
+>   >
+>   > - ![image-20230423105420670](image-20230423105420670.png) 
+>   >
+>   >   1. 捕获列表（捕获上下文变量，lambda中可使用的变量）
+>   >      - `[]`不捕获任何变量，即使用时调用
+>   >      - `[var]`：按值传递，捕获变量var，变量var可更具上下文变动在函数体中使用
+>   >      - `[=]`：值传递方式捕获所有局部变量（包含this）
+>   >      - `[&var]`：同上，使用引用传递
+>   >      - `[&]`：同上，所有局部变量使用引用传递
+>   >      - `[this]`：按值传递方式捕获当前类对象
+>   >   2. 参数列表
+>   >   3. 可变规则（默认是const，可以通过mutable取消常量限制）
+>   >   4. 返回类型
+>   >
+>   > - constexpr Lambda表达式
+>   >
+>   >   ~~~C++
+>   >   int y = 42;
+>   >   // answer为函数
+>   >   auto answer = [y]()constexpr{
+>   >       int x = 10;
+>   >       return y + x;
+>   >   }
+>   >   // 或者
+>   >   auto answer = [](int n){
+>   >       return 32+ n;
+>   >   }
+>   >   constexpr  int response = answer(10); 
+>   >   ~~~
+>
+> - **数组、容器**
+>
+>   > ~~~C++
+>   > // 堆栈声明（在编译时确定数组类型及大小） 
+>   > constexpr size_t size = 1000;
+>   > double numbers[size] {0};
+>   > // 堆声明，在运行时确定数组大小及类型，其指针为数组头元素地址
+>   > double * numbers = new double[size]{0};
+>   > ~~~
+>   >
+>   > **序列容器**
+>   >
+>   > 1. string
+>   > 2. `vector`:自动增长，允许随机访问、连续存储，特定值的元素
+>   > 3. array：固定长度，无法动态扩展  std::array<double,10>values;
+>   > 4. deque：双向队列， 它享有 `vector` 随机访问和长度灵活的优点，但是不具备连续性
+>   > 5. list：双向链表（不能随机访问）
+>   > 6. forward_list：单向链表
+>   >
+>   > **关联容器**
+>   >
+>   > 1. map：map<string,int>m
+>   > 2. set：元素的值是唯一，并用作数据自动排序所依据的键值（key与value是相等的）
+>   > 3. multimap：可以存储多个相同的键值对（快速查找，允许重复值)
+>   > 4. multiset：特定顺序存储元素(快速查找，允许重复值) 
+>   >
+>   > 无序容器
+>   >
+>   > 1. unordered_map
+>   > 2. unordered_multimap
+>   > 3. unordered_set
+>   > 4. unordered_multiset
+
+#### **C++中的异常处理**
+
+> - 与Java异常处理一致，无finally确保释放资源（通常用智能指针代替）
+>
+> - std::exception：异常父类，异常标准库 [`<stdexcept>`](https://learn.microsoft.com/zh-cn/cpp/standard-library/stdexcept?view=msvc-170) 
+>
+>   | 异常                   | 描述                                                         |
+>   | :--------------------- | :----------------------------------------------------------- |
+>   | **std::exception**     | 该异常是所有标准 C++ 异常的父类。                            |
+>   | std::bad_alloc         | 该异常可以通过 **new** 抛出。                                |
+>   | std::bad_cast          | 该异常可以通过 **dynamic_cast** 抛出。                       |
+>   | std::bad_typeid        | 该异常可以通过 **typeid** 抛出。                             |
+>   | std::bad_exception     | 这在处理 C++ 程序中无法预期的异常时非常有用。                |
+>   | **std::logic_error**   | 编译异常（通常语法错误抛出）                                 |
+>   | std::domain_error      | 当使用了一个无效的数学域时，会抛出该异常。                   |
+>   | std::invalid_argument  | 当使用了无效的参数时，会抛出该异常。                         |
+>   | std::length_error      | 当创建了太长的 std::string 时，会抛出该异常。                |
+>   | std::out_of_range      | 该异常可以通过方法抛出，例如 std::vector 和 std::bitset<>::operator[]()。 |
+>   | **std::runtime_error** | 理论上不可以通过读取代码来检测到的异常。                     |
+>   | std::overflow_error    | 当发生数学上溢时，会抛出该异常。                             |
+>   | std::range_error       | 当尝试存储超出范围的值时，会抛出该异常。                     |
+>   | std::underflow_error   | 当发生数学下溢时，会抛出该异常。                             |
+>
+> - noexcept：指定某个函数是否可能会引发异常（无法确定异常情况下，代替 throw() 声明函数异常）
+>
+>   > noexcept：函数不会引发异常，**等效于noexcept(true)**，**当函数发生异常时将调用void terminate()终止程序**（类似于断言，断言一般判断值是否满足条件，noexcept则监听函数是否异常）
+>   >
+>   > noexcept(false)：函数可以引发任何类型的异常，代替throw(tyoe)声明函数可能发生的异常
+>
+> - **断言**：当表达式为假时，打印异常消息，调用abort函数停止程序运行
+>
+>   > assert(int expression) ：expression 为0时发生异常退出程序（运行时检测）
+>   >
+>   > static_assert(bool_constexpt，message)：编译时检测
+
+#### **模板**
+
+>  
+
+#### **C++预处理**
+
 > 
->
+
+#### [**C++模块**  （C++20）]((https://learn.microsoft.com/zh-cn/cpp/cpp/import-export-module?view=msvc-170))
+
+>  ~~~C++
+>  // 链接模块
+>  export module Example;
+>  // 使用模块
+>  import Example;
+>  ~~~
+
+
+
+
 
 
 
