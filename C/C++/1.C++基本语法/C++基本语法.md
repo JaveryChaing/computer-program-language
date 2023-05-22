@@ -173,6 +173,8 @@
 >
 >   9. mutable ：可变数据成员（修饰类的非静态，非常量成员）
 >
+>   10. **`typename`**：泛元，用于指定模板参数
+>
 > - 作用域
 >
 >   1. 全局作用域
@@ -586,21 +588,90 @@
 >
 >   > noexcept：函数不会引发异常，**等效于noexcept(true)**，**当函数发生异常时将调用void terminate()终止程序**（类似于断言，断言一般判断值是否满足条件，noexcept则监听函数是否异常）
 >   >
->   > noexcept(false)：函数可以引发任何类型的异常，代替throw(tyoe)声明函数可能发生的异常
+>   > noexcept(false)：函数可以引发任何类型的异常，代替throw(type)声明函数可能发生的异常
 >
-> - **断言**：当表达式为假时，打印异常消息，调用abort函数停止程序运行
+> - **断言**：当运行到表达式为假时，打印异常消息，调用abort函数停止程序运行
 >
 >   > assert(int expression) ：expression 为0时发生异常退出程序（运行时检测）
 >   >
 >   > static_assert(bool_constexpt，message)：编译时检测
 
-#### **模板**
+#### **模板（泛型）**
 
+>  ~~~C++
+>  // 泛型函数
+>  template <typename T>
+>  T minimum(const T& lhs, const T& rhs)
+>  {
+>      return lhs < rhs ? lhs : rhs;
+>  }
+>  template <class T> void f(T){};
 >  
+>  
+>  // 泛型类 泛元T，U，V typename等同class
+>  template <typename T, typename U, typename V> 
+>  class Foo{};
+>  
+>  template <typename ... Arguments> 
+>  class vtclass;
+>  
+>  // 非类型模板推导（使用auto进行类型推导）
+>  template<auto x> constexpr auto constant = x;
+>  
+>  // 模板参数（嵌套模板）MyClass包含泛元T和Arr
+>  // Arr 包含泛元 U，V
+>  template<typename T, template<typename U, typename V> class Arr>
+>  class MyClass {
+>      T data;
+>      Arr<std::string, int> a;
+>  };
+>  
+>  // 默认模板直变量，vector包含泛元A，B，B默认为int类型
+>  template <class A, typename B = int > 
+>      class vector;
+>  
+>  //typename 定义父类泛元，
+>  template <class T> 
+>     class Subtype : Base<type T::V>{}
+>  
+>  //模板友元
+>  template <typename T> 
+>  class Arr{
+>      T* arr;
+>      // 声明友元模板函数
+>      template<class T>
+>          friend Array<T>* combine(Array<T>&a,Array<T>& b);
+>  }
+>  //定义友元模板
+>  template <class T>
+>      Array<T>* combine (Array<T>&a,Array<T>& b){}
+>  
+>  //常见泛型
+>  template <typename T,size_t N>
+>  class MyArray{
+>      T arr[N];
+>  }
+>  ~~~
 
 #### **C++预处理**
 
-> 
+> 预处理指令 
+>
+> ![image-20230522213223039](image-20230522213223039.png) 
+>
+> - define：定义宏，编译器可用标记字符串替换源文件中标识符的每个匹配项
+>
+> - error：指令在编译时发出用户指定的错误消息，然后终止编译
+>
+>   > \#error C++ compiler required.
+>
+> - `#if，#elif #else #endif`
+>
+> - include
+>
+> - line：指令指示预处理器将编译器的行号和文件名报告值设置为给定行号和文件名
+>
+> - undef：与define相反
 
 #### [**C++模块**  （C++20）]((https://learn.microsoft.com/zh-cn/cpp/cpp/import-export-module?view=msvc-170))
 
