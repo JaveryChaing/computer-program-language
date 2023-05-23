@@ -22,5 +22,75 @@
 > |      本地化      | `<clocale>、<codecvt>、<cvt/wbuffer>、<cvt/wstring>、<locale>` |
 > |     语言支持     | `<cfloat>、<climits>、<codecvt> 、<compare>、<contract>、<coroutine>、<csetjmp>、<csignal>、<cstdarg>、<cstddef>、<cstdint>、<cstdlib>、<exception>、<initializer_list>、<limits>、<new>、<typeinfo>、<version>` |
 >
->  
+
+#### **algorithm：C++标准容器模板函数**(对各种数据结构进行操作)
+
+> adjacent_find：查找容器中条件相等的元素 
+>
+> ~~~C++
+> // twice 二元函数，返回bool值
+> auto result =  adjacent_find(L.begin( ), L.end( ), twice )
+> if(result == L.end()) // 未满足条件
+> ~~~
+
+#### **cstdlib：程序钩子函数**
+
+> ![image-20230523200308129](image-20230523200308129.png) 
+>
+> #### **字符转数字**
+>
+> ![image-20230523200701533](image-20230523200701533.png) 
+>
+> #### **数学运算**
+>
+> ![image-20230523200949274](image-20230523200949274.png) 
+>
+> ![image-20230523201006195](image-20230523201006195.png) 
+>
+> ![image-20230523201021098](image-20230523201021098.png) 
+
+**array：**
+
+> 模板类成员：
+>
+> ![image-20230523201359757](image-20230523201359757.png) 
+>
+> 模板运算符重载（需要泛元满足下面运算符）
+>
+> ![image-20230523201444973](image-20230523201444973.png)  
+>
+> 模版函数
+>
+> ![image-20230523204956535](image-20230523204956535.png) 
+>
+> ~~~C++
+>  array<int,4> c0;
+>  // c0获取元素
+>  cout << " " << get<1>(c0);
+>  cout << " " << get<3>(c0) << endl;
+> // 交换c0，c1中元素
+>  swap(c0,c1);
+> ~~~
+>
+> **array类**
+>
+> 成员
+>
+> ![image-20230523205424508](image-20230523205424508.png) 
+>
+> ![image-20230523205455532](image-20230523205455532.png) 
+
+#### **atomic**：创建支持原子操作的类型的类和类模板(不支持浮点)
+
+> ~~~C++
+> // 所属atomic::atomic命名空间
+> // 构造方法
+> atomic(const atomic &);
+> atomic();
+> atomic(Ty Value)noexcept;
+> ~~~
+
+
+
+ 
 
