@@ -35,7 +35,12 @@
 >
 > - 右值引用（rvalue reference）与 move
 >
->   
+> - 定义字符串常量 
+>
+> - noexcept：异常处理 noexcept(true)
+>
+> - constrxper
+>
 
 #### **algorithm：C++标准容器模板函数**(对各种数据结构进行操作)
 
