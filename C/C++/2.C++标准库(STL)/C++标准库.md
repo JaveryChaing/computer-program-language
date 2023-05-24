@@ -23,6 +23,20 @@
 > |     语言支持     | `<cfloat>、<climits>、<codecvt> 、<compare>、<contract>、<coroutine>、<csetjmp>、<csignal>、<cstdarg>、<cstddef>、<cstdint>、<cstdlib>、<exception>、<initializer_list>、<limits>、<new>、<typeinfo>、<version>` |
 >
 
+#### **C++11语言特性**
+
+> - 使用nullprt代替0或NULL指针
+>
+> - auto自动类型推导
+>
+> - 一致性初始化（使用大括号初始化容器，类，结构体）
+>
+> - Range-Based for 循环（迭代器循环语法）
+>
+> - 右值引用（rvalue reference）与 move
+>
+>   
+
 #### **algorithm：C++标准容器模板函数**(对各种数据结构进行操作)
 
 > adjacent_find：查找容器中条件相等的元素 
