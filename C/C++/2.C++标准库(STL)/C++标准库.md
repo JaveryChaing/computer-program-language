@@ -90,6 +90,20 @@
 > atomic(Ty Value)noexcept;
 > ~~~
 
+#### **通用工具**
+
+> pair：以key/value组成的struct数据模板结构，定义在<utility>中，用于构造map容器，及函数多返回值
+>
+> tuple：多元数据结构，可以存放任意数据类型，定义在<tuple>中,使用std空间，返回多个元组，
+>
+> - tuple_size(tupletype)::value : 获取元素个数
+> - tuple_element<idx，tupletype>::type：获取第idx个元素类型
+> - tuple_cat()：拼接多个tuple
+>
+> **智能指针**
+>
+> - 
+
 
 
  

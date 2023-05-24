@@ -561,7 +561,7 @@
 >   > 3. unordered_set
 >   > 4. unordered_multiset
 
-#### **C++中的异常处理**
+#### **C++中的异常处理
 
 > - 与Java异常处理一致，无finally确保释放资源（通常用智能指针代替）
 >
