@@ -51,6 +51,59 @@
 > auto result =  adjacent_find(L.begin( ), L.end( ), twice )
 > if(result == L.end()) // 未满足条件
 > ~~~
+>
+> **辅助函数**
+>
+> ![image-20230526145931387](image-20230526145931387.png) 
+
+#### **Chrono** 时间处理函数
+
+> GMT：格林尼治时间地球自转时间（UTC=GMT +/-0.9)
+>
+> UTC：世界时间 标准格式为YYYY-MM-DD Thh:mm:ssZ（2023-05-26T16:00:00Z)
+>
+> ***GMT与UTC与时区无关，跨时区应用使用UTC作为标准时间***
+>
+> UNIX：时间戳，以1970-01-01T00:00:00为起点经过的秒数
+>
+> ~~~C++
+> 
+> // C语言中 tm 结构
+> struct tm{
+>     // 0~59
+>     int tm_sec;
+> 	// 0~59
+>     int tm_min;
+>     // 0~23
+>     int tm_hour;
+> 	// 1~31
+>     int tm_mday;
+> 	// 0~11
+>     int tm_mon;
+> 	//当期年份= tm_year+1900
+>     int tm_year;
+>     //0~6（0为周天）
+>     int tm_wday;
+>     // 0~365，从0开始 一年第多少天
+>     int tm_yday;
+>     // 夏令营时间 0 表示生效
+>     int tm_isdst;
+>     // 时区
+>     char &tm_zone;
+> }
+>   // time_t 获取当期时间
+>   time_t now = time(nullptr);
+>   tm* ltm = localtime(&now);
+>   time_point<system_clock> now = system_clock::now();
+>   // 获取时间戳
+>   long long timestamp = system_now.time_since_epoch().count()
+>   // 等价于 duration<int64> sec(3);
+>   seconds sec(3);
+>   // 3000 毫秒，使用double类型包装
+>   duration<double, std::milli> ms3k(3000);
+> ~~~
+>
+> **TODO**
 
 #### **cstdlib：程序钩子函数**
 
@@ -119,9 +172,20 @@
 > - tuple_element<idx，tupletype>::type：获取第idx个元素类型
 > - tuple_cat()：拼接多个tuple
 >
-> **智能指针**
+> **Type Trait：模板类型判断**
 >
-> - 
+> - ![image-20230526143638650](image-20230526143638650.png) 
+> - ![image-20230526143737006](image-20230526143737006.png)  
+> - ![image-20230526143830894](image-20230526143830894.png) 
+> - ![image-20230526145000203](image-20230526145000203.png) 
+> - ![image-20230526145159125](image-20230526145159125.png) 
+>
+> Reference Wrapper ：<functional>模板引用转换
+>
+> - ref(T value) = T & value
+> - cref(T & value) = T value
+>
+>  
 
 
 

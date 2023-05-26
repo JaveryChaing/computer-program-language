@@ -610,7 +610,7 @@
 >   }
 >   // 不能抛出任何异常（如果函数执行异常，中断程序，无法catch) 等同noexcept
 >   void throw_run_error() throw();
->   
+>
 >   // 抛出指定类型异常（异常可以是任意类型）
 >   // catch通过类型匹配（包含基类匹配），如果没有匹配成功，则程序退出
 >   void throw_run_error() throw(char,int);
@@ -648,7 +648,7 @@
 >   > assert(int expression) ：expression 为0时发生异常退出程序（运行时检测）
 >   >
 >   > static_assert(bool_constexpt，message)：编译时检测
->   
+>
 > - Terminate函数 (当存在异常未被捕获时，则通过调用abort()使其终止，不释放对象)
 >
 > - **异常资源回收：**
@@ -675,7 +675,8 @@
 >   > }
 >   > ~~~
 >   >
->   > 
+>   
+>   
 
 #### **模板（泛型）**
 
