@@ -138,7 +138,7 @@
 >         f();
 >         g();
 >      }
->      
+>
 >      // 应用于模板
 >      template <typename T> struct MyAlloc{
 >          // 给泛型T声明别名value_type
@@ -146,7 +146,7 @@
 >      }
 >      // 声明long类型别名UL 等同 using UL = long;
 >      typedef long UL;
->      
+>
 >      ~~~
 >
 >   5. extern：声明变量具有外部连接
@@ -217,14 +217,19 @@
 >   > // 包含 argv 后面的参数计数的整数。 argc 参数始终大于或等于 1
 >   > //argv 传入程序参数
 >   > int main(int argc, char* argv[])
->   > //程序钩子函数 <stdlib.h>
->   > //无条件立即终止程序
->   > exit()
->   > // C++ 运行时终止处理（调用全局对象析构函数）
->   > abort()
->   > // 停止程序 不会销毁在调用 atexit 之前初始化的任何全局静态对象
->   > atexit()
+>   > //程序钩子函数 <cstdlib.h>
 >   > 
+>   > // 直接退出程序，清空使用内存，消除内核中数据结构
+>   > void _Exit(int status) noexcept;
+>   > //同上，_Exit()包装函数，增加I/O缓存写回文件操作
+>   > void exit()
+>   > 
+>   > // 立即终止当前进程，产生异常导致程序终止（不会销毁任意对象）
+>   > void abort() noexcept;
+>   > 
+>   > //程序正常退出时，执行注册函数（异常情况下不会执行）
+>   > int atexit(c-atexit-handler * func) noexcept;
+>   > int atexit(atexit-handler * func) noexcept;
 >   > ~~~
 >   >
 >   > | 命令行输入       | argv[1]   | argv[2] | argv[3] |
@@ -594,9 +599,22 @@
 >   > 3. unordered_set
 >   > 4. unordered_multiset
 
-#### **C++中的异常处理
+#### **C++中的异常处理**
 
 > - 与Java异常处理一致，无finally确保释放资源（通常用智能指针代替）
+>
+>   ~~~C++
+>   // 可以抛出任意类型异常，
+>   void throw_run_error() {
+>       throw "abcd";
+>   }
+>   // 不能抛出任何异常（如果函数执行异常，中断程序，无法catch) 等同noexcept
+>   void throw_run_error() throw();
+>   
+>   // 抛出指定类型异常（异常可以是任意类型）
+>   // catch通过类型匹配（包含基类匹配），如果没有匹配成功，则程序退出
+>   void throw_run_error() throw(char,int);
+>   ~~~
 >
 > - std::exception：异常父类，异常标准库 [`<stdexcept>`](https://learn.microsoft.com/zh-cn/cpp/standard-library/stdexcept?view=msvc-170) 
 >
@@ -630,6 +648,34 @@
 >   > assert(int expression) ：expression 为0时发生异常退出程序（运行时检测）
 >   >
 >   > static_assert(bool_constexpt，message)：编译时检测
+>   
+> - Terminate函数 (当存在异常未被捕获时，则通过调用abort()使其终止，不释放对象)
+>
+> - **异常资源回收：**
+>
+>   > ~~~C++
+>   > // 异常信息与对象同一生命周期 (RAII)
+>   > template <typename T,int sz = 1> 
+>   > class Pwrap{
+>   >     T *prt;
+>   >   public:
+>   >     class RangeError{};  
+>   >     PWrap(){
+>   >         prt = new T[sz];
+>   >     }
+>   >     ~Pwrap(){
+>   >         delete [] prt;
+>   >     }
+>   >     // 取值时发生异常
+>   >     T& operator[](int i) throw(RangeError){
+>   >         if(i>=0 && i < sz) return prt[i];
+>   >         // 抛出成员对象
+>   >         throw RangeError();
+>   >     }
+>   > }
+>   > ~~~
+>   >
+>   > 
 
 #### **模板（泛型）**
 
