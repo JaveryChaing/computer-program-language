@@ -1,5 +1,41 @@
 ## Nginx & Lua
 
+#### **nginx安装**
+
+> ~~~shell
+> # linux 所需依赖
+> yum -y install gcc pcre pcre-devel zlib zlib-devel openssl openssl-devel ;
+> # linux 内核参数优化
+> vim /ect/sysctl.conf
+> #进程同时打开最大句柄数
+> fs.file-max = 999999
+> # 防止SYN攻击
+> net.ipv4.tcp_syncookies=1
+> # 用于创建新的TCP连接
+> net.ipv4.tw_reuse=1
+> ....
+> 
+>  #编译，安装Nginx  
+> ./configure --prefix=/usr/local/nginx 
+> # --prefix=PATH  安装目录
+> # --config-path=PATH  配置文件nginx.conf目录
+> # --error-log-path=PATH error日志存放目录
+> # --pid-path=PATH pid文件存放目录
+> # --http-proxy-temp-path=PATH  反向代理http包体临时存放路径
+> # --with-pcre   添加正则表达式库（强制使用pcre库）
+> # --with=libatomic 强制使用atomic库，提供原子操作
+> # --with-zlib=DIR  使用zlib压缩库
+> # --with-http_ssl_module nginx支持SSL协议，实现HTTPS连接
+> # --with-http_realip_module 从客户单获取真正的IP(通过请求头获取)
+> # --with-http_addition_module 追加http包体和包体
+> # --with-http_image_filter_module 压缩图片（需要ligd库支持）
+> # --with-http_sub_module 替换返回客户端应答包字符串
+> # --with-http_stub_status_module  提供nginx性能统计页面
+> # --with-http_perftools_module 提供性能测试工具
+> ~~~
+>
+> 
+
 #### 	**Nginx.conf：配置**
 
 > ~~~shell
@@ -63,18 +99,17 @@
 >     #开启sendfile，减少管态与目态之间内存复制
 >     sendfile        on;
 >    
->    
 >     #tcp_nopush     on;
-> 
->     # 链接超时时间
+>    
+>  # 链接超时时间
 >     keepalive_timeout  65;
->     
->     # 开启gzip压缩
+>    
+>      # 开启gzip压缩
 >     gzip  on;
 >     #低于1k资源不压缩
->     gzip_min length 1k;
+>     gzip_min_length 1k;
 >     #压缩等级 1-9（数值越大，压缩率越高，同时cpu资源耗费高）
->     gzip_comp_leve  5;
+>     gzip_comp_level  5;
 >     # 压缩资源类型（不建议压缩图片）
 >     gzip_types text/plain application/javascript 
 >     # 添加Accept-Encoding 响应头
@@ -82,21 +117,21 @@
 >     #连接内存池
 >     connection_pool_size size;
 >     request_pool_size size;
->     
->     # 请求头，请求头读取超时时间
+>    
+>      # 请求头，请求头读取超时时间
 >     client_body_time time;
 >     client_header_timour time;
 >     # 发送响应超时时间
 >     send_timeout time;
 >     # 限制请求体最大值
 >     client_max_body_size size;
-> 
->     # DNS解析服务器
+>    
+>  # DNS解析服务器
 >     resolver address;
 >     resolver_timeout;
+>    
 >     
->     
->     # 虚拟服务器配置（可监听本机端口，可以存在多个，按照配置顺序生效）
+>      # 虚拟服务器配置（可监听本机端口，可以存在多个，按照配置顺序生效）
 >     server {
 >         # 监听端口 ipv6 [::]:8080
 >         # 可以绑定本机网卡地址 （内网，外网）
@@ -104,8 +139,8 @@
 >         listen   80;
 >         #主机名，可以配置多个
 >         server_name  localhost;
-> 
->         # 代理路径
+>    
+>      # 代理路径
 >         #  = ：完全匹配Uri(包括参数)
 >         # ~：区分大小写
 >         # ~*：不区分大小写
@@ -126,37 +161,37 @@
 >             # http报文存储在磁盘或内存中
 >             client_body_in_file_only on|clean|off;
 >             client_body_in_single_buffer on|off;
->             
->             #限制用户请求
+>    
+>                      #限制用户请求
 >             limit_except GET{
 >              allow ip/32;
 >              deny all;
 >             }
->             
->             #反向代理(可以代理具体ip或upstream集群或https请求)
+>    
+>                      #反向代理(可以代理具体ip或upstream集群或https请求)
 >             proxy_pass http://backend
->             
->             #默认情况下反向代理不会转发Host头部消息（加上该配置进行头部转发）
+>    
+>                      #默认情况下反向代理不会转发Host头部消息（加上该配置进行头部转发）
 >             proxy_set_header Host $host;
->           
->             #代理请求方法（可以将GET请求代理POST)
+>    
+>                    #代理请求方法（可以将GET请求代理POST)
 >             proxy_method method;
->             
->             #重定向转发，当301,302请求时，重设置http头部refresh，location填充地址
+>    
+>                      #重定向转发，当301,302请求时，重设置http头部refresh，location填充地址
 >             proxy_redirect address
->             
->             # 当代理服务器发生超时，错误时，重新选择一个节点发生
+>    
+>                      # 当代理服务器发生超时，错误时，重新选择一个节点发生
 >             proxy_next_upstrem error timeout 
->            
->         }
+>    
+>                 }
 >         # 根据状态码重定向到页面(全局)
 >         error_page  404  401  402              /404.html;
 >         error_page  404  401  402              @fetch;
 >         error_page  404  401  402              http://example.com;
+>    
 >         
 >         
-> 
->         # redirect server error pages to the static page /50x.html
+>      # redirect server error pages to the static page /50x.html
 >         #
 >         error_page   500 502 503 504  /50x.html;
 >         location = /50x.html {
@@ -178,17 +213,19 @@
 >     }
 >      # 代理TCP请求
 >     stream{
->        
+>    
+>         }
+>    
 >     }
->     
-> }
 > 
 > 
 > ~~~
->
-> ![image-20230525120130535](image-20230525120130535.png) 
+> 
+>![image-20230525120130535](image-20230525120130535.png) 
 
 #### **Nginx性能监控**
 
+> 添加 ngx_http_stub_status_module 模块
+>
 > 
 
