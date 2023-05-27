@@ -89,7 +89,7 @@
 >   > -- g关闭PDB数据库
 >   > alter pluggable database PDBEPPS close;
 >   > -- 切换到CDB  （CDB中的用户必须以C##开头）
->   > alter session set container=CDB&ROOT
+>   > alter session set container=cdb&root
 >   > ~~~
 >
 > **物理结构**
@@ -504,4 +504,28 @@
 >   create synonym table_name for A.table_name
 >   ~~~
 >
->   
+
+#### **Oracle Enterprise Manager Database Express**
+
+> EM：基于Web页面的Oracle管理工具，用作监听和管理Oracle数据库（只能看开启数据库），提供数据库调优
+>
+> ~~~sql
+> -- 查看EM端口号  http 与https 同时开启且不为0
+> select dbms_xdb_config.gethttpport() from dual; 
+> select dbms_xdb_config.gethttpsport() from dual; 
+> exec DBMS_XDB_CONFIG.SETHTTPPORT(5500);
+> exec DBMS_XDB_CONFIG.SETHTTPSPORT(5500);
+> 
+> -- 查看端口监听文件
+> lsnrctl status;
+> -- 设置权限
+> chmod 777 /u01/app/oracle/product/19.0.0/db_1/admin/orcl/xdb_wallet/*
+> 
+> -- 在sqlplus  上执行
+> -- 需要Adobe flash player
+> @?/rdbms/admin/execemx emx
+> -- 仅存在'Performance（性能）
+> @?/rdbms/admin/execemx omx
+> ~~~
+>
+> https://192.168.31.106:5502/em/login
