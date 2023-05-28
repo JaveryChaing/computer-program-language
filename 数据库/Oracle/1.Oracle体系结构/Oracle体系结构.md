@@ -95,22 +95,47 @@
 > **物理结构**
 >
 > > ~~~sql
-> > -- 查看Oracle 文件存储位置
+> > -- 数据文件（dbf,ora），一个表空间存在多个数据文件，一个数据文件只属于某个表空间
 > > show parameter dump;
+> > -- 查看数据文件
+> > select * from dba_data_files;
+> > 
+> > -- 日志文件（trc，log），包含日志，跟踪用户进程日志，redo log重做日志
+> > select * from v$logfile;
+> > 
+> > -- 控制文件，包含数据库名字，数据文件，RMAN备份元信息 (.ctl )
+> > select * from v$controlfile;
+> > 
+> > -- 需要system权限
+> > -- 归档日志状态（非归档状态下，Oracle只能执行离线备份)
+> > archive log list;
+> > shutdown immediate;
+> > startup mount;
+> > alter database archivelog;
+> > alter database open;
+> > 
+> > -- 参数文件（初始化参数配置）
+> > show parameter pfile;
+> > -- 查询参数配置
+> > create pfile = 'path' from spfile;
+> > 
+> > -- 告警日志文件位置
+> > select * from v$diag_info;
+> > 
+> > 
 > > ~~~
 > >
-> > 数据文件（dbf,ora），一个表空间存在多个数据文件，一个数据文件只属于某个表空间
-> >
-> > 日志文件（trc，log），包含报价日志，跟踪用户进程日志，redo log重做日志
-> >
-> > 控制文件
-> >
-> > 参数文件
 >
 > **逻辑结构**
 >
-> - 表空间（tablespaces）：数据库包含多个表空间，表空间时数据库恢复的最小单位。包含表，视图，索引，聚簇、回退段和临时段
+> - 表空间（tablespaces）：数据库包含多个表空间，表空间时数据库恢复的最小单位。包含表，视图，索引，聚簇、回退段和临时段（一个表空间只属于一个数据库，表空间包含多个数据文件）
 >
+>   > system：存储整个数据库的数据字典（包含存储过程，触发器）
+>   >
+>   > undotbsi：回滚表空间
+>   >
+>   > users：用户表空间（默认表空间）
+>   >
 >   > ~~~sql
 >   > -- 查看表空间
 >   > select * from v$tablespace;
@@ -125,31 +150,32 @@
 >   > create tablespace paul datafile '/ora10/product/oradata/ora10/paul01.dbf' size 20m;
 >   > -- 查看表空间大小
 >   > SELECT a.tablespace_name "表空间名",
->   >        a.bytes / 1024 / 1024 "表空间大小(M)",
->   >        (a.bytes - b.bytes) / 1024 / 1024 "已使用空间(M)",
->   >        b.bytes / 1024 / 1024 "空闲空间(M)",
->   >        round(((a.bytes - b.bytes) / a.bytes) * 100, 2) "使用比"
+>   >     a.bytes / 1024 / 1024 "表空间大小(M)",
+>   >     (a.bytes - b.bytes) / 1024 / 1024 "已使用空间(M)",
+>   >     b.bytes / 1024 / 1024 "空闲空间(M)",
+>   >     round(((a.bytes - b.bytes) / a.bytes) * 100, 2) "使用比"
 >   > FROM (SELECT tablespace_name, sum(bytes) bytes
->   >       FROM dba_data_files
->   >       GROUP BY tablespace_name) a,
->   >      (SELECT tablespace_name, sum(bytes) bytes, max(bytes) largest
->   >       FROM dba_free_space
->   >       GROUP BY tablespace_name) b
+>   >    FROM dba_data_files
+>   >    GROUP BY tablespace_name) a,
+>   >   (SELECT tablespace_name, sum(bytes) bytes, max(bytes) largest
+>   >    FROM dba_free_space
+>   >    GROUP BY tablespace_name) b
 >   > WHERE a.tablespace_name = b.tablespace_name
 >   > ORDER BY ((a.bytes - b.bytes) / a.bytes) DESC
 >   > -- 查看表空间是否自动扩展
 >   > SELECT file_id, file_name, tablespace_name, autoextensible, increment_by
->   >  
+>   > 
 >   > FROM dba_data_files
->   >  
+>   > 
 >   > WHERE tablespace_name = '表空间名称'
->   >  
+>   > 
 >   > ORDER BY file_id desc;
 >   > -- 修改文件大小
 >   > alter database datafile '全路径的数据文件名称' resize ***M;
 >   > -- 增加文件数量
 >   > alter tablespace 表空间名称 add datafile '全路径的数据文件名称' size ***M
->   >  autoextend on maxsize 20G;
+>   > autoextend on maxsize 20G;
+>   > 
 >   > ~~~
 >
 > - 段（segment）：占用数据文件空间的通称，或数据库对象使用的空间的集合；段可以有表段、索引段、回滚段、临时段和高速缓存段等。
@@ -174,19 +200,35 @@
 >
 >   > Oracle系统在创建表空间时将数据文件格式化成若干个Oracle块；每个Oracle块是Oracle系统处理的最小单位；
 >
->   逻辑结构：<img src="img\image-20230225221235090.png" alt="image-20230225221235090" style="zoom:67%;" /> 
+>   逻辑结构：<img src="img\image-20230225221235090.png" alt="image-20230225221235090" style="zoom:67%;" />  
 >
 > **内存结构**
 >
-> - 共享池
-> - 数据缓冲区
-> - 日志缓冲区
-> - PGA：一个进程和线程专用的内存，分为私有SQL区域，会话空间，SQL工作区
-> - SGA：一个数据库实例的数据和控制信息的共享内存结构
+> - SGA：一个数据库实例的数据和控制信息的共享内存结构（大小由系统自动分配）
 >
->   内存结构：<img src="img\image-20230225221441971.png" alt="image-20230225221441971" style="zoom:67%;" /> 
+>   1. BufferCache：高速缓冲区（缓冲数据库文件中查询的数据块，用于提供查询效率）
+>
+>      ~~~SQL
+>      -- 查询缓存类型及大小
+>      -- KEEP：数据生命周期长，用于频繁使用很少更新的数据
+>      -- RECYCLE：用于频繁更新的数据，当不在使用时回收
+>      -- nK
+>      show parameter _cache_size;
+>      ~~~
+>
+>   2. 共享池：存储SQL语句及SQL执行计划（用户间共享结构）
+>
+>   3. 重做日志缓冲区：RedoLog，用于数据事务回滚记录
+>
+>   4. LargePool：用于备份与恢复操作，提供大型内存分配
+>
+>   5. JavaPool，StreamPool
+>
+> - PGA：一个进程和线程专用的内存，分为私有SQL区域，会话空间，SQL工作区
 >
 >   
+>
+> 内存结构：<img src="img\image-20230225221441971.png" alt="image-20230225221441971" style="zoom:67%;" /> 
 >
 > **进程**
 >
@@ -205,17 +247,19 @@
 >   alter system set processes = 300 scope = spfile;
 >   -- 释放连接会话
 >   alter system kill session 'sid, serial#'
+>   
 >   -- 查看占用系统 io 较大的 session
 >   SELECT se.sid,se.serial#,pr.SPID,se.username,se.status,se.terminal,se.program,se.MODULE,se.sql_address,st.event,st.p1text,si.physical_reads,si.block_changes
->
+>   
 >   　　FROM v$session se,　v$session_wait st,v$sess_io si,v$process pr
->
+>   
 >   　　WHERE st.sid=se.sid　AND st.sid=si.sid AND se.PADDR=pr.ADDR AND se.sid>6　AND st.wait_time=0 AND st.event NOT LIKE '%SQL%' ORDER BY physical_reads DESC
+>   
 >   -- 找出耗 cpu 较多的 session
 >   select a.sid,spid,status,substr(a.program,1,40) prog,a.terminal,osuser,value/60/100 value
->
+>   
 >   　　from v$session a,v$process b,v$sesstat c
->
+>   
 >   　　where c.statistic#=12 and c.sid=a.sid and a.paddr=b.addr order by value desc
 >   ~~~
 >
