@@ -189,7 +189,7 @@
   >      select * from dual where rownum <= 5;
   >      -- 使用子查询分页 (嵌套2层查询，查询前20条数据，在过滤前10条数据)
   >      select * from (select rownum no ,t.* from dual t where rownum <=20) where no >10;
-  >          
+  >             
   >      -- 分页排序查询（嵌套3层查询）
   >      -- 跳过10前10行
   >      select * from (
@@ -376,9 +376,9 @@
   >
   >   ~~~sql
   >   declare 
-  >   -- v_row_data 单行数据变量名，table1来源表，%ROWTYPE
+  >   -- v_row_data 单行数据变量名，table1来源表，%ROWTYPE结构
   >   v_row_data table1%ROWTYPE;
-  >   -- 行中某列数据
+  >   -- 引用table表中某列类型
   >   declare v_name table1.col%TYPE;
   >   ~~~
   >
