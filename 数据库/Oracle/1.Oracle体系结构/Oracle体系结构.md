@@ -86,7 +86,7 @@
 >   > alter session set container=ORCLPDB
 >   > -- 启动PDB数据库
 >   > alter pluggable database PDBEPPS open;
->   > -- g关闭PDB数据库
+>   > -- 关闭PDB数据库
 >   > alter pluggable database PDBEPPS close;
 >   > -- 切换到CDB  （CDB中的用户必须以C##开头）
 >   > alter session set container=cdb&root
@@ -113,6 +113,7 @@
 > > startup mount;
 > > alter database archivelog;
 > > alter database open;
+> > select log_mode,flashback_on from v$database;
 > > 
 > > -- 参数文件（初始化参数配置）
 > > show parameter pfile;
@@ -147,19 +148,20 @@
 >   > -- 4k最大表空间为：16384M=16G
 >   > -- 8K最大表空间为：32768M=32G
 >   > -- 16k最大表空间为：65536M=64G
->   > create tablespace paul datafile '/ora10/product/oradata/ora10/paul01.dbf' size 20m;
+>   > create tablespace FLASHBACK datafile '/opt/oracle/oradata/ORCL/flashback.dbf' size 1024M autoextend on next 5M maxsize 4096M;
+>   > 
 >   > -- 查看表空间大小
 >   > SELECT a.tablespace_name "表空间名",
->   >     a.bytes / 1024 / 1024 "表空间大小(M)",
->   >     (a.bytes - b.bytes) / 1024 / 1024 "已使用空间(M)",
->   >     b.bytes / 1024 / 1024 "空闲空间(M)",
->   >     round(((a.bytes - b.bytes) / a.bytes) * 100, 2) "使用比"
+>   >  a.bytes / 1024 / 1024 "表空间大小(M)",
+>   >  (a.bytes - b.bytes) / 1024 / 1024 "已使用空间(M)",
+>   >  b.bytes / 1024 / 1024 "空闲空间(M)",
+>   >  round(((a.bytes - b.bytes) / a.bytes) * 100, 2) "使用比"
 >   > FROM (SELECT tablespace_name, sum(bytes) bytes
->   >    FROM dba_data_files
->   >    GROUP BY tablespace_name) a,
->   >   (SELECT tablespace_name, sum(bytes) bytes, max(bytes) largest
->   >    FROM dba_free_space
->   >    GROUP BY tablespace_name) b
+>   > FROM dba_data_files
+>   > GROUP BY tablespace_name) a,
+>   > (SELECT tablespace_name, sum(bytes) bytes, max(bytes) largest
+>   > FROM dba_free_space
+>   > GROUP BY tablespace_name) b
 >   > WHERE a.tablespace_name = b.tablespace_name
 >   > ORDER BY ((a.bytes - b.bytes) / a.bytes) DESC
 >   > -- 查看表空间是否自动扩展
@@ -226,7 +228,7 @@
 >
 > - PGA：一个进程和线程专用的内存，分为私有SQL区域，会话空间，SQL工作区
 >
->   
+> 
 >
 > 内存结构：<img src="img\image-20230225221441971.png" alt="image-20230225221441971" style="zoom:67%;" /> 
 >
@@ -247,19 +249,19 @@
 >   alter system set processes = 300 scope = spfile;
 >   -- 释放连接会话
 >   alter system kill session 'sid, serial#'
->   
+>
 >   -- 查看占用系统 io 较大的 session
 >   SELECT se.sid,se.serial#,pr.SPID,se.username,se.status,se.terminal,se.program,se.MODULE,se.sql_address,st.event,st.p1text,si.physical_reads,si.block_changes
->   
+>
 >   　　FROM v$session se,　v$session_wait st,v$sess_io si,v$process pr
->   
+>
 >   　　WHERE st.sid=se.sid　AND st.sid=si.sid AND se.PADDR=pr.ADDR AND se.sid>6　AND st.wait_time=0 AND st.event NOT LIKE '%SQL%' ORDER BY physical_reads DESC
->   
+>
 >   -- 找出耗 cpu 较多的 session
 >   select a.sid,spid,status,substr(a.program,1,40) prog,a.terminal,osuser,value/60/100 value
->   
+>
 >   　　from v$session a,v$process b,v$sesstat c
->   
+>
 >   　　where c.statistic#=12 and c.sid=a.sid and a.paddr=b.addr order by value desc
 >   ~~~
 >
