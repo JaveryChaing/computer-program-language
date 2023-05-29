@@ -66,44 +66,87 @@
 >
 > UNIX：时间戳，以1970-01-01T00:00:00为起点经过的秒数
 >
+> 时间相关类型
+>
+> - clock_t、time_t：实际上为long int 类型，将时间转为时间戳处理
+>
+>   ~~~C++
+>   // 获取当期时间戳（实际上时间戳为UTC，与时区无关）
+>   time_t tm = time(nullprt);
+>   // 时间戳转为tm，同timep,未加上时区
+>   tm* gmtime(const time_t * timep);
+>   // 加上本地时区
+>   tm* ltm = localtime(&tm);
+>   ~~~
+>
+> - size_t：通常用在32位系统上时间戳处理（unsigned int)
+>
+> - tm：时间结构
+>
+>   ~~~C++
+>   // C语言中 tm 结构
+>   struct tm{
+>    // 0~59
+>    int tm_sec;
+>   	// 0~59
+>    int tm_min;
+>    // 0~23
+>    int tm_hour;
+>   	// 1~31
+>    int tm_mday;
+>   	// 0~11
+>    int tm_mon;
+>   	//当期年份= tm_year+1900
+>    int tm_year;
+>    //0~6（0为周天）
+>    int tm_wday;
+>    // 0~365，从0开始 一年第多少天
+>    int tm_yday;
+>    // 夏令营时间 0 表示生效
+>    int tm_isdst;
+>    // 时区
+>    char &tm_zone;
+>   }
+>   ~~~
+>
+> - Chrono：定义表示和操作持续时间及时刻的类和函数
+>
+>   ~~~C++
+>   // duration类：时间间隔，默认以秒为单位
+>   // 构造方法 Rep：次数，Period：倍率 std::ratio<1, 10>：表示1/10 的倍率 
+>   // duration 支持重载算术运算符操作，计算时不必转换单位
+>   template <class Rep, class Period> class duration;
+>   template <class Rep, class Period = ratio<1>> class duration;
+>   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
+>   
+>   duration::period 获取单位类型
+>   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
+>   std::chrono::seconds  sec(20);
+>   std::chrono::hours aDay(24);
+>   // 时间单位转换
+>   hours m1 = duration_cast<seconds>(sec);
+>   // C++14后可以用 constexpr表示一个常量时间间隔
+>   constexpr auto twoDays = 48h;
+>   constexpr auto my_duration_unit = 108ms;
+>   
+>   ~~~
+>
+> **C、C++获取当前时间**：
+>
 > ~~~C++
-> 
-> // C语言中 tm 结构
-> struct tm{
->     // 0~59
->     int tm_sec;
-> 	// 0~59
->     int tm_min;
->     // 0~23
->     int tm_hour;
-> 	// 1~31
->     int tm_mday;
-> 	// 0~11
->     int tm_mon;
-> 	//当期年份= tm_year+1900
->     int tm_year;
->     //0~6（0为周天）
->     int tm_wday;
->     // 0~365，从0开始 一年第多少天
->     int tm_yday;
->     // 夏令营时间 0 表示生效
->     int tm_isdst;
->     // 时区
->     char &tm_zone;
-> }
->   // time_t 获取当期时间
->   time_t now = time(nullptr);
->   tm* ltm = localtime(&now);
->   time_point<system_clock> now = system_clock::now();
->   // 获取时间戳
->   long long timestamp = system_now.time_since_epoch().count()
->   // 等价于 duration<int64> sec(3);
->   seconds sec(3);
->   // 3000 毫秒，使用double类型包装
->   duration<double, std::milli> ms3k(3000);
+> // time_t 获取当期时间
+> time_t now = time(nullptr);
+> tm* ltm = localtime(&now);
+> time_point<system_clock> now = system_clock::now();
+> // 获取时间戳
+> long long timestamp = system_now.time_since_epoch().count()
+> // 等价于 duration<int64> sec(3);
+> seconds sec(3);
+> // 3000 毫秒，使用double类型包装
+> duration<double, std::milli> ms3k(3000);
 > ~~~
 >
-> **TODO**
+> 
 
 #### **cstdlib：程序钩子函数**
 
