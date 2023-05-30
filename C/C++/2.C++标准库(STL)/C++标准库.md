@@ -77,6 +77,15 @@
 >   tm* gmtime(const time_t * timep);
 >   // 加上本地时区
 >   tm* ltm = localtime(&tm);
+>   // ts 转 time_t
+>   time_t mktime(struct tm* time_ptr);
+>   // tm 转字符 Mon Oct 24 11:41:17 2022，返回本地时间
+>   char asctime(const struct tm time_ptr);
+>   // tm格式化转str；
+>   size_t strftime(char *str ,size_t count,const char * format,const struct tm* tm);
+>   char strTime[100];
+>   // tm格式化成字符串 2022-10-07 20:46:01
+>   strftime(startTime,sizeof(startTime),"%Y-%m-%d %H:%M:%S",tm);
 >   ~~~
 >
 > - size_t：通常用在32位系统上时间戳处理（unsigned int)
@@ -146,7 +155,7 @@
 > duration<double, std::milli> ms3k(3000);
 > ~~~
 >
-> 
+> ![image-20230530095519797](image-20230530095519797.png) 
 
 #### **cstdlib：程序钩子函数**
 
