@@ -410,6 +410,47 @@
 >   > - 基于函数索引（查询列通过函数值创建索引）
 >   > - 位图索引（存储索引列每个可能值的位串），位串长度与索引表中行数相同
 >
+> - **分区表**：表数据量过大超过2G，通过某个字段进行分区
+>
+>   > ~~~SQL
+>   > -- oracle 创建表时候未建分区，后续必须转为分区表才能添加分区
+>   > create table table_name(
+>   > column_1 datatype,
+>   > column_2 datatype,
+>   > column_3 datatype,
+>   > column_4 datatype,
+>   > ) 
+>   > -- 创建range类型分区
+>   > partition by range(column_1)(
+>   > partition region_name values less then('value'),
+>   > partition region_name values less then('value'),
+>   > partition region_name values less then('value'),
+>   > )
+>   > -- partition 哈希模
+>   > partition by hash(column_1)(
+>   > partition 2
+>   > partition 4
+>   > partition 8
+>   > )
+>   > -- list 分区
+>   > partition by list(column_1)(
+>   > partition Li_ke value ('value','value','value') tablespace xxx,
+>   > partition Li_ke_1 value ('value','value','value') tablespace xxx
+>   > )
+>   > -- 组合分区
+>   > partition by range(score)
+>   > 	subpartition by hash(id)
+>   > 	subpartitions 2 store in (ccrpt,sjfx)
+>   > 	(
+>   > 		partition part1 values less than(60),
+>   > 		partition part2 values less than(80),
+>   > 		partition part3 values less than(maxvalue)
+>   > );
+>   > 
+>   > -- 添加分区
+>   > alter table table_name add partition region_name values less then('value');
+>   > ~~~
+>
 > - **视图** (存储查询)
 >
 >   > - 普通视图（不存储任何数据）
@@ -430,7 +471,7 @@
 >   >   > select p.pid as id, p.name, a.address from test_person p,test_address a
 >   >   > where p.pid = a.aid;
 >   >   > ~~~
->   
+>
 > - **PL/SQL**
 >
 >   > - 存储过程/函数（用于执行系列的SQL）
