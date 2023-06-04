@@ -100,27 +100,45 @@
 >   >
 >   > CheckPoint：事务提交时保存脏页数据到redo log 中（原子性）
 >
+> - bin log：归档日志（记录操作的SQL语句）
+>
+>   > 1. 用于主从复制：Master端开启binlog，将binlog发送到各个Slave端，实现主从一致
+>   > 2. 数据恢复：使用`mysqlbinlog`工具恢复数据
+>   >
+>   > 日志格式
+>   >
+>   > - STATEMENT：基于SQL语句的复制
+>   > - ROW：基于行的复制
+>   > - MIXED
+>   
 > - undo log：回滚日志（数据版本控制）
 >
->   > 
+>   > undo log：记录事务开启前数据，事务提交后，判断存其他事务是否存在使用该版本数据决定回收还是保留，用于数据回滚，实现事务隔离机制。
+>   >
+>   > MVCC（多版本并发控制）：
+>   >
+>   >  undo log内容
+>   >
+>   > 1. trx_id：最近一次更新事务Id
+>   > 2. roll_pointer：指向上一个已提交的事务的数据指针
+>   > 3. m_ids：记录那些事务ID没提交
+>   > 4. min_trx_id：已提交的最小事务
+>   > 5. max_trx_id：下一个生成的事务Id（事务Id自增生成）
+>   > 6. creator_trx_id：生成undo log的事务Id
+>   >
+>   > ReadView：
+>   >
+>   > - creator_trx_id小于min_trx_id：当前事务只能读取到已提交的数据
 >
 > - 线程
 >
->   > 1. Mster Thread：负责将缓存池中的数据异步刷新到磁盘中（脏页刷新，合并插入缓存，undo页回收）
->   > 2. IO Thread
->   > 3. Purge Thread：事务提交线程（回收已使用的undo)
+>   > - Master Thread：循环将buffer pool中脏页刷入到磁盘中，配合change buffer清理undo页
+>   >
+>   > - IO Thread
+>   >
+>   > - Purge Thread： 清除行记录，对数据页行记录的真正删除操作和删除undo log
+>   > - page cleaner：脏页清除
 >
-> InnoDB性能监控
->
-> ~~~SQL
-> -- 查看Innodb 状态
-> show engine innodb status\G;
-> -- Buffer pool size 当前页数
-> -- Free buffers 空闲页数
-> -- Database pages 数据页 （Database + free <= buffer pool）
-> -- pages made young 显示LRU列表移动前端次数
-> -- buffer pool hit rate 缓存命中率（1000% 缓存池运行良好，通常不小于95%，小于95%存在全表扫描引起的LRU表污染）
-> ~~~
 
 
 
