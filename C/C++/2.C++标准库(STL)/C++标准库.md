@@ -138,7 +138,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->
+>  
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -174,7 +174,7 @@
 >
 > - 序列容器（顺序集合，使用数组，链表实现）
 >
->   1. 底层C数组：array，vector（动态数组），deque：查询快，增减慢
+>   1. 底层C数组：array，vector（动态数组），deque(双端队列)：查询快，增减慢
 >
 >      > ![image-20230523201359757](image-20230523201359757.png) 
 >      >
@@ -182,7 +182,7 @@
 >      >
 >      > <img src="image-20230523205424508.png" alt="image-20230523205424508" style="zoom:100%;" /> 
 >      >
->      > <img src="image-20230523205455532.png" alt="image-20230523205455532" style="zoom:100%;" /> 
+>      > <img src="image-20230523205455532.png" alt="image-20230523205455532" style="zoom:100%;" />  
 >
 >   2. 指针结构链表：list，forward_list（单向链表）：查询慢，增减快
 >
@@ -232,7 +232,15 @@
 >
 > - 无序容器（无序集合，使用散列表实现）
 >
+> - 容器适配器（上述容器中满足指定的操作）
+>
+>   1. Stack：栈（LIFO)
+>   2. Queue：队列
+>   3. Priority Queue：优先队列
+>
 > 迭代器（Iterator）
+>
+> 
 >
 > 算法（Algorithm）
 
