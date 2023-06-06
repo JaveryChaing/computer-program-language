@@ -68,7 +68,7 @@
 >
 > 时间相关类型
 >
-> - clock_t、time_t：实际上为long int 类型，将时间转为时间戳处理
+> - **C和POSIX提供的Date/Time函数**
 >
 >   ~~~C++
 >   // 获取当期时间戳（实际上时间戳为UTC，与时区无关）
@@ -86,6 +86,17 @@
 >   char strTime[100];
 >   // tm格式化成字符串 2022-10-07 20:46:01
 >   strftime(startTime,sizeof(startTime),"%Y-%m-%d %H:%M:%S",tm);
+>   
+>   // time_t 获取当期时间
+>   time_t now = time(nullptr);
+>   tm* ltm = localtime(&now);
+>   time_point<system_clock> now = system_clock::now();
+>   // 获取时间戳
+>   long long timestamp = system_now.time_since_epoch().count()
+>   // 等价于 duration<int64> sec(3);
+>   seconds sec(3);
+>   // 3000 毫秒，使用double类型包装
+>   duration<double, std::milli> ms3k(3000);
 >   ~~~
 >
 > - size_t：通常用在32位系统上时间戳处理（unsigned int)
@@ -127,7 +138,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->   
+>
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -137,22 +148,6 @@
 >   // C++14后可以用 constexpr表示一个常量时间间隔
 >   constexpr auto twoDays = 48h;
 >   constexpr auto my_duration_unit = 108ms;
->   
->   ~~~
->
-> **C、C++获取当前时间**：
->
-> ~~~C++
-> // time_t 获取当期时间
-> time_t now = time(nullptr);
-> tm* ltm = localtime(&now);
-> time_point<system_clock> now = system_clock::now();
-> // 获取时间戳
-> long long timestamp = system_now.time_since_epoch().count()
-> // 等价于 duration<int64> sec(3);
-> seconds sec(3);
-> // 3000 毫秒，使用double类型包装
-> duration<double, std::milli> ms3k(3000);
 > ~~~
 >
 > ![image-20230530095519797](image-20230530095519797.png) 
@@ -173,36 +168,73 @@
 >
 > ![image-20230523201021098](image-20230523201021098.png) 
 
-**array：**
+#### **STL标准模板库**
 
-> 模板类成员：
+> 容器（Container）：**容器里存储的是元素的拷贝、副本，而不是引用**
 >
-> ![image-20230523201359757](image-20230523201359757.png) 
+> - 序列容器（顺序集合，使用数组，链表实现）
 >
-> 模板运算符重载（需要泛元满足下面运算符）
+>   1. 底层C数组：array，vector（动态数组），deque：查询快，增减慢
 >
-> ![image-20230523201444973](image-20230523201444973.png)  
+>      > ![image-20230523201359757](image-20230523201359757.png) 
+>      >
+>      > **支持算数运算符重载**
+>      >
+>      > <img src="image-20230523205424508.png" alt="image-20230523205424508" style="zoom:100%;" /> 
+>      >
+>      > <img src="image-20230523205455532.png" alt="image-20230523205455532" style="zoom:100%;" /> 
 >
-> 模版函数
+>   2. 指针结构链表：list，forward_list（单向链表）：查询慢，增减快
 >
-> ![image-20230523204956535](image-20230523204956535.png) 
+>      > | 名称                                                         | 说明                                                         |
+>      > | :----------------------------------------------------------- | :----------------------------------------------------------- |
+>      > | [`assign`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#assign) | 将元素从列表中擦除并将一组新的元素复制到目标列表。           |
+>      > | [`back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#back) | 返回对列表中最后一个元素的引用。                             |
+>      > | [`begin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#begin) | 返回发现列表中第一个元素的位置的迭代器。                     |
+>      > | [`cbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#cbegin) | 返回发现列表中第一个元素的位置的常量迭代器。                 |
+>      > | [`cend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#cend) | 返回发现一个列表中最后一个元素之后的位置的敞亮表达式。       |
+>      > | [`clear`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#clear) | 消除列表中的全部元素。                                       |
+>      > | [`crbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#crbegin) | 返回发现反向列表中第一个元素的位置的常量迭代器。             |
+>      > | [`crend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#crend) | 返回用于发现反向列表中最后一个元素之后的位置的常量迭代器。   |
+>      > | [`emplace`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace) | 将构造的元素插入到列表中的指定位置。                         |
+>      > | [`emplace_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace_back) | 在列表的结尾处添加一个就地构造的元素。                       |
+>      > | [`emplace_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace_front) | 在列表的起始位置添加一个就地构造的元素。                     |
+>      > | [`empty`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#empty) | 测试列表是否为空。                                           |
+>      > | [`end`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#end) | 返回用于发现列表中最后一个元素之后的位置的迭代器。           |
+>      > | [`erase`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#erase) | 从列表中的指定位置移除一个或一系列元素。                     |
+>      > | [`front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#front) | 返回对列表中第一个元素的引用。                               |
+>      > | [`get_allocator`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#get_allocator) | 返回用于构造列表的 `allocator` 对象的一个副本。              |
+>      > | [`insert`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#insert) | 将一个、几个或一系列元素插入列表中的指定位置。               |
+>      > | [`max_size`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#max_size) | 返回列表的最大长度。                                         |
+>      > | [`merge`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#merge) | 将元素从参数列表移除，将它们插入目标列表，将新的组合元素集以升序或其他指定顺序排序。 |
+>      > | [`pop_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#pop_back) | 删除列表末尾的元素。                                         |
+>      > | [`pop_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#pop_front) | 删除列表起始处的一个元素。                                   |
+>      > | [`push_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#push_back) | 在列表的末尾添加元素。                                       |
+>      > | [`push_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#push_front) | 在列表的开头添加元素。                                       |
+>      > | [`rbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#rbegin) | 返回发现反向列表中第一个元素的位置的迭代器。                 |
+>      > | [`remove`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#remove) | 清除列表中与指定值匹配的元素。                               |
+>      > | [`remove_if`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#remove_if) | 将满足指定谓词的元素从列表中消除。                           |
+>      > | [`rend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#rend) | 返回发现反向列表中最后一个元素之后的位置的迭代器。           |
+>      > | [`resize`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#resize) | 为列表指定新的大小。                                         |
+>      > | [`reverse`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#reverse) | 反转列表中元素的顺序。                                       |
+>      > | [`size`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#size) | 返回列表中元素的数目。                                       |
+>      > | [`sort`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#sort) | 按升序或其他顺序关系排列列表中的元素。                       |
+>      > | [`splice`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#splice) | 将元素从自变量列表中删除或将它们插入目标列表。               |
+>      > | [`swap`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#swap) | 交换两个列表的元素。                                         |
+>      > | [`unique`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#unique) | 从列表中删除满足某些其他二元谓词的相邻重复元素或相邻元素。   |
 >
-> ~~~C++
->  array<int,4> c0;
->  // c0获取元素
->  cout << " " << get<1>(c0);
->  cout << " " << get<3>(c0) << endl;
-> // 交换c0，c1中元素
->  swap(c0,c1);
-> ~~~
+> - 关联容器（已排序集合，使用二叉树实现）
 >
-> **array类**
+>   1. set：元素更具value排序，不重复
+>   2. multiset：元素排序，允许重复
+>   3. map
+>   4. multiamp：允许相同的key
 >
-> 成员
+> - 无序容器（无序集合，使用散列表实现）
 >
-> ![image-20230523205424508](image-20230523205424508.png) 
+> 迭代器（Iterator）
 >
-> ![image-20230523205455532](image-20230523205455532.png) 
+> 算法（Algorithm）
 
 #### **atomic**：创建支持原子操作的类型的类和类模板(不支持浮点)
 
@@ -237,7 +269,10 @@
 > - ref(T value) = T & value
 > - cref(T & value) = T value
 >
->  
+
+
+
+
 
 
 
