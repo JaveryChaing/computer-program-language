@@ -138,7 +138,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->      
+>        
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -169,7 +169,7 @@
 
 #### **STL标准模板库**
 
-> 容器（Container）：**容器里存储的是元素的拷贝、副本，而不是引用，**通常元素满足复制构造函数，移动构造函数。
+> 容器（Container）：**容器里存储的是元素的拷贝、副本。**通常元素需要满足复制构造函数，移动构造函数。
 >
 > - 元素类型
 >   1. value_type
