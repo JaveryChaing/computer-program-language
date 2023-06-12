@@ -1,5 +1,7 @@
 ## [C++标准库](https://learn.microsoft.com/zh-cn/cpp/standard-library/cpp-standard-library-header-files?view=msvc-170)
 
+#### **标准头文件**
+
 > |       类别       |                          标准头文件                          |
 > | :--------------: | :----------------------------------------------------------: |
 > |       算法       |             `<algorithm>, <cstdlib>, <numeric>`              |
@@ -21,7 +23,6 @@
 > |       时间       |                     `<chrono>、<ctime>`                      |
 > |      本地化      | `<clocale>、<codecvt>、<cvt/wbuffer>、<cvt/wstring>、<locale>` |
 > |     语言支持     | `<cfloat>、<climits>、<codecvt> 、<compare>、<contract>、<coroutine>、<csetjmp>、<csignal>、<cstdarg>、<cstddef>、<cstdint>、<cstdlib>、<exception>、<initializer_list>、<limits>、<new>、<typeinfo>、<version>` |
->
 
 #### **C++11语言特性**
 
@@ -42,19 +43,15 @@
 > - constrxper
 >
 
-#### **algorithm：C++标准容器模板函数**(对各种数据结构进行操作)
+#### **atomic**：创建支持原子操作的类型的类和类模板(不支持浮点)
 
-> adjacent_find：查找容器中条件相等的元素 
->
 > ~~~C++
-> // twice 二元函数，返回bool值
-> auto result =  adjacent_find(L.begin( ), L.end( ), twice )
-> if(result == L.end()) // 未满足条件
+> // 所属atomic::atomic命名空间
+> // 构造方法
+> atomic(const atomic &);
+> atomic();
+> atomic(Ty Value)noexcept;
 > ~~~
->
-> **辅助函数**
->
-> ![image-20230526145931387](image-20230526145931387.png) 
 
 #### **Chrono** 时间处理函数
 
@@ -138,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->        
+>    
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -148,8 +145,9 @@
 >   // C++14后可以用 constexpr表示一个常量时间间隔
 >   constexpr auto twoDays = 48h;
 >   constexpr auto my_duration_unit = 108ms;
-> 
->![image-20230530095519797](image-20230530095519797.png) 
+>   ~~~
+>  
+>   ![image-20230530095519797](image-20230530095519797.png) 
 
 #### **cstdlib：程序钩子函数**
 
@@ -167,25 +165,32 @@
 >
 > ![image-20230523201021098](image-20230523201021098.png) 
 
+#### **通用工具**
+
+> pair：以key/value组成的struct数据模板结构，定义在<utility>中，用于构造map容器，及函数多返回值
+>
+> tuple：多元数据结构，可以存放任意数据类型，定义在<tuple>中,使用std空间，返回多个元组，
+>
+> - tuple_size(tupletype)::value : 获取元素个数
+> - tuple_element<idx，tupletype>::type：获取第idx个元素类型
+> - tuple_cat()：拼接多个tuple
+>
+> **Type Trait：模板类型判断**
+>
+> - ![image-20230526143638650](image-20230526143638650.png) 
+> - ![image-20230526143737006](image-20230526143737006.png)  
+> - ![image-20230526143830894](image-20230526143830894.png) 
+> - ![image-20230526145000203](image-20230526145000203.png) 
+> - ![image-20230526145159125](image-20230526145159125.png) 
+>
+> Reference Wrapper ：<functional>模板引用转换
+>
+> - ref(T value) = T & value
+> - cref(T & value) = T value
+
 #### **STL标准模板库**
 
-> 容器（Container）：**容器里存储的是元素的拷贝、副本。**通常元素需要满足复制构造函数，移动构造函数。
->
-> - 元素类型
->   1. value_type
->   2. reference
->   3. const_reference
->   4. iterator
->   5. const_iterator
->   6. reverse_iterator
->   7. const_reverse_iterator
->   8. pointer
->   9. cosnt_pointer
-> - 满足STL容器元素要求
->   1. 空参构造函数
->   2. Copy构造函数（深拷贝，不影响原值）
->   3. 重载`=`操作符（初始化对象时调用Copy构造函数）
->   4. Move构造函数（构造函数是右值引用，转移原值内存所有权）
+> 容器（Container）：**容器里存储的是元素的拷贝、副本，而不是引用**
 >
 > - 序列容器（顺序集合，使用数组，链表实现）
 >
@@ -247,53 +252,11 @@
 >
 > - 无序容器（无序集合，使用散列表实现）
 >
->   1. unordered_map
->   2. unordered_set
->
 > - 容器适配器（上述容器中满足指定的操作）
 >
 >   1. Stack：栈（LIFO)
 >   2. Queue：队列
 >   3. Priority Queue：优先队列
->
-> **迭代器（Iterator）**
->
-> 
->
-> 算法（Algorithm）
-
-#### **atomic**：创建支持原子操作的类型的类和类模板(不支持浮点)
-
-> ~~~C++
-> // 所属atomic::atomic命名空间
-> // 构造方法
-> atomic(const atomic &);
-> atomic();
-> atomic(Ty Value)noexcept;
-> ~~~
-
-#### **通用工具**
-
-> pair：以key/value组成的struct数据模板结构，定义在<utility>中，用于构造map容器，及函数多返回值
->
-> tuple：多元数据结构，可以存放任意数据类型，定义在<tuple>中,使用std空间，返回多个元组，
->
-> - tuple_size(tupletype)::value : 获取元素个数
-> - tuple_element<idx，tupletype>::type：获取第idx个元素类型
-> - tuple_cat()：拼接多个tuple
->
-> **Type Trait：模板类型判断**
->
-> - ![image-20230526143638650](image-20230526143638650.png) 
-> - ![image-20230526143737006](image-20230526143737006.png)  
-> - ![image-20230526143830894](image-20230526143830894.png) 
-> - ![image-20230526145000203](image-20230526145000203.png) 
-> - ![image-20230526145159125](image-20230526145159125.png) 
->
-> Reference Wrapper ：<functional>模板引用转换
->
-> - ref(T value) = T & value
-> - cref(T & value) = T value
 >
 
 
