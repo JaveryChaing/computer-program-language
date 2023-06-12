@@ -135,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->    
+>        
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -153,11 +153,11 @@
 
 > ![image-20230523200308129](image-20230523200308129.png) 
 >
-> #### **字符转数字**
+> **字符转数字**
 >
 > ![image-20230523200701533](image-20230523200701533.png) 
 >
-> #### **数学运算**
+> **数学运算**
 >
 > ![image-20230523200949274](image-20230523200949274.png) 
 >
@@ -258,6 +258,41 @@
 >   2. Queue：队列
 >   3. Priority Queue：优先队列
 >
+
+#### **STL迭代器**
+
+> - Output迭代器：向前写入（只能写入/更改元素）
+>
+>   > ~~~c++
+>   > // 当val写入当前迭代器位置
+>   > *iter = val;
+>   > // 向前步进，返回新位置（前一个元素）
+>   > ++iter;
+>   > //向前步进，返回当前位置（旧位置）
+>   > iter++;
+>   > // 复制元素
+>   > type(iter)
+>   > ~~~
+>
+> - Input迭代器：向前读取一次（只能读取/判断元素）
+>
+>   > ~~~C++
+>   > *iter;
+>   > iter->member;
+>   > ++iter;
+>   > iter++;
+>   > iter!=iter2;
+>   > iter == iter2;
+>   > type(iter)
+>   > ~~~
+>
+> - Forward
+>
+> - Bidirectional：支持迭代器`+，-`操作，支持读取和写入
+>
+> - Random-access：随机读取
+>
+> 
 
 
 
