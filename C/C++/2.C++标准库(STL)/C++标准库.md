@@ -135,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->          
+>              
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -329,6 +329,49 @@
 
 **STL算法**
 
+> - **非变动算法**（不改变元素次序和值，通过input或forward迭代器实现）
+>
+>   1. count()，count_if()
+>   2. min_element()，max_element()
+>   3. search()、search_n()
+>   4. find()，find_if()，find_first_of()，find_end()
+>   5. adjacent_find()：查找连续两个条件同元素
+>   6. equal()
+>   7. is_permutaion()：判断两个容器是否包含相等元素
+>   8. is_sorted()，is_partitioned()
+>   9. is_heap()，is_heap_until()
+>   10. all_of()，any_of()，none_of()
+>   
+> - **变更算法**
+>
+>   1. for_each()：引用传参
+>   2. transform()：元素转换
+>   3. copy_if()、copy()，copy_backward()
+>   4. move()，move_backward()
+>   5. merge()
+>   6. swap_ranges()
+>   7. fill()，fill_n()
+>   8. generate()，generate()_n
+>   9. iota()
+>   10. replace()，replace_if()，replace_copy()，replace_copy_if()
+>
+> - **移除算法**
+>
+>   1. remove()，remove_if()，remove_copy()，remove_copy_if()
+>   2. unique()，unique_copy()
+>
+> - **排序算法**（通过元素赋值和转换改变元素顺序）
+>
+>   1. reverse()，reverse_copy()
+>   2. rotate()，rotate_copy()：首位连接移动
+>   3. next_permutation()，prev_permutation()：获取容器中已排序元素值
+>   4. shuffle()，random_shuffle()：洗牌（打乱元素顺序）
+>   5. sort()，partial_sort()
+>   6. nth_element()：第n个元素位置开始排序
+>   7. make_heap()，push_heap()，pop_heap()，sort_heap()
+>
+>   
+>
 > 
 
 
