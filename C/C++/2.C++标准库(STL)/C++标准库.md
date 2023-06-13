@@ -135,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->        
+>          
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -272,6 +272,10 @@
 >   > iter++;
 >   > // 复制元素
 >   > type(iter)
+>   > // Insert 迭代器
+>   > push_back(val);
+>   > push_front(val);
+>   > insert(pos,value);
 >   > ~~~
 >
 > - Input迭代器：向前读取一次（只能读取/判断元素）
@@ -283,7 +287,7 @@
 >   > iter++;
 >   > iter!=iter2;
 >   > iter == iter2;
->   > type(iter)
+>   > type(iter);
 >   > ~~~
 >
 > - Forward
@@ -292,6 +296,39 @@
 >
 > - Random-access：随机读取
 >
+>   > ~~~C++
+>   > iter[n];
+>   > ~~~
+>
+> - stream
+>
+>   > ~~~C++
+>   > // Ostream：输出流迭代器 ,元素需要重载 << 操作符，用于拷贝容器或配合cout输出元素值
+>   > //配合copy，将元素赋值到out_it中（写）
+>   > ostream_iterator<int> out_it(cout);
+>   > ostream_iterator<int> out_it(cout,",");
+>   > // 拷贝元素
+>   > ostream_iterator<int> out_it_1(out_id);
+>   > 
+>   > // istream_iterator：输入迭代器（读取）
+>   > istream_iterator<int> intReader(cin);
+>   > ~~~
+>
+> - Move()：移动元素内存空间
+>
+>   > ~~~C++
+>   > make_move_iterator(s.begin(),make_move_iterator(s.end()));
+>   > ~~~
+>
+> 迭代器辅助函数
+>
+> 1. advance(iterator,n)：当前位置前进或后退（只读）
+> 2. next()，prev()：前进或后退位置
+> 3. distance()：返回两个迭代器之间间隔
+> 4. iter_swap()：交换元素值
+
+**STL算法**
+
 > 
 
 
