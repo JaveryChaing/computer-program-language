@@ -194,55 +194,10 @@
 >
 > - 序列容器（顺序集合，使用数组，链表实现）
 >
->   1. 底层C数组：array，vector（动态数组），deque(双端队列)：查询快，增减慢
+>   1. 底层C数组：array，vector（动态数组），deque(双端队列)：查询快，增减慢  
 >
->      > ![image-20230523201359757](image-20230523201359757.png) 
->      >
->      > **支持算数运算符重载**
->      >
->      > <img src="image-20230523205424508.png" alt="image-20230523205424508" style="zoom:100%;" /> 
->      >
->      > <img src="image-20230523205455532.png" alt="image-20230523205455532" style="zoom:100%;" />  
->
->   2. 链表：list，forward_list（单向链表）：查询慢，增减快，不支持随机迭代器
->
->      > | 名称                                                         | 说明                                                         |
->      > | :----------------------------------------------------------- | :----------------------------------------------------------- |
->      > | [`assign`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#assign) | 将元素从列表中擦除并将一组新的元素复制到目标列表。           |
->      > | [`back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#back) | 返回对列表中最后一个元素的引用。                             |
->      > | [`begin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#begin) | 返回发现列表中第一个元素的位置的迭代器。                     |
->      > | [`cbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#cbegin) | 返回发现列表中第一个元素的位置的常量迭代器。                 |
->      > | [`cend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#cend) | 返回发现一个列表中最后一个元素之后的位置的敞亮表达式。       |
->      > | [`clear`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#clear) | 消除列表中的全部元素。                                       |
->      > | [`crbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#crbegin) | 返回发现反向列表中第一个元素的位置的常量迭代器。             |
->      > | [`crend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#crend) | 返回用于发现反向列表中最后一个元素之后的位置的常量迭代器。   |
->      > | [`emplace`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace) | 将构造的元素插入到列表中的指定位置。                         |
->      > | [`emplace_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace_back) | 在列表的结尾处添加一个就地构造的元素。                       |
->      > | [`emplace_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace_front) | 在列表的起始位置添加一个就地构造的元素。                     |
->      > | [`empty`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#empty) | 测试列表是否为空。                                           |
->      > | [`end`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#end) | 返回用于发现列表中最后一个元素之后的位置的迭代器。           |
->      > | [`erase`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#erase) | 从列表中的指定位置移除一个或一系列元素。                     |
->      > | [`front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#front) | 返回对列表中第一个元素的引用。                               |
->      > | [`get_allocator`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#get_allocator) | 返回用于构造列表的 `allocator` 对象的一个副本。              |
->      > | [`insert`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#insert) | 将一个、几个或一系列元素插入列表中的指定位置。               |
->      > | [`max_size`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#max_size) | 返回列表的最大长度。                                         |
->      > | [`merge`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#merge) | 将元素从参数列表移除，将它们插入目标列表，将新的组合元素集以升序或其他指定顺序排序。 |
->      > | [`pop_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#pop_back) | 删除列表末尾的元素。                                         |
->      > | [`pop_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#pop_front) | 删除列表起始处的一个元素。                                   |
->      > | [`push_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#push_back) | 在列表的末尾添加元素。                                       |
->      > | [`push_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#push_front) | 在列表的开头添加元素。                                       |
->      > | [`rbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#rbegin) | 返回发现反向列表中第一个元素的位置的迭代器。                 |
->      > | [`remove`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#remove) | 清除列表中与指定值匹配的元素。                               |
->      > | [`remove_if`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#remove_if) | 将满足指定谓词的元素从列表中消除。                           |
->      > | [`rend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#rend) | 返回发现反向列表中最后一个元素之后的位置的迭代器。           |
->      > | [`resize`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#resize) | 为列表指定新的大小。                                         |
->      > | [`reverse`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#reverse) | 反转列表中元素的顺序。                                       |
->      > | [`size`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#size) | 返回列表中元素的数目。                                       |
->      > | [`sort`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#sort) | 按升序或其他顺序关系排列列表中的元素。                       |
->      > | [`splice`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#splice) | 将元素从自变量列表中删除或将它们插入目标列表。               |
->      > | [`swap`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#swap) | 交换两个列表的元素。                                         |
->      > | [`unique`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#unique) | 从列表中删除满足某些其他二元谓词的相邻重复元素或相邻元素。   |
->
+>   2. 链表：list，forward_list（单向链表）：查询慢，增减快，**不支持随机迭代器**
+>   
 > - 关联容器（已排序集合，使用红黑树实现，默认less顺序排序）
 >
 >   1. set：元素更具value排序，不重复
@@ -250,7 +205,19 @@
 >   3. map
 >   4. multiamp：允许相同的key
 >
+>   | 名称        | 说明       |
+>   | ----------- | ---------- |
+>   | key_type    | 关键值类型 |
+>   | mapped_type | 映射值类型 |
+>   | key_compare | 比较标准   |
+>
 > - 无序容器（无序集合，使用散列表实现）
+>
+>   | 名称                                  | 说明         |
+>   | ------------------------------------- | ------------ |
+>   | hasher                                | 哈希函数类型 |
+>   | key_euqal                             | 等值判断     |
+>   | local_iterator 、const_local_iterator | 桶迭代器     |
 >
 > - 容器适配器（上述容器中满足指定的操作）
 >
@@ -265,6 +232,69 @@
 >   3. bitset<N>
 >   4. vector<bool>
 >
+>   
+>
+> **容器通用方法**
+>
+> |                          名称                          | 说明（C是个容器，默认情况下使用C::allocator_type{} 分配空间） |
+> | :----------------------------------------------------: | ------------------------------------------------------------ |
+> |                  **容器初始化及赋值**                  |                                                              |
+> |               C c{}，C c{ele}，C c{b,e}                | 初始化容器c  ，拷贝[b,e)区间容器                             |
+> |              C c(n)，C c(n,x)，C c(n,x,a)              | 初始化容器c，容量为n，使用value_type{}分配空间，不使用关联容器 |
+> |                C c{c2}，C c {move(c2)}                 | 拷贝，移动容器元素                                           |
+> |                         c.~C()                         | 析构函数，销毁c的元素，释放资源                              |
+> |                  c2 = c，c2 = move(c)                  | 拷贝赋值                                                     |
+> |                     c = {element}                      | 重写赋值                                                     |
+> |     c.assign(n,x)，c.assign(b,e)，c.assign({ele})      | 将指定位置容器赋值给c，不支持关联容器                        |
+> |                      **元素访问**                      |                                                              |
+> |                       c.front()                        | 不支持关联容器                                               |
+> |                        c.back()                        | 不支持关联容器和forward_list                                 |
+> |                     c[i]，c.at(i)                      | 不支持链表和关联容器                                         |
+> |                     c[k]，c.at(k)                      | 适用于map，unordered_map                                     |
+> |         **适用于vector，deque，list元素新增**          |                                                              |
+> | c.push_back(v)，c.pop_back()<br />e_emplace_back(args) | 末尾添加或删除元素                                           |
+> |                    c.insert(p,n,x)                     | 将x插入到p之前，n：x的拷贝数量                               |
+> |                   c.emplace(p,args)                    | 适用args创建元素，插入到p之前，不使用关联容器                |
+> |                       c.erase(p)                       | 将p处元素删除                                                |
+>
+> **容器通用方法**
+>
+> | 名称                                                         | 说明                                                         |
+> | :----------------------------------------------------------- | :----------------------------------------------------------- |
+> | [`assign`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#assign) | 将元素从列表中擦除并将一组新的元素复制到目标列表。           |
+> | [`back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#back) | 返回对列表中最后一个元素的引用。                             |
+> | [`begin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#begin) | 返回发现列表中第一个元素的位置的迭代器。                     |
+> | [`cbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#cbegin) | 返回发现列表中第一个元素的位置的常量迭代器。                 |
+> | [`cend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#cend) | 返回发现一个列表中最后一个元素之后的位置的敞亮表达式。       |
+> | [`clear`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#clear) | 消除列表中的全部元素。                                       |
+> | [`crbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#crbegin) | 返回发现反向列表中第一个元素的位置的常量迭代器。             |
+> | [`crend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#crend) | 返回用于发现反向列表中最后一个元素之后的位置的常量迭代器。   |
+> | [`emplace`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace) | 将构造的元素插入到列表中的指定位置。                         |
+> | [`emplace_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace_back) | 在列表的结尾处添加一个就地构造的元素。                       |
+> | [`emplace_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#emplace_front) | 在列表的起始位置添加一个就地构造的元素。                     |
+> | [`empty`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#empty) | 测试列表是否为空。                                           |
+> | [`end`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#end) | 返回用于发现列表中最后一个元素之后的位置的迭代器。           |
+> | [`erase`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#erase) | 从列表中的指定位置移除一个或一系列元素。                     |
+> | [`front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#front) | 返回对列表中第一个元素的引用。                               |
+> | [`get_allocator`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#get_allocator) | 返回用于构造列表的 `allocator` 对象的一个副本。              |
+> | [`insert`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#insert) | 将一个、几个或一系列元素插入列表中的指定位置。               |
+> | [`max_size`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#max_size) | 返回列表的最大长度。                                         |
+> | [`merge`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#merge) | 将元素从参数列表移除，将它们插入目标列表，将新的组合元素集以升序或其他指定顺序排序。 |
+> | [`pop_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#pop_back) | 删除列表末尾的元素。                                         |
+> | [`pop_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#pop_front) | 删除列表起始处的一个元素。                                   |
+> | [`push_back`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#push_back) | 在列表的末尾添加元素。                                       |
+> | [`push_front`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#push_front) | 在列表的开头添加元素。                                       |
+> | [`rbegin`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#rbegin) | 返回发现反向列表中第一个元素的位置的迭代器。                 |
+> | [`remove`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#remove) | 清除列表中与指定值匹配的元素。                               |
+> | [`remove_if`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#remove_if) | 将满足指定谓词的元素从列表中消除。                           |
+> | [`rend`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#rend) | 返回发现反向列表中最后一个元素之后的位置的迭代器。           |
+> | [`resize`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#resize) | 为列表指定新的大小。                                         |
+> | [`reverse`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#reverse) | 反转列表中元素的顺序。                                       |
+> | [`size`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#size) | 返回列表中元素的数目。                                       |
+> | [`sort`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#sort) | 按升序或其他顺序关系排列列表中的元素。                       |
+> | [`splice`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#splice) | 将元素从自变量列表中删除或将它们插入目标列表。               |
+> | [`swap`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#swap) | 交换两个列表的元素。                                         |
+> | [`unique`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#unique) | 从列表中删除满足某些其他二元谓词的相邻重复元素或相邻元素。   |
 
 #### **STL迭代器**
 
