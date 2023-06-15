@@ -135,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->              
+>                
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -190,7 +190,7 @@
 
 #### **STL标准模板库**
 
-> 容器（Container）：**容器里存储的是元素的拷贝、副本，而不是引用**
+> 容器（Container）：**容器里存储的是元素的拷贝、副本，而不是引用**,必须实现复制构造，移动构造
 >
 > - 序列容器（顺序集合，使用数组，链表实现）
 >
@@ -204,7 +204,7 @@
 >      >
 >      > <img src="image-20230523205455532.png" alt="image-20230523205455532" style="zoom:100%;" />  
 >
->   2. 指针结构链表：list，forward_list（单向链表）：查询慢，增减快
+>   2. 链表：list，forward_list（单向链表）：查询慢，增减快，不支持随机迭代器
 >
 >      > | 名称                                                         | 说明                                                         |
 >      > | :----------------------------------------------------------- | :----------------------------------------------------------- |
@@ -243,7 +243,7 @@
 >      > | [`swap`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#swap) | 交换两个列表的元素。                                         |
 >      > | [`unique`](https://learn.microsoft.com/zh-cn/cpp/standard-library/list-class?view=msvc-170#unique) | 从列表中删除满足某些其他二元谓词的相邻重复元素或相邻元素。   |
 >
-> - 关联容器（已排序集合，使用二叉树实现）
+> - 关联容器（已排序集合，使用红黑树实现，默认less顺序排序）
 >
 >   1. set：元素更具value排序，不重复
 >   2. multiset：元素排序，允许重复
@@ -257,6 +257,13 @@
 >   1. Stack：栈（LIFO)
 >   2. Queue：队列
 >   3. Priority Queue：优先队列
+>   
+> - 拟容器
+>
+>   1. string
+>   2. array<T,N>
+>   3. bitset<N>
+>   4. vector<bool>
 >
 
 #### **STL迭代器**
