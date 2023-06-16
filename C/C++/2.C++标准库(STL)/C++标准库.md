@@ -135,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->                
+>                    
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -407,9 +407,27 @@
 >   6. nth_element()：第n个元素位置开始排序
 >   7. make_heap()，push_heap()，pop_heap()，sort_heap()
 >
->   
+
+**IOStream**
+
+> **Stream对象**
 >
-> 
+> - 全局Steam对象
+>   1. input stream：读取数据流
+>   2. output stream：写入数据流
+> - 标准IO通道
+>   1. cin
+>   2. cout
+>   3. cerr
+>   4. clog
+> - Stream操作符
+>   1. `>>`：
+>   2. `<<`：
+> - 操控器
+>   1. endl：刷新output缓冲区，并换行
+>   2. ends：输出`\0`,用作字符串的结束标志
+>   3. flush：刷新output缓冲区
+>   4. ws：读入并忽略空白字符
 
 
 
