@@ -135,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->                    
+>                      
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -197,7 +197,7 @@
 >   1. 底层C数组：array，vector（动态数组），deque(双端队列)：查询快，增减慢  
 >
 >   2. 链表：list，forward_list（单向链表）：查询慢，增减快，**不支持随机迭代器**
->   
+>
 > - 关联容器（已排序集合，使用红黑树实现，默认less顺序排序）
 >
 >   1. set：元素更具value排序，不重复
@@ -224,15 +224,16 @@
 >   1. Stack：栈（LIFO)
 >   2. Queue：队列
 >   3. Priority Queue：优先队列
->   
+>
 > - 拟容器
 >
 >   1. string
 >   2. array<T,N>
 >   3. bitset<N>
 >   4. vector<bool>
->
->   
+>   5. pair<T,U>
+>   6. tuple<T...>
+>   7. valarry<T>
 >
 > **容器通用方法**
 >
@@ -407,6 +408,38 @@
 >   6. nth_element()：第n个元素位置开始排序
 >   7. make_heap()，push_heap()，pop_heap()，sort_heap()
 >
+
+**内存与资源**
+
+> **资源管理指针**
+>
+> - unique_prt：独占指针 
+>
+>   > | 名称                                       | 说明（cp为包含的指针）                         |
+>   > | ------------------------------------------ | ---------------------------------------------- |
+>   > | unique_prt up {}                           | 默认构造函数，cp = nullprt                     |
+>   > | unique_prt up {cp}，unique_prt up {cp,del} | cp = p ，使用del释放器                         |
+>   > | unique_pet up {up2}，up = up2              | 移动构造函数，up.cp = up2.cp ,up2.cp = nullprt |
+>   > | up.~upique_prt()                           | cp!=nullprt，则调用cp的析构函数                |
+>   > | up = nullprt，up.reset(nullprt)            | 释放up对象，cp空间被回收                       |
+>   > | bool b (up)                                | 判断 cp是否为空                                |
+>   > | cp = *up，up.get()，up[n]                  | 取原指针（up[n]原指针必须是数组）              |
+>   > | p = up.release()                           | p = up.cp，up.cp = nullprt                     |
+>   > | up.reset(p)，up.reset()                    | 释放之前cp指针，up.cp = p                      |
+>   > | up.swap(up2)，swap(up,up2)                 | 交换cp指向                                     |
+>   > | up->m                                      | 等同 up.cp->m                                  |
+>
+> - shard_prt：共享指针，垃圾回收器
+>
+>   > | 名称                    | 说明(cp包含指针，uc使用计数)               |
+>   > | ----------------------- | ------------------------------------------ |
+>   > | shared_prt sp{p,del,a}  | cp = p ; uc = 1,del资源释放器，a资源分配器 |
+>   > | shared_prt sp {sp2}     | 赋值构造，uc ++                            |
+>   > | sp.~shard_prt()         | --uc；释放sp对象，uc =0 释放cp对象         |
+>   > | sp.reset()，sp.reset(p) | --uc；sp.cp = p                            |
+>   > | sp.use_cont()           | 返回uc数，若cp == nullprt，则uc = 0        |
+>
+> - weak_prt
 
 **IOStream**
 
