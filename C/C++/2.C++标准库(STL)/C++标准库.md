@@ -135,7 +135,7 @@
 >   template <class Rep, class Period> class duration;
 >   template <class Rep, class Period = ratio<1>> class duration;
 >   template <class Rep, class Period1, class Period2> class duration <duration<Rep, Period1>, Period2>;
->                      
+>                          
 >   duration::period 获取单位类型
 >   // 指定时间间隔类型20秒间隔，实际上为包装的 duration类型
 >   std::chrono::seconds  sec(20);
@@ -195,9 +195,8 @@
 > - 序列容器（顺序集合，使用数组，链表实现）
 >
 >   1. 底层C数组：array，vector（动态数组），deque(双端队列)：查询快，增减慢  
->
 >   2. 链表：list，forward_list（单向链表）：查询慢，增减快，**不支持随机迭代器**
->
+>   
 > - 关联容器（已排序集合，使用红黑树实现，默认less顺序排序）
 >
 >   1. set：元素更具value排序，不重复
@@ -219,11 +218,11 @@
 >   | key_euqal                             | 等值判断     |
 >   | local_iterator 、const_local_iterator | 桶迭代器     |
 >
-> - 容器适配器（上述容器中满足指定的操作）
+> - 容器适配器
 >
->   1. Stack：栈（LIFO)
->   2. Queue：队列
->   3. Priority Queue：优先队列
+>   1. stack<T>：deque<T>容器模板，实现LIFO
+>   2. queue<T>：queue<T>模板，实现FIFO
+>   3. priority_queue<T>：vector<T>模板
 >
 > - 拟容器
 >
@@ -411,12 +410,13 @@
 
 **内存与资源**
 
-> **资源管理指针**
+> **资源管理指针**：与原指针对比，不允许指针算法运算
 >
 > - unique_prt：独占指针 
 >
 >   > | 名称                                       | 说明（cp为包含的指针）                         |
 >   > | ------------------------------------------ | ---------------------------------------------- |
+>   > | make_unique<T>(n,value)                    | 初始化n个value值的指针                         |
 >   > | unique_prt up {}                           | 默认构造函数，cp = nullprt                     |
 >   > | unique_prt up {cp}，unique_prt up {cp,del} | cp = p ，使用del释放器                         |
 >   > | unique_pet up {up2}，up = up2              | 移动构造函数，up.cp = up2.cp ,up2.cp = nullprt |
@@ -429,7 +429,7 @@
 >   > | up.swap(up2)，swap(up,up2)                 | 交换cp指向                                     |
 >   > | up->m                                      | 等同 up.cp->m                                  |
 >
-> - shard_prt：共享指针，垃圾回收器
+> - shard_prt：共享指针，uc为0时释放原指针
 >
 >   > | 名称                    | 说明(cp包含指针，uc使用计数)               |
 >   > | ----------------------- | ------------------------------------------ |
@@ -439,7 +439,7 @@
 >   > | sp.reset()，sp.reset(p) | --uc；sp.cp = p                            |
 >   > | sp.use_cont()           | 返回uc数，若cp == nullprt，则uc = 0        |
 >
-> - weak_prt
+> - weak_prt：弱引用指针，从shard_prt创建但不增加引用计数。当最后一个shared_prt释放时，weak_prt<T>被释放
 
 **IOStream**
 
