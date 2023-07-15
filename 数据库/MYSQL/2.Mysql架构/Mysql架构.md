@@ -70,9 +70,10 @@
 >   >    > |               TRIGGERS                |                 触发器                  |
 >   >    > |               ROUTINES                |                存储过程                 |
 >   >    > | TABLE_CONSTRAINTS<br>KEY_COLUMN_USAGE |             约束字段及外键              |
->   >    > |                                       |                                         |
 >   >
 >   > 4. sys：查询库（服务器状态，数据库，表，存储过程，触发器信息通过视图关联查询）
+>   >
+>   >    
 
 #### **InnoDB引擎**
 
