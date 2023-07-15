@@ -386,15 +386,15 @@
   >   > >                 this.value = value;
   >   > >                 this.next = next;
   >   > >             }
-  >   > >                                                                                                             
+  >   > >                                                                                                                 
   >   > >             public final K getKey()        { return key; }
   >   > >             public final V getValue()      { return value; }
   >   > >             public final String toString() { return key + "=" + value; }
-  >   > >                                                                                                             
+  >   > >                                                                                                                 
   >   > >             public final int hashCode() {
   >   > >                 return Objects.hashCode(key) ^ Objects.hashCode(value);
   >   > >             }
-  >   > >                                                                                                             
+  >   > >                                                                                                                 
   >   > >             public final V setValue(V newValue) {
   >   > >                 V oldValue = value;
   >   > >                 value = newValue;
@@ -469,7 +469,7 @@
   >   > >         afterNodeInsertion(evict);
   >   > >         return null;
   >   > >     }
-  >   > >                                                                                                             
+  >   > >                                                                                                                 
   >   > >     ~~~
   >   >
   >   > **ConcurrentHashMap** （涉及分段锁，volatile，CAS，链表，红黑树）
@@ -913,7 +913,7 @@
   >
   > <img src="img\image-20230129095427841.png" alt="image-20230129095427841" style="zoom:67%;" /> <img src="img\image-20230129100913237.png" alt="image-20230129100913237" style="zoom:67%;" /> 
   >
-  > 
+  >  **[javassist](http://www.javassist.org/)**：java反射工具类
   >
   > loadClass 类加载器源码
   >
@@ -1087,7 +1087,6 @@
   > ~~~
   > 
   > **字节码校验**
-  >
   
 - #### **RMI** (Remote Method Invocation)
 
