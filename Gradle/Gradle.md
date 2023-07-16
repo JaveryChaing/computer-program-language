@@ -4,34 +4,47 @@
 
 > ![image-20230129160448332](img\image-20230129160448332.png) 
 >
-> 1. gradle wrapper：gradle构建插件，在项目新建时候生成，Gradle Wrapper 为 Gradle 包装器，是将 Gradle 再次包装
+> 1. gradle：编译，打包，测试工具
 >
-> 2. gradle wrapper启动脚本
+> 2. gradle/wrapper：由gradle工具生成，记录当前项目编译，打包方式（属于项目一部分，需要提交到版本依赖）
 >
-> 3. 项目描述文件，定义项目名称，包含模块
+>    > ~~~properties
+>    > # gradle-wrapper.properties  gradle-wrapper 环境变量配置
+>    > distributionBase=GRADLE_USER_HOME
+>    > distributionPath=wrapper/dists
+>    > # 指定镜像仓库下载当前版本gradle
+>    > distributionUrl=https\://mirrors.cloud.tencent.com/gradle/gradle-7.5-bin.zip
+>    > zipStoreBase=GRADLE_USER_HOME
+>    > zipStorePath=wrapper/dists
+>    > ~~~
 >
->    > ```groovy
->    > // 项目名称
->    > rootProject.name = 'demo'
->    > // 包含模块
->    > include('app')
->    > ```
+> 3. gradle.properties 环境变量，需要按配置新建文件，与项目同级目录
 >
-> 4. 项目构建脚本（项目依赖，打包方式）
+>    > ~~~properties
+>    > #设置jvm内存大小
+>    > org.gradle.jvmargs= -Xmx4g -Xms512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+>    > #开启并行编译任务
+>    > org.gradle.parallel= true
+>    > #启用新的孵化模式
+>    > org.gradle.configureondemand= true
+>    > #开启 Gradle 缓存
+>    > org.gradle.caching= true
+>    > 
+>    > #maven repo url
+>    > MAVEN_REPO=https://maven.aliyun.com/repository/public/
+>    > #springboot version
+>    > VERSION_SPRINGBOOT=2.7.5
+>    > #spring plugin version
+>    > VERSION_SPRING_PLUGIN=1.0.15.RELEASE
+>    > #group
+>    > GROUP=com
+>    > #version
+>    > VERSION=1.0.0
+>    > ~~~
 >
->    > <img src="img\image-20230129161431564.png" alt="image-20230129161431564" style="zoom:67%;" /> 
->    >
->    > 1.  应用程序插件以添加用Java构建CLI应用程序的支持
->    >
->    >    ![image-20230129161711293](img\image-20230129161711293.png) 
->    >
->    > 2. 使用maven仓库解决依赖关系
->    >
->    > 3. 测试依赖
->    >
->    > 4. 应用依赖
->    >
->    > 5. main函数所在类
+> 4. settings.gradle：定义项目名，模块目录
+>
+> 5. build.gradle：模块依赖文件
 
 - #### **Groovy**  基于java的动态脚本语言
 
@@ -57,7 +70,7 @@
   >
   > 4. 依赖管理配置
   >
-  >    - implementation：编译时只能在当前模块访问（其他模块使用该依赖时将无法通过编译），编译效率最高
+  >    - implementation：编译时只能在当前模块访问（其他模块使用该依赖时将无法通过编译）编译效率最高
   >
   >    - api：模块之间依赖可以编译传递
   >
@@ -93,15 +106,8 @@
   >        }
   >        ~~~
   >
-  > plugins：
-  >
-  > 1. apply plugin：二进制插件，通常是jar包
-  > 2. apply from：应用脚本插件
-  >
-  > task：定义任务
-  >
   > 
-
+  
 - **gradle 全局配置文件**
 
   > ~~~java
@@ -150,12 +156,9 @@
   >         maven { url GRADLE_PLUGIN_URL }
   >     }
   > }
-  > 
-  > 
   > ~~~
-  >
   > 
-
+  
 - #### **Springboot 多模块构建  settings.gradle**
 
   > ~~~groovy
@@ -195,9 +198,7 @@
   >         testImplementation 'org.springframework.boot:spring-boot-starter-test'
   >         testImplementation 'io.projectreactor:reactor-test'
   >     }
-  > 
   > }
-  > 
   > ~~~
-  >
+  > 
   > 

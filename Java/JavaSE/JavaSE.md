@@ -1836,7 +1836,7 @@
   >   *使用static修饰的ThreadLocal不适用于弱引用机制收回线程变量。必须显式remove操作*
   
 
-#### **单元测试**
+#### **基准测试**
 
 > - **Junit 单元测试框架**
 >
@@ -1861,6 +1861,12 @@
 >   > @Nested
 >   >
 >   > @Tag
+>
+> **[JMH](https://openjdk.org/projects/code-tools/jmh/)**
+>
+> > 
+>
+> 
 
   
 
