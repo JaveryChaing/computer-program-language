@@ -224,17 +224,16 @@
 >  - **索引类型**
 >
 >    1. 唯一索引
->   2. 多列索引
->    3. 主键
->    4. 函数索引（将函数计算结果构造索引）
->    5. 条件索引（约束字段指定范围构成索引）
-> 
+>    1. 多列索引
+>       3. 主键
+>       4. 函数索引（将函数计算结果构造索引）
+>       5. 条件索引（约束字段指定范围构成索引）
 > - 用户与权限管理
->
->   - 权限：crud，truncate，trigger，create，connect，temp，execute，usage
->
->     ~~~postgresql
->    -- 创建用户
+> 
+>  - 权限：crud，truncate，trigger，create，connect，temp，execute，usage
+> 
+>    ~~~postgresql
+>      -- 创建用户
 >     create user user_name with login;
 >     -- 修改密码
 >     alter user user_name with password '';
