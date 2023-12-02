@@ -12,11 +12,11 @@
 >    -- listen_addresses = '*'
 >   vim pg_hba.conf
 >    -- host all all 0.0.0.0/0 scram-sha-256
->   
+>
 >   # 连接数据库
 >   su postgres
 >   psql -h <ip> -p <port> -U <user> -d <database>
->   
+>
 >   # 切换数据库
 >   \c initdb
 >   # 切换schema(表空间)
@@ -58,85 +58,75 @@
 >   -- 解除分区
 >   alter table t_main detach partition on  t_partiion;
 >   
->   
->   
->   
 >   -- 继承表 （只继承字段,不继承主键，唯一约束和数据）
 >   create table t_name(column) inherits(parent_t_name);
->   
 >   -- 单查询父表( only限制只操作父表，不使用only则会查询所有子表所有数据union) 
 >   select * from only parent_t_name ;
->   
 >   --解除继承关系
 >   alter table sub_table no inherit parent_table;
->   
->   
->   
 >   -- check 约束，约束字段范围
->     check(field_name > 'value' | field_name_2)
->   
+>   check(field_name > 'value' | field_name_2)
 >   -- 非空约束 NOT NULL。 唯一约束 UNIQUE， 主键约束 PARIMAEY KEY，默认约束 DEFAULT
 >   
->     -- 创建自增序列
+>   -- 创建自增序列
 >   create sequence seq_name start with 1 increment by 1 no minvalue no maxvalue cache 1;
->   
 >   -- 查看seq
 >   select nextval('seq_name');
->   ~~~
+>   
+>   
 >
 > - 数据类型及其运算符
 >
 >   ~~~postgresql
->  -- 整数
+>   -- 整数
 >   smallint/integer/bigint
->  -- 浮点数
+>   -- 浮点数
 >   numeric/decimal 
->
 >   --字符类型
 >   char(n)/varchar(n)/text
 >   -- 支持的运算符
->     ||：字符拼接， like  similar to  ～ ：模糊查询
->
+>   ||：字符拼接， like  similar to  ～ ：模糊查询
+>   
 >   -- 时间类型 支持基本的算术运算符
 >   timestamp/date/time/interval
->
->     -- 布尔类型  true/false/unkonw
+>   
+>   -- 布尔类型  true/false/unkonw
 >   boolean
->
->     -- 枚举
+>   
+>   -- 枚举
 >   create type week as enum('value');
->
->     -- 几何类型
+>   
+>   -- 几何类型
 >   point/line/lseg/box/path/polygon/circle
 >   -- line/lesg '{A,B,C}' line '(x,y)(x,y)'
->
+>   
 >   -- JSON数据类型
 >   json/jsonb(支持索引)
 >   select '{"key":"value"}'::jsonb;
->     -- 支持的运算符
+>   -- 支持的运算符
 >   json->'key | index ' -- 获取json下标为index 或key的元素
 >   json ->> ''          -- 输出为text 或 int
 >   json #> '{}'         -- 嵌套读取json 
 >   json #>> '{}'				 -- 嵌套读取json,输出为文本
->
+>   
 >   jsonb ? 'key'        -- key是否存在最外层json中
 >   jsonb ?| array['key']  -- key是否存在最外层json中
 >   jsonb || jsonb        -- 合并两个json
->     jsonb - ''            -- 删除指定的key
->
+>   jsonb - ''            -- 删除指定的key
+>   
 >   --范围数据类型
 >   int8range/numberange/tsrange/daterange
 >   --范围值输入 '[start,end]' / '(start,end)'
->     --支持的运算符 
+>   --支持的运算符 
 >   --  @> 包含 <@ 被包含
 >   --  -|- 是否相邻
 >   --  && 是否重叠
 >   --  + * - 并交差
->
+>   
 >   -- 数组类型,支持切片访问
 >   array['value'] / '{"str","str2"}'
 >   --支持的运算符
->     -- || 拼接数组
+>   -- || 拼接数组
 >   ~~~
 >
 > - 常用函数
@@ -207,8 +197,6 @@
 >   -- 刷新物化视图
 >   refresh materialized view view_name;
 >   
->   
->   
 >   -- 服务器上执行
 >   -- copy 标准文件于表数据传输指令
 >   -- 将查询结果或表输出到文件，使用""间隔
@@ -252,7 +240,6 @@
 >     create user user_name with login;
 >     -- 修改密码
 >     alter user user_name with password '';
->     
->     ~~~
+> ~~~
 >
->     
+> 
