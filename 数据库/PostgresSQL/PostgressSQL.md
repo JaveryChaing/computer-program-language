@@ -96,11 +96,11 @@
 >     create type week as enum('value');
 >   
 >   -- 几何类型
->     point/line/lseg/box/path/polygon/circle
+>   point/line/lseg/box/path/polygon/circle
 >   -- line/lesg '{A,B,C}' line '(x,y)(x,y)'
 >   
 >   -- JSON数据类型
->     json/jsonb(支持索引)
+>   json/jsonb(支持索引)
 >   select '{"key":"value"}'::jsonb;
 >   -- 支持的运算符
 >   json->'key | index ' -- 获取json下标为index 或key的元素
@@ -114,7 +114,7 @@
 >   jsonb - ''            -- 删除指定的key
 >   
 >   --范围数据类型
->     int8range/numberange/tsrange/daterange
+>   int8range/numberange/tsrange/daterange
 >   --范围值输入 '[start,end]' / '(start,end)'
 >   --支持的运算符 
 >   --  @> 包含 <@ 被包含
@@ -123,7 +123,7 @@
 >   --  + * - 并交差
 >   
 >   -- 数组类型,支持切片访问
->     array['value'] / '{"str","str2"}'
+>   array['value'] / '{"str","str2"}'
 >   --支持的运算符
 >   -- || 拼接数组
 >   ~~~
@@ -149,15 +149,15 @@
 >   select current_user();
 >   
 >   --返回当前session信息
->    -- inet_client_addr()   //返回本机ip
+>   -- inet_client_addr()   //返回本机ip
 >   -- inet_client_port()
 >   -- inet_server_addr()  inet_server_port()
 >   
 >   -- 返回当前session连接pid
->    pg_backend_pid()
+>   pg_backend_pid()
 >   
 >   -- 返回数据库配置
->    select current_setting('key')
+>   select current_setting('key')
 >   
 >   ~~~
 >
@@ -168,7 +168,7 @@
 >   select distinct on (field_name,field_name_2);
 >   
 >   -- like 别名（操作符）
->     ~~ 等效 like
+>   ~~ 等效 like
 >   -- ilike 不区分大小写
 >   ~~* 等效 ilike
 >   
