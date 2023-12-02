@@ -235,8 +235,20 @@
 >   - 权限：crud，truncate，trigger，create，connect，temp，execute，usage
 >
 >      ~~~postgresql
->        -- 创建用户
->       create user user_name with login;
->       -- 修改密码
->       alter user user_name with password '';
+>      -- 创建用户
+>      create user user_name with login;
+>      -- 修改密码
+>      alter user user_name with password '';
 >      ~~~
+
+#### **备份与恢复**
+
+> pg_dump/pg_restore：将数据库所有对象输入输出为sql或归档文件
+>
+> pg_basebackup：将数据库实例进行备份
+>
+> 
+
+#### **服务器配置参数**
+
+> 
