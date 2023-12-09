@@ -142,7 +142,7 @@
       1. normal：默认内容取消空格
       2. pre：显示空格
   
-  -  **字体样式**
+  - **字体样式**
   
     - font-family：使用系统库文字字体
   
@@ -152,7 +152,7 @@
   
     - font-size：字体大小（默认分内7级，对应small，medium，large）
   
-  -  **div盒子模型**
+  - **div盒子模型**
   
     - <img src="assets/image-20231209221735368.png" alt="image-20231209221735368" style="zoom: 67%;" /> 
   
@@ -164,4 +164,167 @@
   
     - margin：与其他盒子的间距
   
+  - 其他样式
+  
+    - outline：选中轮廓
+  
+    - color
+  
+    - backgroud：背景颜色（覆盖元素，内边距）
+  
+      1. color：背景颜色
+  
+      2. image：指定图片作为背景
+  
+      3. repeage：背景重复
+  
+      4. position：背景定位
+  
+      5. clip：背景剪切（指定背景覆盖范围）
+  
+    - **box-sizing：指定元素宽，高计算位置（默认width，height不包含padding长度）**
+  
+      1. content-box
+      2. padding-box
+      3. border-box
+  
+    - **overflow：内容溢出处理**（容器高度自动不需要添加overflow属性）
+  
+      1. visible：溢出显示
+      2. hidden：隐藏溢出部分
+      3. scroll：添加滚动条
+      4. auto：
+  
+    - **display：**元素显示方式
+  
+      1. none：隐藏对应元素（不占据空间）
+      2. block：块级元素（占据一行）
+      3. inline：行内元素（宽度由内容决定）
+      4. inline-block：通常使用width，height限制大小
+  
+    - **position：定位元素（非static属性都会覆盖其他元素内容）**
+  
+      1. static：以左上角位置进行静态定位（浏览器默认排版）
+  
+      2. relative：相对定位（相对于原位置，使用top，left进行内容偏移）
+  
+      3. absolute：绝对定位（父级元素以左上角为位置，使用top,left进行偏移）
+  
+         - 通常使用relative作为父级元素，absolute作为子级元素在父级元素内部任意位置进行定位
+         
+      4. fixed：浮动元素（覆盖），不会随页面进行移动
+  
+      5. sticky：同上，元素超出范围时浮动
+  
+      6. 元素层叠顺序
+  
+         - 非静态定位层级高于静态定位
+         
+         - 非静态定位会覆盖先出现的层级
+         
+         - z-index：手动调整层级 
+  
+    - **float：**浮动，让元素脱离父级元素控制（在内部单独构件一个block，其他元素会占位）
+  
+      1. left/right：浮动向左，向右排列
+      2. 多个浮动元素不会覆盖（会覆盖原其他非浮动的元素)
+  
+    - **属性特殊值**
+  
+      1. initial：默认值（不继承上级元素值）
+  
+      2. unset：默认先使用继承值，无继承使用默认值
+  
+      3. url：引用其他资源
+  
+      4. 百分比：对比父级元素的百分比
+  
+      5. 单位
+  
+         - px：像素
+  
+         - pt/pc/in/cm/mm：点（用于印刷）
+  
+         - em/ex：相对当前字体缩放
+  
+         - rem：相对与根元素缩放
+  
+         - vw/vh：窗口宽高度的1%（动态变换）
+  
+         - calc()：动态计算
+  
+      6. 颜色属性值
+  
+         - transparent：透明度
+  
+         - rgb()：三元色占比
+  
+         - `#0x`：16进制颜色
+  
+         - hsl()
+  
+    - 响应式布局：指定相应条件
+  
+      1. @media (max-width:450px) {} // 视窗小于450采用的样式
+  
+    - **弹性布局**：将display属性设置flex，inline-fex等（弹性容器中float，clear,vertical-align属性失效）
+  
+      1. <img src="assets/image-20231210011654639.png" alt="image-20231210011654639" style="zoom:80%;" /> 
+  
+      2. Main Axis：主轴，默认从左到右排列
+  
+      3. Cross Axis：交叉轴，默认从上到下排列
+  
+      4. **flex属性**
+  
+         - flex-direction：控制主轴方向（row,row-reverse，column，column-reverse)
+  
+         - flex-wrap：子元素超出父容器时是否换行
+  
+           1. nowrap：默认不换行，压缩所有子元素
+           2. wrap：换行
+  
+         - justify-content：Main Axis上子元素对齐方式
+  
+         - align-items：Crpss Axos上子元素对齐方式
+  
+         - align-content：行对齐方式
+  
+         - align-self：列对齐方式
+  
+         - flex-grow：填充剩余的空间（拉升子元素铺满剩余空间）
+  
+         - flex-shrink：压缩子元素铺满容器
+  
+         - flex-basic：同min-width，分配智能子元素大小
       
+    - **网格布局：**  将display属性设置grid，inline-grid等（网格容器子作用子元素）
+    
+      1. <img src="assets/image-20231210014553086.png" alt="image-20231210014553086" style="zoom:80%;" /> <img src="assets/image-20231210014603638.png" alt="image-20231210014603638" style="zoom: 67%;" /> 
+    
+      2. **grid元素属性**
+    
+         - grid-template-rows/grid-template-columns：定义子元素长宽
+    
+           1. repate(auto-fill,30px)：定义每个元素30px填充
+           2. 50px 1fr：行列占用大小
+           3. max-contenx：以内容最多的元素为准
+           4. minmax()：设置元素范围
+    
+         - grid-row/column-gap：设置行列间距
+    
+         - grid-row/column-start：设置元素位置
+    
+         - grid-row-end：设置元素结束位置（合并单元格）
+    
+           
+  
+  
+  
+  ​         
+  
+  ​         
+  
+  ​    
+  
+  ​    
