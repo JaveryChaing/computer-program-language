@@ -288,7 +288,7 @@
            - flex-grow：与其他元素放大比例
            - flex-basis：限制元素大小（优先级比width/height高）
            - flex：复合属性 grow，shrink，basic缩写
-      
+    
     - **网格布局：**display:grid/inline-grid（float`、inline-block`、` table-cell`、vertical-align失效）
     
       1. <img src="assets/image-20231210014553086.png" alt="image-20231210014553086" style="zoom:80%;" /> <img src="assets/image-20231210014603638.png" alt="image-20231210014603638" style="zoom: 67%;" /> 
@@ -309,45 +309,67 @@
          - grid-gap：设置单元格间隔
     
          - grid-template-areas：定义单元格名称
-      
+    
            1. `a b c` : `.` 表示跳过当前位置单元格
-      
+    
               `d . f`
-      
+    
               `g h i`
-      
+    
          - **grid-auto-flow：单元格排列顺序**
-      
+    
            1. row
            2. column
            3. row | column dense：行列优先填满
-      
+    
          - justify-item：grid容器中**单元格内容**水平对齐位置
-      
+    
          - align-item：grid容器中**单元格内容**垂直对齐位置
-      
+    
          - place-item：<align-items> <justify-items>;
-      
+    
          - place-content：<align-content> <justify-content> 设置单元格对齐方式
-      
+    
          - **grid子元素属性**
-      
+    
            - grid-colum/row：子元素占用单元格空间（网格线进行定位），
-      
+    
            - grid-area：子元素占用指定名称单元格
-      
+    
            - place-self：同place-items，单元格内容对齐
+    
+    - **CSS动画**
+    
+      1. transform：用于转换元素形状、大小和位置
+    
+         - translate()：平移
+         - rotate()：旋转
+         - scale()：放大缩小
+         - skew()：倾斜
       
-             
+      2. transition：过渡效果
+      
+         - transition：opactity  1s：1s后过渡设置opactity属性，通常与伪类使用
+      
+      3. animation：动画选择器
+      
+         - name
+      
+         - duration：指定时间内加载
+      
+         - delay：加载前延迟
+      
+         - iteration-count：播放次数
+      
+         - direction：反方向播放（normal，alternate，reverse）
+      
+      4. @keyframs：动画中关键帧
+      
+         - from - to： 通常与transition使用，显示0到100的样式
       
            
-  
-  
-  
-  ​         
-  
-  ​         
-  
-  ​    
-  
-  ​    
+      
+         ​     
+
+
+​      
