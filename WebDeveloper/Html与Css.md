@@ -166,37 +166,39 @@
   
   - 其他样式
   
-    - outline：选中轮廓
+    - outline：显示容器轮廓，不占据空间
   
-    - color
-  
-    - backgroud：背景颜色（覆盖元素，内边距）
+    - **backgroud：背景颜色（覆盖元素，内边距）**
   
       1. color：背景颜色
-  
-      2. image：指定图片作为背景
-  
-      3. repeage：背景重复
-  
-      4. position：背景定位
-  
-      5. clip：背景剪切（指定背景覆盖范围）
+      2. repeage：背景重复
+      3. position：背景定位（top，right，bottom，left，center）
+      4. attachment：背景图片是否固定（scroll：不固定，fixed：固定）
+      5. blend-mode：图片与背景颜色混合模式（多个图片混合展示）
+      6. origin：背景图片定位参考系（padding-box，border-box，content-box）
+      7. clip：背景剪切（背景图片溢出剪切位置）
+      8. size：背景图片占据元素大小（cover 拉伸覆盖，contain等比缩放，自适应背景区）
+      9. image：指定图片作为背景
+      10. clip-path：指定背景显示的形状 circle(40px at center)，elipse，inset(20%,0,round 0 20%)，使用polygon进行绘图
+      11. 背景图片与img标签对比
+          - 背景图片不占用content内容部分
+          - 背景图片超出元素不会展示
   
     - **box-sizing：指定元素宽，高计算位置（默认width，height不包含padding长度）**
-  
+    
       1. content-box
       2. padding-box
       3. border-box
   
     - **overflow：内容溢出处理**（容器高度自动不需要添加overflow属性）
-  
+    
       1. visible：溢出显示
       2. hidden：隐藏溢出部分
       3. scroll：添加滚动条
       4. auto：
   
     - **display：**元素显示方式
-  
+    
       1. none：隐藏对应元素（不占据空间）
       2. block：块级元素（占据一行）
       3. inline：行内元素（宽度由内容决定）
@@ -209,7 +211,7 @@
       2. relative：相对定位（相对于原位置，使用top，left进行内容偏移）
   
       3. absolute：绝对定位（父级元素以左上角为位置，使用top,left进行偏移）
-  
+    
          - 通常使用relative作为父级元素，absolute作为子级元素在父级元素内部任意位置进行定位
          
       4. fixed：浮动元素（覆盖），不会随页面进行移动
@@ -217,7 +219,7 @@
       5. sticky：同上，元素超出范围时浮动
   
       6. 元素层叠顺序
-  
+    
          - 非静态定位层级高于静态定位
          
          - 非静态定位会覆盖先出现的层级
@@ -225,7 +227,7 @@
          - z-index：手动调整层级 
   
     - **float：**浮动，让元素脱离父级元素控制（在内部单独构件一个block，其他元素会占位）
-  
+    
       1. left/right：浮动向左，向右排列
       2. 多个浮动元素不会覆盖（会覆盖原其他非浮动的元素)
   
@@ -267,56 +269,77 @@
   
       1. @media (max-width:450px) {} // 视窗小于450采用的样式
   
-    - **弹性布局**：将display属性设置flex，inline-fex等（弹性容器中float，clear,vertical-align属性失效）
+    - **弹性布局**：（display:flex/inline-flex，弹性容器中float,clear,vertical-align属性失效）
   
       1. <img src="assets/image-20231210011654639.png" alt="image-20231210011654639" style="zoom:80%;" /> 
-  
       2. Main Axis：主轴，默认从左到右排列
-  
       3. Cross Axis：交叉轴，默认从上到下排列
-  
-      4. **flex属性**
-  
-         - flex-direction：控制主轴方向（row,row-reverse，column，column-reverse)
-  
-         - flex-wrap：子元素超出父容器时是否换行
-  
-           1. nowrap：默认不换行，压缩所有子元素
-           2. wrap：换行
-  
-         - justify-content：Main Axis上子元素对齐方式
-  
-         - align-items：Crpss Axos上子元素对齐方式
-  
-         - align-content：行对齐方式
-  
-         - align-self：列对齐方式
-  
-         - flex-grow：填充剩余的空间（拉升子元素铺满剩余空间）
-  
-         - flex-shrink：压缩子元素铺满容器
-  
-         - flex-basic：同min-width，分配智能子元素大小
+      4. **flex容器元素**
+         - flex-direaction：row|column（元素排列顺序）
+         - justify-content：元素主轴方向对齐方式（左右）
+         - align-items：单行元素交叉轴对齐方向（上下）
+         - align-content：多行元素在交叉轴上对齐方式（上下）
+         - flex-wrap：nowrap｜wrap｜wrap-reverse 行/列元素超出换行
+         - flex-flow：direaction与wrap复合属性
+         - flex子元素属性
+           - align-self：覆盖align-items属性
+           - order：控制元素排序
+           - flex-shrink：与其他元素缩小比例
+           - flex-grow：与其他元素放大比例
+           - flex-basis：限制元素大小（优先级比width/height高）
+           - flex：复合属性 grow，shrink，basic缩写
       
-    - **网格布局：**  将display属性设置grid，inline-grid等（网格容器子作用子元素）
+    - **网格布局：**display:grid/inline-grid（float`、inline-block`、` table-cell`、vertical-align失效）
     
       1. <img src="assets/image-20231210014553086.png" alt="image-20231210014553086" style="zoom:80%;" /> <img src="assets/image-20231210014603638.png" alt="image-20231210014603638" style="zoom: 67%;" /> 
     
-      2. **grid元素属性**
+      2. **grid容器元素属性**
     
-         - grid-template-rows/grid-template-columns：定义子元素长宽
+         - grid-template-rows/columns：定义单元长宽
     
-           1. repate(auto-fill,30px)：定义每个元素30px填充
-           2. 50px 1fr：行列占用大小
-           3. max-contenx：以内容最多的元素为准
-           4. minmax()：设置元素范围
+           1. repeat(3,33.33%)：重复次数，
+           1. repeat(auto-fill,100px)：根据容器自动填充
+           1. 1fr 2fr：等比例单元格
+           1. minmax()：范围内动态变化
+           1. auto：浏览器自动扩展
+           1. [c1] 100px：定义网格线名c1
     
-         - grid-row/column-gap：设置行列间距
+         - grid-auto-rows/columns：定义额外空间的长宽
     
-         - grid-row/column-start：设置元素位置
+         - grid-gap：设置单元格间隔
     
-         - grid-row-end：设置元素结束位置（合并单元格）
-    
+         - grid-template-areas：定义单元格名称
+      
+           1. `a b c` : `.` 表示跳过当前位置单元格
+      
+              `d . f`
+      
+              `g h i`
+      
+         - **grid-auto-flow：单元格排列顺序**
+      
+           1. row
+           2. column
+           3. row | column dense：行列优先填满
+      
+         - justify-item：grid容器中**单元格内容**水平对齐位置
+      
+         - align-item：grid容器中**单元格内容**垂直对齐位置
+      
+         - place-item：<align-items> <justify-items>;
+      
+         - place-content：<align-content> <justify-content> 设置单元格对齐方式
+      
+         - **grid子元素属性**
+      
+           - grid-colum/row：子元素占用单元格空间（网格线进行定位），
+      
+           - grid-area：子元素占用指定名称单元格
+      
+           - place-self：同place-items，单元格内容对齐
+      
+             
+      
            
   
   
