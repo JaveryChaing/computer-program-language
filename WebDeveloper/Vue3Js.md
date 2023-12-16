@@ -43,7 +43,7 @@
 >
 >   7. toRaw/makeRaw：将响应式参数转为普通参数
 > - **Vue特殊函数**
->   
+>
 >   1. computed：计算衍生值，定义函数返回计算后的变量（当原变量变动时进行计算）
 >   2. watch：响应式变量状态发生变化时触发回调函数
 >   3. watchEffect：同watch，响应式变量定义时回触发一次
@@ -53,9 +53,7 @@
 >      - mounted：用户页面DOM已渲染完成，this.$nextTick确保所有节点都渲染完成
 >      - updated：DOM修改触发执行（data数据更改触发）
 >      - activated/deactivated：与keep-alive使用，缓存当前页面状态
->      
->      
->   
+>
 > - **组件方法，参数传递**
 >
 >   1. props：父组件向子组件单向传递数据
@@ -91,6 +89,17 @@
 > - beforeRouteEnter/Update/Leave：路由钩子函数
 >
 > - 嵌套路由/同级路由：嵌套路由必须到子路由才显示页面，同级路由需要存在多个router-view
+>
+> **Vue transition动画**
+>
+> - 动画运行事件
+>
+>   1. enter-from-class
+>   2. enter-active-class
+>   3. enter-to-class
+>   4. leave-from-class
+>   5. leave-active-class
+>   6. leave-to-class
 >
 >   
 
