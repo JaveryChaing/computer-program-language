@@ -35,8 +35,9 @@
   >   4. **established：建立TCP连接（双方正在通信）**
   >   5. fin_wait/fin：tcp释放连接
   >
-  > top/lsof/netstat/tcpdump/free：查询当前系统资源使用
+  > top/vmstat/ldd/lsof/netstat/tcpdump/free：查询当前系统资源使用
   >
+  > - top -d  1: 刷新频率
   > - losf -p：显示当前进程打开的文件
   > - losf -u ：指定用户打开的文件
   > - losf /path ：当前文件使用的进程
@@ -135,12 +136,6 @@
   
 
    
-
-- export  设置或显示环境遍历
-
-  > export [-fn] [变量名称="变量值"]
-  >
-  > ![image-20220530165607367](img\image-20220530165607367.png) 
 
    
 
