@@ -45,6 +45,34 @@
   > - netstat -ntlp：查看所有tcp端口
   > - netstat -antp：查看所有已经建立的tcp连接
 
+- 网络配置
+
+  > 网卡配置文件：
+  >
+  > - /etc/sysconfig/network 
+  > -  /etc/sysconfig/network-scripts
+  > - /etc/hosts ，/etc/host.conf
+  > - /etc/services：服务名与端口映射关系
+  >
+  > ifconfig：查看网卡信息
+  >
+  > route：路由配置
+  >
+  > arp：查看和修改Linux系统的ARP缓存
+  >
+  > telnet
+  >
+  > ping
+  >
+  > - -b：测试广播地址
+  > - -c：执行次数
+  > - -t：指定ttl次数
+  >
+  > traceroute：连通性测试
+  >
+  > - -g：设置路由网关
+  > - -m：设置最大ttl次数
+  
 - service服务管理
 
   > - chkconfig：管理系统服务的启动和停止
@@ -139,17 +167,57 @@
   >
   > file 判断文件类型
   > 
-  > df：磁盘挂载情况
-  > 
-  >du：显示目录或文件大小
-  > 
-  >tar：文件归档与压缩
+  > tar：文件归档与压缩
   > 
   >- tar -czvf：将文件打包并压缩
   > 
   >- tar -zxvf  -C path：将压缩包解压到指定目录
   > 
-  >  
+  
+- 磁盘管理
+  
+  > swap：磁盘与内存交换区
+  >
+  > MS-DOS：DOS文件系统
+  >
+  > NFS：网络文件系统
+  >
+  > ISO 9660：CD-ROM文件系统
+  >
+  > mount：磁盘挂载
+  >
+  > umount：磁盘卸载
+  >
+  > blkid：查看设备
+  >
+  > fdisk：磁盘分区
+  >
+  > mkfs：格式化磁盘
+  >
+  > df：查看挂载点及使用情况
+  >
+  > du：查看文件占用情况
+  >
+  > dump：系统备份
+  >
+  > restore：系统还原
+  
+- 软件包管理
+  
+  > rpm：包管理器
+  >
+  > - rpm -ivh ：软件包安装
+  > - rpm -e ：软件卸载
+  > - rpm -U：软件升级
+  > - rpm -qa：查询已安装软件
+  > - rpm -qR：查询包依赖关系
+  >
+  > yum/apt：在线包管理器
+  >
+  > - /etc/yum.conf：配置文件
+  > - rpm --import GPG key：软件包校验，导入仓库时使用
+  
+  
   
   
   
