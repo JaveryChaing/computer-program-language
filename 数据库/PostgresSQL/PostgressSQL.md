@@ -24,6 +24,8 @@
 >   \du # 查看用户
 >   \dS # 查看表分区情况
 >   \timing # 开启查询时间
+>   \l # 查看数据库
+>   
 >   ```
 >
 > - 数据库操作
@@ -73,33 +75,33 @@
 >     --解除继承关系
 >     alter table sub_table no inherit parent_table;
 >   ```
->   
+>
 > - 数据类型及运算符
 >
 >     ```postgresql
 >     -- 整数
 >     smallint/integer/bigint
->   
+>     
 >     -- 浮点数
 >     numeric/decimal 
 >     --字符类型
 >     char(n)/varchar(n)/text
 >     -- 支持的运算符
 >     ||：字符拼接， like  similar to  ～ ：模糊查询
->   
+>     
 >     -- 时间类型 支持基本的算术运算符
 >       timestamp/date/time/interval
->   
+>     
 >     -- 布尔类型  true/false/unkonw
 >       boolean
->   
+>     
 >     -- 枚举
 >       create type week as enum('value');
->   
+>     
 >     -- 几何类型
 >     point/line/lseg/box/path/polygon/circle
 >     -- line/lesg '{A,B,C}' line '(x,y)(x,y)'
->   
+>     
 >     -- JSON数据类型
 >     json/jsonb(支持索引)
 >     select '{"key":"value"}'::jsonb;
@@ -108,12 +110,12 @@
 >     json ->> ''          -- 输出为text 或 int
 >     json #> '{}'         -- 嵌套读取json 
 >     json #>> '{}'				 -- 嵌套读取json,输出为文本
->   
+>     
 >     jsonb ? 'key'        -- key是否存在最外层json中
 >     jsonb ?| array['key']  -- key是否存在最外层json中
 >     jsonb || jsonb        -- 合并两个json
 >     jsonb - ''            -- 删除指定的key
->   
+>     
 >     --范围数据类型
 >     int8range/numberange/tsrange/daterange
 >     --范围值输入 '[start,end]' / '(start,end)'
@@ -122,7 +124,7 @@
 >     --  -|- 是否相邻
 >     --  && 是否重叠
 >     --  + * - 并交差
->   
+>     
 >     -- 数组类型,支持切片访问
 >     array['value'] / '{"str","str2"}'
 >     --支持的运算符
@@ -135,28 +137,28 @@
 >   -- 格式化字符串输出
 >   -- type: %S:字符串占位， %I:双引号占位 ，%L:SQL占位
 >   format('%[position][flags][with]type')
->
+>   
 >   -- json函数，将任意类型数据转为jsonb
 >    to_jsonb(anyelement)
->
+>   
 >   -- 数组转json
 >    array_to_json()/row_to_json()
->
+>   
 >   -- 返回当前数据库名称
 >    select current_catalog; / select current_database();
->
+>   
 >   --返回当前schema（表空间）
 >    select current_schema();
 >   select current_user();
->
+>   
 >   --返回当前session信息
 >   -- inet_client_addr()   //返回本机ip
 >   -- inet_client_port()
 >   -- inet_server_addr()  inet_server_port()
->
+>   
 >   -- 返回当前session连接pid
 >   pg_backend_pid()
->
+>   
 >   -- 返回数据库配置
 >   select current_setting('key')
 >   ```
@@ -166,27 +168,27 @@
 >   ```postgresql
 >    --任意表达式去重（类似于group by，返回每组第一行）
 >   select distinct on (field_name,field_name_2);
->
+>   
 >   -- like 别名（操作符）
 >   ~~ 等效 like
 >   -- ilike 不区分大小写
 >   ~~* 等效 ilike
->
+>   
 >   -- with : 临时表，用于复杂查询和递归查询
 >     with recursive T(field_name) as (query_sql)
 >   select * from T1 where T.field_name = T1.field_name
->
+>   
 >   -- 归并数据 replace 语法
 >     on conflict do nothing  -- 不采取任何操作，忽略该行
 >   on conflict do update   -- 采取更新操作
 >   insert into (...value) on conflict(field_name) do update set field_name = 'value'
->
+>   
 >   -- 关联update语句 (在update语句中构造更改数据的临时表)
 >     update T set column = update_column from (values ('update_value'),('update_value')) as T2(colum) where T.colum = T2.colum
->
+>   
 >   -- 批量删除(同上)
 >     delete from T using (values)
->
+>   
 >   -- 视图
 >     create view view_name as query_sql;
 >   -- 临时视图
@@ -195,7 +197,7 @@
 >   create materialized view view_name as query_sql;
 >   -- 刷新物化视图
 >   refresh materialized view view_name;
->
+>   
 >   -- 服务器上执行
 >     -- copy 标准文件于表数据传输指令
 >   -- 将查询结果或表输出到文件，使用""间隔
@@ -204,10 +206,10 @@
 >   copy [(query_sql) | table]  to '/path/file' with csv;
 >   -- 输出到控制台
 >   copy table to stdout (delimiter,',')
->
+>   
 >   -- 导入命令 t1为临时表
 >   copy t1(...column) from '/tmp/file' with csv header encoding 'GBK';
->
+>   
 >   -- 查看事务隔离级别
 >   show transaction_isolation;
 >   -- 更改事务级别
@@ -259,6 +261,22 @@
 
 #### **数据库运维**
 
+> - 服务端命令
+>
+>   1. clusterdb：基于堆表的物理文件重新排序，以使数据存储在物理上相邻的位置，节约磁盘访问次数，加快查询
+> 2. reindexdb：对数据库或表重新生成索引
+>   3. vacuumed：清除数据库中无用的物理文件
+>
+> - 数据库配置
+>
+>   1. pg_hba.conf：数据库实例防火墙配置
+>
+>      ![image-20240324154300918](./assets/image-20240324154300918.png) 
+>
+>   2. postgresql.conf：数据库配置文件
+>
+>       [postgresql.conf](./assets/postgresql.conf) 
+>   
 > - 备份与恢复
 >
 >   pg_dump/pg_restore：将数据库所有对象输入输出为sql或归档文件
@@ -300,5 +318,5 @@
 >   select * from pg_stat_database;
 >   ```
 >
->   
+> 
 
