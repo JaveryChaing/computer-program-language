@@ -176,27 +176,27 @@
   >   LDFLAGS =                # 链接选项（如有需要）
   >   OBJ = main.o utils.o     # 目标文件
   >   EXEC = my_program        # 生成的可执行文件名
-  >   
+  >     
   >   # 默认目标
   >   all: $(EXEC)
-  >   
+  >     
   >   # 生成可执行文件
   >   $(EXEC): $(OBJ)
   >   	$(CC) $(LDFLAGS) -o $@ $(OBJ)
   >   # 文件推导
   >   VPATH=<dir>:<dir>
-  >   
+  >     
   >   # 生成目标文件
   >   main.o: main.c utils.h
   >   	$(CC) $(CFLAGS) -c main.c
-  >   
+  >     
   >   utils.o: utils.c utils.h
   >   	$(CC) $(CFLAGS) -c utils.c
-  >   
+  >     
   >   # 清理生成文件
   >   clean:
   >   	rm -f $(OBJ) $(EXEC)
-  >   
+  >     
   >   # 伪目标
   >   .PHONY: all clean
   >   ~~~
@@ -208,6 +208,42 @@
 - Linux 嵌入式应用
 
   > sqlite3 , boa, Mongoose
+
+- **Linux硬件接口**
+
+  > GPIO
+  >
+  > PWM
+  >
+  > UART
+  >
+  > RS-485
+  >
+  > I2C
+  >
+  > SPI
+  >
+  > ADC/DAC
+  >
+  > eMMC
+  >
+  > SD/MMC
+  >
+  > PCI/PCie
+  >
+  > USB
+  >
+  > SATA
+  >
+  > NVMe
+  >
+  > HDMI
+  >
+  > VGA
+  >
+  > DisplayPort
+  >
+  > Audio
 
 - **Linux驱动**
 
