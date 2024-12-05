@@ -2,7 +2,7 @@
 
 > #### 概念
 >
-> - RTOS：实时操作系统，能够在特定的时间范围内保证响应和执行操作，[VxWorks，HC/OS，eCos，Nucleus，QNX，OSBK](./assets/实时系统概述.md))
+> - RTOS：实时操作系统，能够在特定的时间范围内保证响应和执行操作，[VxWorks，HC/OS，eCos，Nucleus，QNX，OSBK](实时系统概述.md))
 >- Soc：芯片级系统，将一个完整的系统集成在一块芯片上，它通常包含 CPU（处理器核心）、内存（如 RAM、ROM、Flash）、外设接口（如 USB、I2C、SPI、UART）、通信模块（如 Wi-Fi、蓝牙）和其他专用功能模块
 > - MCU：微控器，集成微处理器（CPU）、内存（RAM 和 ROM）、I/O 控制器（GPIO、UART、SPI、I2C 等）和定时器的单芯片微型计算机。MCU 通常用来执行简单的控制任务
 >- MPU：MPU 是一种只包含中央处理器（CPU）的处理单元，不包括 RAM、ROM 或外设接口。MPU 需要配合外部存储器和外设工作，因此它更适合复杂的应用
