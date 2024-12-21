@@ -325,3 +325,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+.idea/setting.xml
+.idea/misc.xml
+.idea/.gitignore
+.gitignore

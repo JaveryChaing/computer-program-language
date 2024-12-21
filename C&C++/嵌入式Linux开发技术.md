@@ -91,6 +91,37 @@
 >   2. ramfs
 > - 网络文件系统：NFS
 >
+> **Linux模块机制**：允许动态地向运行的内核添加或删除代码，而无需重新编译或重启系统
+>
+> ~~~c
+> #include <linux/module.h>      // 需要的模块头文件
+> #include <linux/kernel.h>      // printk() 函数需要的头文件
+> #include <linux/init.h>        // 用于宏 INIT 和 EXIT
+> 
+> // 模块加载时的函数
+> static int __init hello_init(void)
+> {
+>     printk(KERN_INFO "HelloModule: Module loaded.\n");
+>     return 0; // 成功加载模块
+> }
+> 
+> // 模块卸载时的函数
+> static void __exit hello_exit(void)
+> {
+>     printk(KERN_INFO "HelloModule: Module unloaded.\n");
+> }
+> 
+> // 注册模块的加载和卸载函数
+> module_init(hello_init);    // 模块初始化（加载）函数
+> module_exit(hello_exit);    // 模块卸载函数
+> 
+> // 模块信息
+> MODULE_LICENSE("GPL");       // GPL 开源协议
+> MODULE_AUTHOR("Your Name");  // 作者
+> MODULE_DESCRIPTION("A simple Hello World kernel module."); // 描述
+> 
+> ~~~
+>
 > 
 
 > #### 概念
