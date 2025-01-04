@@ -642,9 +642,23 @@
 >   unsigned long copy_from_user(void *to, const void __user *from, unsigned long n);
 >   ~~~
 >
->   
+> **设备中断处理函数** 
 >
->   1. 
+> - top half：中断立即执行（快速执行），具有较高的优先级
+>
+>   ~~~c
+>   // irq: 中断号
+>   // handler: 中断处理函数指针
+>   // flags: 中断标志，如IRQF_SHARED表示中断可以共享
+>   // name: 中断描述
+>   // dev: 设备指针
+>   // 中断处理函数注册
+>   int request_irq(unsigned int irq, irq_handler_t handler, unsigned long flags, const char *name, void *dev);
+>   ~~~
+>
+> - bottom half：负责完成中断相关的较复杂和耗时的操作。它运行在内核进程上下文中，优先级低于顶半部
+>
+>   
 
 > #### 概念
 >
